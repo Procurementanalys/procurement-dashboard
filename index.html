@@ -465,7 +465,7 @@ const bn=bs==&quot;hpp&quot;?&quot;HPP (Net Sales − GP)&quot;:&quot;Net Sales&
 const un=m.unmatched;
 $(&quot;p-moi&quot;).innerHTML=`&lt;div class=&quot;bc&quot;&gt;Inventory / MOI · SOH: ${esc(APP.soh.file)}&lt;/div&gt;
 &lt;div class=&quot;tb&quot;&gt;${tgl(&quot;tgM&quot;,[[&quot;hpp&quot;,&quot;Basis HPP&quot;],[&quot;net&quot;,&quot;Basis Net Sales&quot;]],bs)}&lt;span class=&quot;n&quot; style=&quot;margin:0&quot;&gt;Sales periode ${esc(m.meta.period_start||&quot;-&quot;)} s/d ${esc(m.meta.period_end||&quot;-&quot;)} (${m.days} hari) → disetarakan ke ${m.dim} hari${m.k!=1?&quot; (×&quot;+F(m.k,2)+&quot;)&quot;:&quot;&quot;}&lt;/span&gt;&lt;/div&gt;
-${un.length?`&lt;div class=&quot;warn&quot;&gt;&lt;b&gt;${I(un.length)} store&lt;/b&gt; di file SOH tidak ditemukan di data Sales (SOH ${RP(sum(un.map(x=&gt;x.val)))}) dan tidak ikut dihitung. Pencocokan lewat kode / nama store — pastikan kolom &lt;code&gt;Store Code&lt;/code&gt; / &lt;code&gt;Store Name&lt;/code&gt; berisi kode atau nama yang sama dengan data Sales.${rows.length?&quot;&quot;:&quot; &lt;b&gt;Tidak ada satu pun yang cocok.&lt;/b&gt;&quot;}&lt;br&gt;Contoh di SOH: ${un.slice(0,3).map(slabel).join(&quot; | &quot;)}&lt;br&gt;Contoh di Sales: ${(m.ss||[]).map(slabel).join(&quot; | &quot;)}&lt;/div&gt;`:&quot;&quot;}
+${un.length?`&lt;div class=&quot;warn&quot;&gt;&lt;b&gt;${I(un.length)} store&lt;/b&gt; di file SOH tidak ditemukan di data Sales (SOH ${RP(sum(un.map(x=&gt;x.val)))}) dan tidak ikut dihitung. ${m.salesN&lt;Math.max(30,un.length/2)?&quot;&lt;b&gt;Data Sales hanya berisi &quot;+I(m.salesN)+&quot; store&lt;/b&gt; — kemungkinan Sales belum di-upload / belum tersimpan di database Sales. &quot;:&quot;&quot;}Pencocokan lewat kode / nama store — pastikan kolom &lt;code&gt;Store Code&lt;/code&gt; / &lt;code&gt;Store Name&lt;/code&gt; berisi kode atau nama yang sama dengan data Sales.${rows.length?&quot;&quot;:&quot; &lt;b&gt;Tidak ada satu pun yang cocok.&lt;/b&gt;&quot;}&lt;br&gt;Contoh di SOH: ${un.slice(0,3).map(slabel).join(&quot; | &quot;)}&lt;br&gt;Contoh di Sales: ${(m.ss||[]).map(slabel).join(&quot; | &quot;)}&lt;/div&gt;`:&quot;&quot;}
 ${kpi([[&quot;b1&quot;,F(m.tot.moi,2)+&quot; bln&quot;,&quot;MOI Total&quot;,&quot;SOH &quot;+RP(m.tot.soh)+&quot; ÷ &quot;+bn+&quot; &quot;+RP(m.tot.base)+&quot;/bln&quot;],[&quot;b4&quot;,I(cnt.Low),&quot;Store Low (&amp;lt; 1,5)&quot;],[&quot;b2&quot;,I(cnt.OK),&quot;Store OK (1,5 – 4)&quot;],[&quot;b3&quot;,I(cnt.Overstock+cnt[&quot;No Sales&quot;]),&quot;Store Overstock (&amp;gt; 4)&quot;,cnt[&quot;No Sales&quot;]?I(cnt[&quot;No Sales&quot;])+&quot; tanpa sales&quot;:&quot;&quot;]])}
 &lt;div class=&quot;g c2&quot;&gt;&lt;div class=&quot;card&quot;&gt;&lt;h2&gt;20 Store dengan MOI Tertinggi&lt;/h2&gt;&lt;div class=&quot;ch&quot; style=&quot;height:440px&quot;&gt;&lt;canvas id=&quot;m1&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;div class=&quot;card&quot;&gt;&lt;h2&gt;Distribusi Status MOI&lt;/h2&gt;&lt;div class=&quot;ch&quot; style=&quot;height:440px&quot;&gt;&lt;canvas id=&quot;m2&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
@@ -1308,7 +1308,20 @@ body{font-family:'Inter','Segoe UI',system-ui,-apple-system,Roboto,sans-serif!im
 // ============================================================
 // KONFIGURASI
 // ============================================================
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyWUYxAeciev2wMTAR9K_cl6hcit3981efNjcT22LYdCdCGWesCrhygO1VWk9Mu_d2U/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzssOmdiskkPNuezKMJ4EgSofAEwomK8a34zKMzqZ5dZbi-YvP2ck-V80plwejeOKQ0sA/exec';
+
+// window.storage hanya ada di artifact Claude. Di browser biasa dibuat versi localStorage
+// supaya cache data Sales/GAS benar-benar tersimpan (cadangan kalau AppScript tidak terjangkau).
+if(!window.storage){
+  window.storage = {
+    async get(k){ const v = localStorage.getItem('alpro_sales_'+k); if(v===null) throw new Error('not found'); return {key:k, value:v}; },
+    async set(k,v){ localStorage.setItem('alpro_sales_'+k, v); return {key:k, value:v}; }
+  };
+}
+// Beri tahu halaman utama (Home / MOI) bahwa data Sales sudah siap / berubah
+function notifyParent(){
+  try{ const a = window.parent &amp;&amp; window.parent!==window ? window.parent.APP : null; if(a &amp;&amp; a.emit) a.emit(); }catch(e){}
+}
 
 const EXCLUDED_OFFICERS = ['ZHAFRAN VIRZALDI YULMAN', 'RUPA LESTY'];
 const EXCLUDED_GROUPS   = ['NON MERCHANDISE'];
@@ -1382,6 +1395,7 @@ async function fetchAppScriptData(){
     }catch(e){}
   }
   render();
+  notifyParent();
 }
 
 function applyGasData(gas){
@@ -1395,6 +1409,30 @@ function applyGasData(gas){
     remainingToTarget: gas.remainingToTarget || 0,
     lastUpdate:        gas.lastUpdate        || '-'
   };
+
+  // Data per store dari sheet SalesStore — supaya tidak kembali ke 10 store bawaan setelah refresh
+  if(Array.isArray(gas.stores) &amp;&amp; gas.stores.length &gt; 0){
+    const gs = gas.stores.map(s =&gt; ({
+      code:  String(s.code == null ? '' : s.code).trim(),
+      name:  String(s.name || '').trim(),
+      sales: Number(s.sales) || 0,
+      qty:   Number(s.qty)   || 0,
+      gp:    Number(s.gp)    || 0,
+      gross: Number(s.gross) || 0
+    })).filter(s =&gt; s.name || s.code).sort((a,b) =&gt; b.sales - a.sales);
+    const tn  = gs.reduce((x,s) =&gt; x + s.sales, 0);
+    const tg  = gs.reduce((x,s) =&gt; x + s.gp, 0);
+    const tq  = gs.reduce((x,s) =&gt; x + s.qty, 0);
+    const tgr = gs.reduce((x,s) =&gt; x + (s.gross || s.sales), 0);
+    DATA.stores = gs;
+    DATA.meta = Object.assign({}, DATA.meta, {
+      period_start: gas.periodStart || DATA.meta.period_start,
+      period_end:   gas.periodEnd   || DATA.meta.period_end,
+      days_elapsed: gas.daysElapsed || DATA.meta.days_elapsed,
+      total_stores: gs.length
+    });
+    DATA.totals = { net_sales: tn, gross_sales: tgr, gp: tg, gp_pct: tn&gt;0 ? tg/tn*100 : 0, qty: tq };
+  }
 
   // Build target map dari officerTargets (sheet TargetOfficer)
   const targetMap = {};
@@ -1681,8 +1719,8 @@ document.getElementById('fileInput').addEventListener('change', async (e)=&gt;{
       }
       // Agregasi store
       const sKey=String(storeName).trim();
-      if(!storeMap[sKey]) storeMap[sKey]={code:store,name:sKey,sales:0,qty:0,gp:0};
-      storeMap[sKey].sales+=ns; storeMap[sKey].qty+=qty; storeMap[sKey].gp+=gp;
+      if(!storeMap[sKey]) storeMap[sKey]={code:store,name:sKey,sales:0,qty:0,gp:0,gross:0};
+      storeMap[sKey].sales+=ns; storeMap[sKey].qty+=qty; storeMap[sKey].gp+=gp; storeMap[sKey].gross+=gs;
     }
 
     const officers = Object.values(offMap).map(o=&gt;({
@@ -1710,6 +1748,7 @@ document.getElementById('fileInput').addEventListener('change', async (e)=&gt;{
     SETTINGS.days = daysElapsed;
     await saveDataset(); await saveSettings();
     render();
+    notifyParent();
 
     // ── PUSH ke Google Sheets — hanya summary by officer (~5-10 baris!) ──
     if(GAS_URL&amp;&amp;!GAS_URL.includes('ISI_URL')&amp;&amp;officers.length&gt;0){
@@ -1728,6 +1767,15 @@ document.getElementById('fileInput').addEventListener('change', async (e)=&gt;{
             net_sales: o.net_sales,
             gp:        o.gp,
             gp_pct:    o.gp_pct
+          })),
+          // Data per store → sheet SalesStore (dipakai MOI &amp; agar tidak hilang saat refresh)
+          stores: stores.map(s=&gt;({
+            code:        s.code,
+            name:        s.name,
+            qty:         s.qty,
+            net_sales:   s.sales,
+            gp:          s.gp,
+            gross_sales: s.gross
           }))
         };
         const res  = await fetch(GAS_URL, {
@@ -1738,7 +1786,7 @@ document.getElementById('fileInput').addEventListener('change', async (e)=&gt;{
         const json = await res.json();
         if(!json.success) throw new Error(json.error||'AppScript error');
         // Ambil summary terbaru dari AppScript (target dll)
-        if(json.summary){ applyGasData(json.summary); render(); }
+        if(json.summary){ applyGasData(json.summary); render(); notifyParent(); }
         showToast(`✅ Selesai! ${officers.length} officer tersimpan ke Sheets &amp; dashboard diperbarui.`);
       }catch(pushErr){
         console.error('Push gagal:',pushErr);
@@ -8540,7 +8588,7 @@ for(const st of d.stores){if(st.apd)continue;const x=find(st);if(!x){un.push(st)
 const sm=(+x.sales||0)*k,base=b=="net"?sm:((+x.sales||0)-(+x.gp||0))*k,moi=base>0?st.val/base:null;
 rows.push({s:st,sale:x,salesM:sm,base,moi});ts+=st.val;if(base>0)tb+=base}
 const key=r=>r.moi==null?1e12:r.moi;rows.sort((a,b)=>key(b)-key(a));
-return{rows,unmatched:un,ss:sl.stores.slice(0,3),k,days,dim,meta:m,tot:{soh:ts,base:tb,moi:tb>0?ts/tb:0}}}};
+return{rows,unmatched:un,salesN:sl.stores.length,ss:sl.stores.slice(0,3),k,days,dim,meta:m,tot:{soh:ts,base:tb,moi:tb>0?ts/tb:0}}}};
 
 
 async function syncSoh(again){APP.loading="Memuat SOH…";APP.loadErr="";setLd();renderHome();
