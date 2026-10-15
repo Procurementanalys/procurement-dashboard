@@ -4103,7 +4103,8 @@
   .hero-brand{display:none!important}
   .container{max-width:1600px!important;margin:0 auto!important}
   body{padding:24px 28px 40px!important}
-  }&lt;/style&gt;&lt;/head&gt;
+  }&lt;/style&gt;  &lt;script src=&quot;https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js&quot;&gt;&lt;/script&gt;
+&lt;/head&gt;
   &lt;body data-theme=&quot;light&quot;&gt;
       &lt;div class=&quot;container&quot;&gt;
           &lt;section class=&quot;hero glass&quot;&gt;
@@ -4218,6 +4219,7 @@
               &lt;/div&gt;
               &lt;div class=&quot;controls-right&quot;&gt;
                   &lt;button class=&quot;btn btn-secondary&quot; onclick=&quot;resetFilters()&quot;&gt;Reset Filter&lt;/button&gt;
+                  &lt;button class=&quot;btn btn-secondary&quot; id=&quot;impOpen&quot; type=&quot;button&quot;&gt;📥 Import Excel&lt;/button&gt;
                   &lt;button class=&quot;btn btn-primary&quot; onclick=&quot;loadDashboard()&quot;&gt;🔄 Refresh Dashboard&lt;/button&gt;
                   &lt;div class=&quot;last-updated&quot; id=&quot;lastUpdated&quot;&gt;Terakhir update: -&lt;/div&gt;
               &lt;/div&gt;
@@ -4412,7 +4414,7 @@
       &lt;/div&gt;
 
       &lt;script&gt;
-          const PROCUREMENT_API_URL = 'https://script.google.com/macros/s/AKfycbymp0rM8EaO7nGVYjdzj-f_6IoFqRMudK78v1sdUJGSfD6-UyFcRiim0PrwGU3_Npqm/exec';
+          const PROCUREMENT_API_URL = 'https://script.google.com/macros/s/AKfycbxlsh0a945pEBmMo7EXworqgWOqhL-2q2VKfUDzQZYD4dlKRDIAF9RRYMWnyoWSsQzi/exec';
 
           let rawTrackingData = [];
           let filteredTrackingData = [];
@@ -5225,7 +5227,294 @@
   .btn-primary{background:#2563eb!important;color:#fff!important;border:0!important}
   .container{max-width:1200px!important}
   .kpi-icon{background:#eef1f6!important}
-  &lt;/style&gt;&lt;/body&gt;
+  &lt;/style&gt;&lt;!-- ===== IMPORT EXCEL (PO_Issued / PO_Received) ===== --&gt;
+&lt;style id=&quot;imp-style&quot;&gt;
+.imp-ov{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;z-index:99999;padding:16px}
+.imp-ov.open{display:flex}
+.imp-box{background:#fff;color:#0f172a;width:min(760px,100%);max-height:92vh;overflow:auto;border-radius:18px;padding:22px 24px;box-shadow:0 24px 60px rgba(0,0,0,.35);font-family:inherit}
+.imp-box h3{margin:0 0 4px;font-size:20px}
+.imp-sub{margin:0 0 14px;color:#64748b;font-size:13px}
+.imp-tabs{display:flex;gap:8px;margin-bottom:12px}
+.imp-tab{flex:1;padding:10px;border-radius:12px;border:1px solid #cbd5e1;background:#f8fafc;color:#0f172a;font-weight:700;cursor:pointer;font-family:inherit}
+.imp-tab.on{background:#2563eb;color:#fff;border-color:#2563eb}
+.imp-cols{font-size:12.5px;background:#f1f5f9;border-radius:10px;padding:10px 12px;margin-bottom:12px;color:#334155}
+.imp-cols code{background:#e2e8f0;border-radius:6px;padding:1px 6px;margin-right:2px;white-space:nowrap}
+.imp-link{background:none;border:0;color:#2563eb;font-weight:700;cursor:pointer;padding:0;font-family:inherit;font-size:12.5px;text-decoration:underline}
+.imp-drop{border:2px dashed #94a3b8;border-radius:14px;padding:22px;text-align:center;cursor:pointer;color:#475569;margin-bottom:12px}
+.imp-drop.over{border-color:#2563eb;background:#eff6ff}
+.imp-drop b{color:#0f172a}
+.imp-mode{display:grid;gap:6px;margin-bottom:12px;font-size:13.5px}
+.imp-mode label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
+.imp-sum{font-size:13.5px;margin-bottom:8px}
+.imp-sum .ok{color:#15803d;font-weight:700}.imp-sum .bad{color:#b91c1c;font-weight:700}
+.imp-tw{overflow:auto;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:8px;max-height:230px}
+.imp-tw table{border-collapse:collapse;width:100%;font-size:12px}
+.imp-tw th,.imp-tw td{padding:6px 8px;border-bottom:1px solid #e2e8f0;text-align:left;white-space:nowrap}
+.imp-tw th{background:#f1f5f9;position:sticky;top:0}
+.imp-tw td.n{text-align:right}
+.imp-err{font-size:12px;color:#b91c1c;margin:0 0 8px;padding-left:18px;max-height:90px;overflow:auto}
+.imp-key{display:none;margin-bottom:10px}
+.imp-key input{width:100%;min-height:40px;border-radius:10px;border:1px solid #cbd5e1;padding:0 12px;font-family:inherit}
+.imp-st{font-size:13px;margin:6px 0 10px;min-height:18px;font-weight:600}
+.imp-st.err{color:#b91c1c}.imp-st.ok{color:#15803d}
+.imp-act{display:flex;gap:10px;justify-content:flex-end}
+.imp-act button{min-height:42px;border-radius:12px;padding:0 18px;font-weight:800;font-family:inherit;cursor:pointer;border:1px solid #cbd5e1;background:#f8fafc;color:#0f172a}
+.imp-act button.pri{background:#2563eb;color:#fff;border-color:#2563eb}
+.imp-act button:disabled{opacity:.45;cursor:not-allowed}
+body[data-theme=&quot;dark&quot;] .imp-box{background:#0f172a;color:#e2e8f0}
+body[data-theme=&quot;dark&quot;] .imp-sub{color:#94a3b8}
+body[data-theme=&quot;dark&quot;] .imp-tab,body[data-theme=&quot;dark&quot;] .imp-act button{background:#1e293b;color:#e2e8f0;border-color:#334155}
+body[data-theme=&quot;dark&quot;] .imp-tab.on,body[data-theme=&quot;dark&quot;] .imp-act button.pri{background:#2563eb;border-color:#2563eb;color:#fff}
+body[data-theme=&quot;dark&quot;] .imp-cols{background:#1e293b;color:#cbd5e1}
+body[data-theme=&quot;dark&quot;] .imp-cols code{background:#334155}
+body[data-theme=&quot;dark&quot;] .imp-drop{border-color:#475569;color:#94a3b8}
+body[data-theme=&quot;dark&quot;] .imp-drop b{color:#e2e8f0}
+body[data-theme=&quot;dark&quot;] .imp-tw,body[data-theme=&quot;dark&quot;] .imp-tw th,body[data-theme=&quot;dark&quot;] .imp-tw td{border-color:#334155}
+body[data-theme=&quot;dark&quot;] .imp-tw th{background:#1e293b}
+body[data-theme=&quot;dark&quot;] .imp-key input{background:#1e293b;color:#e2e8f0;border-color:#334155}
+&lt;/style&gt;
+
+&lt;div class=&quot;imp-ov&quot; id=&quot;impOv&quot;&gt;
+  &lt;div class=&quot;imp-box&quot; role=&quot;dialog&quot; aria-modal=&quot;true&quot; aria-labelledby=&quot;impTitle&quot;&gt;
+    &lt;h3 id=&quot;impTitle&quot;&gt;📥 Import Excel ke Spreadsheet&lt;/h3&gt;
+    &lt;p class=&quot;imp-sub&quot;&gt;Upload file Excel sekali, data langsung masuk ke Google Sheet lalu dashboard otomatis refresh.&lt;/p&gt;
+    &lt;div class=&quot;imp-cols&quot; id=&quot;impCols&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;imp-drop&quot; id=&quot;impDrop&quot;&gt;&lt;b&gt;Klik untuk pilih file&lt;/b&gt; atau drag &amp;amp; drop di sini&lt;br&gt;&lt;small&gt;.xlsx / .xls / .csv&lt;/small&gt;&lt;/div&gt;
+    &lt;input type=&quot;file&quot; id=&quot;impFile&quot; accept=&quot;.xlsx,.xls,.csv&quot; style=&quot;display:none&quot;&gt;
+    &lt;div class=&quot;imp-mode&quot;&gt;
+      &lt;label&gt;&lt;input type=&quot;radio&quot; name=&quot;impMode&quot; value=&quot;replace&quot; checked&gt;&lt;span&gt;&lt;b&gt;Ganti semua data&lt;/b&gt; — isi sheet dihapus &amp;amp; diganti isi file (backup otomatis dibuat, disembunyikan)&lt;/span&gt;&lt;/label&gt;
+      &lt;label&gt;&lt;input type=&quot;radio&quot; name=&quot;impMode&quot; value=&quot;append&quot;&gt;&lt;span&gt;&lt;b&gt;Tambah data baru&lt;/b&gt; — baris yang persis sama dengan yang sudah ada dilewati&lt;/span&gt;&lt;/label&gt;
+    &lt;/div&gt;
+    &lt;div id=&quot;impPrev&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;imp-key&quot; id=&quot;impKeyW&quot;&gt;&lt;input type=&quot;password&quot; id=&quot;impKey&quot; placeholder=&quot;Kode import (sesuai IMPORT_KEY di Apps Script)&quot; autocomplete=&quot;off&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;imp-st&quot; id=&quot;impSt&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;imp-act&quot;&gt;
+      &lt;button type=&quot;button&quot; id=&quot;impCancel&quot;&gt;Tutup&lt;/button&gt;
+      &lt;button type=&quot;button&quot; class=&quot;pri&quot; id=&quot;impGo&quot; disabled&gt;Import ke Spreadsheet&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script id=&quot;imp-script&quot;&gt;
+(function(){
+/*PURE_START*/
+var IMP_CFG={
+  issued:{sheet:'PO_Issued',cols:[
+    {k:'PO Number',t:'po'},{k:'Tanggal PO',t:'date',al:['po date','tgl po']},{k:'Category',t:'txt',req:1},
+    {k:'Pareto',t:'txt'},{k:'Supplier',t:'txt'},{k:'Nilai PO',t:'num',al:['po value']}]},
+  received:{sheet:'PO_Received',cols:[
+    {k:'PO Number',t:'po'},{k:'Received Date',t:'date',al:['tanggal received','tgl received']},{k:'Category',t:'txt',req:1},
+    {k:'Pareto',t:'txt'},{k:'Supplier',t:'txt'},{k:'Nilai Received',t:'num',al:['received value']}]}
+};
+function p2(n){return (n&lt;10?'0':'')+n}
+function impNorm(s){return String(s==null?'':s).toLowerCase().replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim()}
+function impISO(y,m,d){var t=new Date(Date.UTC(y,m-1,d));if(t.getUTCFullYear()!==y||t.getUTCMonth()!==m-1||t.getUTCDate()!==d)return null;return y+'-'+p2(m)+'-'+p2(d)}
+function impDate(v){
+  if(v==null||v==='')return null;
+  if(typeof v==='number'){if(v&lt;20000||v&gt;80000)return null;var t=new Date((Math.floor(v)-25569)*86400000);return impISO(t.getUTCFullYear(),t.getUTCMonth()+1,t.getUTCDate())}
+  if(v instanceof Date&amp;&amp;!isNaN(v))return impISO(v.getFullYear(),v.getMonth()+1,v.getDate());
+  var m=String(v).trim().match(/^(\d{1,4})[\/\-.](\d{1,2})[\/\-.](\d{1,4})/);if(!m)return null;
+  var a=+m[1],b=+m[2],c=+m[3];
+  if(m[1].length===4)return impISO(a,b,c);
+  if(c&lt;100)c+=2000;
+  if(a&gt;12)return impISO(c,b,a);   // dd/mm/yyyy
+  return impISO(c,a,b);           // m/d/yyyy (format sheet kamu)
+}
+function impNum(v){
+  if(typeof v==='number')return isFinite(v)?v:null;
+  if(v==null)return null;
+  var s=String(v).replace(/rp|idr/ig,'').replace(/[\s\u00a0]/g,'');
+  if(!s)return null;
+  var neg=/^\(.*\)$/.test(s);if(neg)s=s.slice(1,-1);
+  var hc=s.indexOf(',')&gt;-1,hd=s.indexOf('.')&gt;-1;
+  if(hc&amp;&amp;hd){if(s.lastIndexOf(',')&gt;s.lastIndexOf('.'))s=s.replace(/\./g,'').replace(',','.');else s=s.replace(/,/g,'')}
+  else if(hc){if(/^-?\d{1,3}(,\d{3})+$/.test(s))s=s.replace(/,/g,'');else s=s.replace(',','.')}
+  else if(hd){if((s.match(/\./g)||[]).length&gt;1)s=s.replace(/\./g,'')}
+  var n=Number(s);if(!isFinite(n))return null;return neg?-n:n;
+}
+function impPO(v){
+  if(typeof v==='number'){var s=String(Math.round(v));return s.length&lt;12?('000000000000'+s).slice(-12):s}
+  return String(v==null?'':v).trim();
+}
+function impFindHeader(rows,cfg){
+  var best=null;
+  for(var r=0;r&lt;Math.min(rows.length,15);r++){
+    var idx={},hit=0;
+    cfg.cols.forEach(function(c){
+      var names=[impNorm(c.k)].concat((c.al||[]).map(impNorm));
+      for(var j=0;j&lt;rows[r].length;j++){if(names.indexOf(impNorm(rows[r][j]))&gt;-1){idx[c.k]=j;hit++;break}}
+    });
+    if(!best||hit&gt;best.hit)best={row:r,idx:idx,hit:hit};
+    if(hit===cfg.cols.length)break;
+  }
+  if(!best)return {missing:cfg.cols.map(function(c){return c.k})};
+  var missing=cfg.cols.filter(function(c){return !(c.k in best.idx)}).map(function(c){return c.k});
+  return {row:best.row,idx:best.idx,missing:missing};
+}
+function impConvert(rows,hdr,cfg){
+  var valid=[],errors=[];
+  for(var r=hdr.row+1;r&lt;rows.length;r++){
+    var raw=rows[r];
+    var blank=cfg.cols.every(function(c){var x=raw[hdr.idx[c.k]];return x==null||String(x).trim()===''});
+    if(blank)continue;
+    var out=[],bad=[];
+    cfg.cols.forEach(function(c){
+      var x=raw[hdr.idx[c.k]],val;
+      if(c.t==='po'){val=impPO(x);if(!val)bad.push(c.k+' kosong')}
+      else if(c.t==='date'){val=impDate(x);if(!val)bad.push(c.k+' tidak valid')}
+      else if(c.t==='num'){val=impNum(x);if(val===null)bad.push(c.k+' bukan angka')}
+      else{val=String(x==null?'':x).trim();if(c.req&amp;&amp;!val)bad.push(c.k+' kosong')}
+      out.push(val);
+    });
+    if(bad.length)errors.push('Baris '+(r+1)+': '+bad.join(', '));else valid.push(out);
+  }
+  return {valid:valid,errors:errors};
+}
+/*PURE_END*/
+
+var $=function(id){return document.getElementById(id)};
+var TYPES=['issued','received'];
+var S={data:{},fileName:'',busy:false};
+function emptyData(){S.data={issued:{rows:[],errors:[],sheet:null,hdrErr:null},received:{rows:[],errors:[],sheet:null,hdrErr:null}}}
+emptyData();
+function esc(s){return String(s).replace(/[&amp;&lt;&gt;&quot;]/g,function(c){return {'&amp;':'&amp;amp;','&lt;':'&amp;lt;','&gt;':'&amp;gt;','&quot;':'&amp;quot;'}[c]})}
+function rp(n){return 'Rp '+n.toLocaleString('id-ID',{maximumFractionDigits:0})}
+function dShow(iso){var p=iso.split('-');return new Date(Date.UTC(+p[0],+p[1]-1,+p[2])).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'})}
+function setSt(msg,cls){var e=$('impSt');e.textContent=msg||'';e.className='imp-st'+(cls?' '+cls:'')}
+function totalValid(){return TYPES.reduce(function(a,t){return a+S.data[t].rows.length},0)}
+
+function renderCols(){
+  $('impCols').innerHTML='Cukup upload &lt;b&gt;1 file template&lt;/b&gt;, semua data terbaca otomatis. Jangan ubah nama header &amp; nama sheet di template. · &lt;button type=&quot;button&quot; class=&quot;imp-link&quot; id=&quot;impTpl&quot;&gt;⬇ Download template&lt;/button&gt;';
+  $('impTpl').onclick=downloadTpl;
+}
+function reset(){emptyData();S.fileName='';$('impPrev').innerHTML='';$('impGo').disabled=true;$('impFile').value='';setSt('')}
+function open(){reset();renderCols();$('impOv').classList.add('open');try{var k=sessionStorage.getItem('impKey');if(k){$('impKey').value=k;$('impKeyW').style.display='block'}}catch(e){}}
+function close(){$('impOv').classList.remove('open')}
+
+function downloadTpl(){
+  if(!window.XLSX){setSt('Library Excel belum termuat, cek koneksi internet.','err');return}
+  var serial=function(y,m,d){return Math.round(Date.UTC(y,m-1,d)/86400000)+25569};
+  var samples={
+    issued:[['000110004584',serial(2026,10,6),'ARISYANTI PRIMA NUGRAHESTI','A','PT SAN PRIMA SEJATI',5091575.77]],
+    received:[['000110004584',serial(2026,10,7),'ARISYANTI PRIMA NUGRAHESTI','A','PT SAN PRIMA SEJATI',3610658.02]]};
+  var wb=XLSX.utils.book_new();
+  TYPES.forEach(function(t){
+    var c=IMP_CFG[t],head=c.cols.map(function(x){return x.k});
+    var ws=XLSX.utils.aoa_to_sheet([head].concat(samples[t]));
+    ws['B2'].t='n';ws['B2'].z='m/d/yyyy';ws['A2'].t='s';ws['F2'].z='#,##0.00';
+    ws['!cols']=[{wch:16},{wch:14},{wch:30},{wch:10},{wch:34},{wch:18}];
+    XLSX.utils.book_append_sheet(wb,ws,c.sheet);
+  });
+  XLSX.writeFile(wb,'Template_Import_Budget.xlsx');
+}
+
+function handleFile(f){
+  if(!f)return;
+  reset();
+  if(!window.XLSX){setSt('Library Excel belum termuat, cek koneksi internet.','err');return}
+  S.fileName=f.name;setSt('Membaca '+f.name+' ...');
+  var fr=new FileReader();
+  fr.onerror=function(){setSt('Gagal membaca file.','err')};
+  fr.onload=function(ev){
+    try{
+      var wb=XLSX.read(new Uint8Array(ev.target.result),{type:'array'});
+      TYPES.forEach(function(t){
+        var cf=IMP_CFG[t],d=S.data[t],want=cf.sheet.toLowerCase();
+        var name=wb.SheetNames.filter(function(n){return n.trim().toLowerCase()===want})[0];
+        // CSV / file 1 sheet: tidak ada nama sheet yang cocok, jangan ditebak
+        if(!name)return;
+        d.sheet=name;
+        var rows=XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,raw:true,defval:''});
+        var hdr=impFindHeader(rows,cf);
+        if(hdr.missing.length){d.hdrErr='Kolom tidak ditemukan: '+hdr.missing.join(', ');return}
+        var res=impConvert(rows,hdr,cf);
+        d.rows=res.valid;d.errors=res.errors;
+      });
+      renderPreview();
+    }catch(e){console.error(e);setSt('File tidak bisa dibaca: '+e.message,'err')}
+  };
+  fr.readAsArrayBuffer(f);
+}
+
+function renderPreview(){
+  var h='';
+  TYPES.forEach(function(t){
+    var c=IMP_CFG[t],d=S.data[t],n=d.rows.length,ci=c.cols.length-1,di=1;
+    h+='&lt;div style=&quot;margin-bottom:14px&quot;&gt;&lt;div style=&quot;font-weight:800;margin-bottom:4px&quot;&gt;'+c.sheet+'&lt;/div&gt;';
+    if(!d.sheet){h+='&lt;div class=&quot;imp-sum&quot;&gt;&lt;span class=&quot;bad&quot;&gt;Sheet &quot;'+c.sheet+'&quot; tidak ditemukan di file — dilewati.&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;';return}
+    if(d.hdrErr){h+='&lt;div class=&quot;imp-sum&quot;&gt;&lt;span class=&quot;bad&quot;&gt;'+esc(d.hdrErr)+' — dilewati.&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;';return}
+    var total=d.rows.reduce(function(a,r){return a+r[ci]},0);
+    var dates=d.rows.map(function(r){return r[di]}).sort();
+    h+='&lt;div class=&quot;imp-sum&quot;&gt;&lt;span class=&quot;ok&quot;&gt;'+n.toLocaleString('id-ID')+' baris valid&lt;/span&gt;'+
+      (d.errors.length?' · &lt;span class=&quot;bad&quot;&gt;'+d.errors.length+' baris dilewati&lt;/span&gt;':'')+
+      (n?' · Total '+esc(c.cols[ci].k)+': &lt;b&gt;'+rp(total)+'&lt;/b&gt; · '+dShow(dates[0])+' – '+dShow(dates[dates.length-1]):'')+'&lt;/div&gt;';
+    if(n){
+      h+='&lt;div class=&quot;imp-tw&quot;&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;'+c.cols.map(function(x){return '&lt;th&gt;'+x.k+'&lt;/th&gt;'}).join('')+'&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;'+
+        d.rows.slice(0,5).map(function(r){return '&lt;tr&gt;'+r.map(function(v,i){
+          var tp=c.cols[i].t;return tp==='num'?'&lt;td class=&quot;n&quot;&gt;'+v.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})+'&lt;/td&gt;':tp==='date'?'&lt;td&gt;'+dShow(v)+'&lt;/td&gt;':'&lt;td&gt;'+esc(v)+'&lt;/td&gt;'}).join('')+'&lt;/tr&gt;'}).join('')+
+        '&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;'+(n&gt;5?'&lt;small&gt;Menampilkan 5 dari '+n+' baris.&lt;/small&gt;':'');
+    }
+    if(d.errors.length)h+='&lt;ul class=&quot;imp-err&quot;&gt;'+d.errors.slice(0,10).map(function(e){return '&lt;li&gt;'+esc(e)+'&lt;/li&gt;'}).join('')+(d.errors.length&gt;10?'&lt;li&gt;… dan '+(d.errors.length-10)+' lainnya&lt;/li&gt;':'')+'&lt;/ul&gt;';
+    h+='&lt;/div&gt;';
+  });
+  $('impPrev').innerHTML=h;
+  var ok=totalValid()&gt;0;
+  $('impGo').disabled=!ok;
+  setSt(ok?'Cek preview, lalu klik Import.':'Tidak ada baris valid untuk diimport.',ok?'':'err');
+}
+
+async function doImport(){
+  var mode=document.querySelector('input[name=&quot;impMode&quot;]:checked').value;
+  var todo=TYPES.filter(function(t){return S.data[t].rows.length});
+  if(!todo.length||S.busy)return;
+  var lines=todo.map(function(t){return '• '+IMP_CFG[t].sheet+': '+S.data[t].rows.length+' baris'}).join('\n');
+  var msg=mode==='replace'
+    ?'Isi sheet berikut akan DIGANTI dengan data dari file:\n'+lines+'\n(Backup otomatis dibuat.)\n\nLanjutkan?'
+    :'Baris berikut akan DITAMBAHKAN (baris yang sama persis dilewati):\n'+lines+'\n\nLanjutkan?';
+  if(!confirm(msg))return;
+  var btn=$('impGo');btn.disabled=true;S.busy=true;
+  var done=[];
+  try{
+    for(var i=0;i&lt;todo.length;i++){
+      var t=todo[i],c=IMP_CFG[t];
+      setSt('⏳ Mengirim '+c.sheet+' ('+(i+1)+'/'+todo.length+'), mohon tunggu...');
+      var payload={action:'import',sheet:c.sheet,mode:mode,fileName:S.fileName,key:$('impKey').value||'',
+        columns:c.cols.map(function(x){return x.k}),rows:S.data[t].rows};
+      var res=await fetch(PROCUREMENT_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+      var out=await res.json();
+      if(!out.ok){
+        if(out.code==='AUTH'){$('impKeyW').style.display='block';$('impKey').focus()}
+        throw new Error(c.sheet+': '+(out.error||'Import gagal'));
+      }
+      try{if($('impKey').value)sessionStorage.setItem('impKey',$('impKey').value)}catch(e){}
+      done.push(out.sheet+' '+out.added.toLocaleString('id-ID')+' baris'+(out.skipped?' ('+out.skipped+' duplikat dilewati)':''));
+      S.data[t].rows=[];
+    }
+    setSt('✅ '+done.join(' · ')+'. Dashboard di-refresh...','ok');
+    if(typeof loadDashboard==='function')await loadDashboard();
+    setSt('✅ Selesai: '+done.join(' · ')+'.','ok');
+  }catch(e){
+    console.error(e);
+    setSt((done.length?'⚠ Sudah masuk: '+done.join(' · ')+'. ':'')+'❌ '+e.message,'err');
+    btn.disabled=!totalValid();
+    if(done.length&amp;&amp;typeof loadDashboard==='function'){try{await loadDashboard()}catch(_){}}
+  }finally{S.busy=false}
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  $('impOpen').onclick=open;$('impCancel').onclick=close;$('impGo').onclick=doImport;
+  $('impOv').addEventListener('mousedown',function(e){if(e.target===this)close()});
+  var dz=$('impDrop');
+  dz.onclick=function(){$('impFile').click()};
+  $('impFile').onchange=function(){handleFile(this.files[0])};
+  ['dragover','dragenter'].forEach(function(t){dz.addEventListener(t,function(e){e.preventDefault();dz.classList.add('over')})});
+  ['dragleave','drop'].forEach(function(t){dz.addEventListener(t,function(e){e.preventDefault();dz.classList.remove('over')})});
+  dz.addEventListener('drop',function(e){handleFile(e.dataTransfer.files[0])});
+});
+})();
+&lt;/script&gt;
+
+&lt;/body&gt;
   &lt;/html&gt;"></iframe><iframe allow="fullscreen" id="f3" class="fr" data-doc="&lt;!DOCTYPE html&gt;
   &lt;html lang=&quot;id&quot;&gt;
   &lt;head&gt;
@@ -8933,14 +9222,15 @@
   {u:"user",n:"User (View Only)",role:"user",h:"4659c46c35f9f7be6bda98e7c1ee05debc7f65132dbd723318f152d6a42196ea"}];
   window.hashPw=(u,p)=>sha256("alpro|"+String(u).trim().toLowerCase()+"|"+p);
   const sess={get(){try{return JSON.parse(sessionStorage.getItem("alpro_sess")||"null")}catch(e){return null}},set(v){try{v?sessionStorage.setItem("alpro_sess",JSON.stringify(v)):sessionStorage.removeItem("alpro_sess")}catch(e){}}};
-  const PERMS=[["soh","SOH"],["sales","Sales"],["oos","OOS"],["sla","SLA"]],FPERM={f1:"sales",f3:"oos",f4:"sla"},normPerms=p=>Array.isArray(p)?p.filter(Boolean):typeof p=="string"?p.split(/[,;\s]+/).filter(Boolean):[];
+  const PERMS=[["soh","SOH"],["sales","Sales"],["budget","Budget"],["oos","OOS"],["sla","SLA"]],FPERM={f1:"sales",f2:"budget",f3:"oos",f4:"sla"},normPerms=p=>Array.isArray(p)?p.filter(Boolean):typeof p=="string"?p.split(/[,;\s]+/).filter(Boolean):[];
 const LOCK_CSS={
   f1:"#uploadBtn,#resetBtn,#fileInput{display:none!important}",
+  f2:"#impOpen,#impOv{display:none!important}",
   f3:'button[onclick*="openImportModal"],#importModal{display:none!important}',
   f4:'.upload-area,button[onclick*="resetToDefaultData"]{display:none!important}'};
   function lockFrame(f){if(!APP||APP.role=="admin"||APP.can(FPERM[f.id]))return;try{const w=f.contentWindow,d=w.document,css=LOCK_CSS[f.id];
   if(css){const s=d.createElement("style");s.textContent=css;d.head.appendChild(s)}
-  ["uploadBtn","resetBtn","fileInput","importFileInput"].forEach(i=>{const e=d.getElementById(i);if(e)e.remove()});
+  ["uploadBtn","resetBtn","fileInput","importFileInput","impOpen","impOv"].forEach(i=>{const e=d.getElementById(i);if(e)e.remove()});
   ["openImportModal","confirmImportData","resetToDefaultData","handleImportFileChange"].forEach(n=>{if(typeof w[n]=="function")w[n]=function(){}})}catch(e){}}
   const F=(n,d=1)=>(+n||0).toLocaleString("id-ID",{maximumFractionDigits:d}),I=n=>F(n,0);
   const RP=n=>{n=+n||0;const a=Math.abs(n);return a>=1e12?"Rp "+F(n/1e12,2)+" T":a>=1e9?"Rp "+F(n/1e9,2)+" M":a>=1e6?"Rp "+F(n/1e6,1)+" jt":"Rp "+I(n)};
