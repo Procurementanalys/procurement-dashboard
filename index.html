@@ -5931,15 +5931,17 @@ document.addEventListener('DOMContentLoaded',function(){
         align-items: center;
         padding: 7px 10px;
         border-radius: 999px;
-        background: rgba(34, 197, 94, 0.16);
-        color: #b6f7c6;
+        background: #dcfce7;
+        border: 1px solid #86efac;
+        color: #166534;
         font-size: 12px;
         font-weight: 700;
       }
 
       .status-badge.inactive {
-        background: rgba(239, 68, 68, 0.16);
-        color: #fecaca;
+        background: #fee2e2;
+        border: 1px solid #fca5a5;
+        color: #991b1b;
       }
 
       .metric-cell {
@@ -6549,7 +6551,7 @@ document.addEventListener('DOMContentLoaded',function(){
     &lt;script src=&quot;https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js&quot;&gt;&lt;/script&gt;
     &lt;script src=&quot;https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js&quot;&gt;&lt;/script&gt;
     &lt;script&gt;
-      const API_URL = 'https://script.google.com/macros/s/AKfycbzsaXK_w6YVkIj89PcG2EwkfKFUnDsSgxG9RYokzB6xLjmzoS10WdRWNMTsMuuuh3KZ7Q/exec';
+      const API_URL = 'https://script.google.com/macros/s/AKfycbzVs-UhC0kbzcf3IH_A5fMTD0EioGbUShuS94kv_Mkh-7hrY1hH6Yoq4XJobUZBTU5nlA/exec';
 
       let dashboardData = null;
 
@@ -6631,7 +6633,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
           dashboardData = data;
           const newUpdatedAt = data.databaseUpdatedAt || data.generatedAt || null;
-          checkAndResetFeedback(newUpdatedAt);
+          await loadFeedbackFromServer();
           renderSummary();
           renderTopStores();
           renderOfficerTable();
@@ -6970,14 +6972,36 @@ document.addEventListener('DOMContentLoaded',function(){
       let activeCategory  = '';         // currently filtered category
 
       // ── Reset when DB updates ─────────────────────────────────────────
-      function checkAndResetFeedback(newUpdatedAt) {
-        if (lastDbUpdatedAt &amp;&amp; newUpdatedAt &amp;&amp; newUpdatedAt !== lastDbUpdatedAt) {
-          for (const key in feedbackMap) delete feedbackMap[key];
+      // Feedback &amp; lock disimpan di Google Sheet (sheet OOS_Feedback) sehingga
+      // berlaku untuk semua user. Server otomatis mengosongkan sheet ini saat Import Database.
+      const submittingSkus = new Set();
+      let lastFeedbackSync = 0;
+
+      async function loadFeedbackFromServer() {
+        try {
+          const data = await fetchApi('getFeedback');
+          const prevLocked = Array.from(lockedItems);
           lockedItems.clear();
-          console.info('[Feedback] DB updated — feedback reset.');
+          prevLocked.forEach(k =&gt; { delete feedbackMap[k]; });
+          (data.items || []).forEach(it =&gt; {
+            const k = String(it.sku);
+            feedbackMap[k] = it.feedback || '';
+            lockedItems.add(k);
+          });
+          lastFeedbackSync = Date.now();
+          return true;
+        } catch (err) {
+          console.warn('[Feedback] gagal load dari server:', err);
+          return false;
         }
-        lastDbUpdatedAt = newUpdatedAt;
       }
+
+      // Sinkron ulang saat user kembali ke tab ini, supaya lock dari user lain ikut terlihat
+      window.addEventListener('focus', async () =&gt; {
+        if (!dashboardData || Date.now() - lastFeedbackSync &lt; 15000) return;
+        const before = lockedItems.size;
+        if (await loadFeedbackFromServer() &amp;&amp; lockedItems.size !== before) renderTopItems();
+      });
 
       // ── Helpers ───────────────────────────────────────────────────────
       function getFeedback(sku)        { return feedbackMap[sku] || ''; }
@@ -7013,13 +7037,26 @@ document.addEventListener('DOMContentLoaded',function(){
       }
 
       // ── Submit per item ───────────────────────────────────────────────
-      function submitItemFeedback(sku) {
-        if (isSkuLocked(sku)) return;
+      async function submitItemFeedback(sku) {
+        sku = String(sku);
+        if (isSkuLocked(sku) || submittingSkus.has(sku)) return;
         const fb = getFeedback(sku).trim();
         if (!fb) {
           if (!confirm('Feedback masih kosong. Tetap submit &amp; lock item ini?')) return;
         }
-        lockedItems.add(String(sku));
+        submittingSkus.add(sku);
+        try {
+          const res = await postApi('submitFeedback', { sku: sku, feedback: fb });
+          feedbackMap[sku] = res.feedback || '';
+          lockedItems.add(sku);
+          if (res.alreadyLocked) {
+            alert('Item ini sudah di-submit lebih dulu oleh user lain, jadi feedback Anda tidak disimpan.');
+          }
+        } catch (err) {
+          alert('Gagal submit feedback: ' + err.message);
+        } finally {
+          submittingSkus.delete(sku);
+        }
         renderTopItems();
       }
 
@@ -7074,10 +7111,10 @@ document.addEventListener('DOMContentLoaded',function(){
 
           const feedbackCell = locked
             ? `&lt;div style=&quot;display:flex;flex-direction:column;gap:5px;&quot;&gt;
-                &lt;div style=&quot;padding:8px 10px;border-radius:10px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);color:${fb ? '#86efac' : 'var(--muted)'};font-size:13px;line-height:1.5;min-height:38px;&quot;&gt;
+                &lt;div style=&quot;padding:8px 10px;border-radius:10px;background:#f0fdf4;border:1px solid #86efac;color:${fb ? '#14532d' : 'var(--muted)'};font-size:13px;line-height:1.5;min-height:38px;&quot;&gt;
                   ${fb ? fbEsc : '&lt;em style=&quot;opacity:0.5;&quot;&gt;Tidak ada feedback&lt;/em&gt;'}
                 &lt;/div&gt;
-                &lt;span style=&quot;font-size:11px;color:#4ade80;font-weight:700;letter-spacing:0.06em;&quot;&gt;🔒 SUBMITTED&lt;/span&gt;
+                &lt;span style=&quot;font-size:11px;color:#15803d;font-weight:700;letter-spacing:0.06em;&quot;&gt;🔒 SUBMITTED&lt;/span&gt;
               &lt;/div&gt;`
             : `&lt;div style=&quot;display:flex;gap:8px;align-items:flex-start;&quot;&gt;
                 &lt;textarea
@@ -7101,7 +7138,7 @@ document.addEventListener('DOMContentLoaded',function(){
               &lt;td&gt;&lt;strong&gt;${skuEsc}&lt;/strong&gt;&lt;/td&gt;
               &lt;td&gt;${escapeHtml(item.itemDescription)}&lt;/td&gt;
               &lt;td&gt;
-                &lt;span style=&quot;padding:4px 10px;border-radius:8px;background:rgba(79,140,255,0.12);border:1px solid rgba(79,140,255,0.2);font-size:12px;font-weight:600;color:#93c5fd;&quot;&gt;
+                &lt;span style=&quot;padding:4px 10px;border-radius:8px;background:#dbeafe;border:1px solid #93c5fd;font-size:12px;font-weight:700;color:#1e3a8a;&quot;&gt;
                   ${escapeHtml(item.procurementOfficer || '-')}
                 &lt;/span&gt;
               &lt;/td&gt;
@@ -7116,13 +7153,26 @@ document.addEventListener('DOMContentLoaded',function(){
       }
 
       // ── Submit per item ───────────────────────────────────────────────
-      function submitItemFeedback(sku) {
-        if (isSkuLocked(sku)) return;
+      async function submitItemFeedback(sku) {
+        sku = String(sku);
+        if (isSkuLocked(sku) || submittingSkus.has(sku)) return;
         const fb = getFeedback(sku).trim();
         if (!fb) {
           if (!confirm('Feedback masih kosong. Tetap submit &amp; lock item ini?')) return;
         }
-        lockedItems.add(String(sku));
+        submittingSkus.add(sku);
+        try {
+          const res = await postApi('submitFeedback', { sku: sku, feedback: fb });
+          feedbackMap[sku] = res.feedback || '';
+          lockedItems.add(sku);
+          if (res.alreadyLocked) {
+            alert('Item ini sudah di-submit lebih dulu oleh user lain, jadi feedback Anda tidak disimpan.');
+          }
+        } catch (err) {
+          alert('Gagal submit feedback: ' + err.message);
+        } finally {
+          submittingSkus.delete(sku);
+        }
         renderTopItems();
       }
 
