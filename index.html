@@ -10106,7 +10106,7 @@ function officerModel(){
     if(apd.has(sk))o.apd+=v;else{o.store+=v;o.skus.add(r[2]);const c=d.cls.get(r[2])||&#x27;-&#x27;;if(v&gt;0)o.cls[c]=(o.cls[c]||0)+v}}
   const used=new Set(),rows=[],bs=A.basis;
   sl.officers.forEach(x=&gt;{const key=nz(x.name),s=so.get(key);if(s)used.add(key);
-    const sales=+x.sales||0,gp=+x.gp||0,target=+x.target||0,proj=sales*si.k,bse=(bs==&#x27;net&#x27;?sales:(sales-gp))*si.k;
+    const sales=+(x.sales!=null?x.sales:x.net_sales)||0,gp=+x.gp||0,target=+x.target||0,proj=sales*si.k,bse=(bs==&#x27;net&#x27;?sales:(sales-gp))*si.k;
     rows.push({name:x.name,sales,proj,target,achv:target&gt;0?sales/target*100:null,pach:target&gt;0?proj/target*100:null,
       gpp:sales&gt;0?gp/sales*100:null,store:s?s.store:null,apd:s?s.apd:null,skus:s?s.skus.size:null,cls:s?s.cls:null,base:bse,
       moi:s&amp;&amp;bse&gt;0?s.store/bse:null,hasSoh:!!s})});
@@ -10206,7 +10206,7 @@ function drawTable(){const R=MD.rows,q=S.q.toLowerCase();let r=R.filter(x=&gt;(!
   $(&#x27;tbl&#x27;).querySelectorAll(&#x27;th&#x27;).forEach(th=&gt;th.onclick=()=&gt;{const i=+th.dataset.i;if(!COLS[i].v)return;if(S.k==i)S.dir*=-1;else{S.k=i;S.dir=typeof COLS[i].v(MD.rows[0]||{})==&#x27;string&#x27;?1:-1}drawTable()})}
 const filtO=x=&gt;x.moi==null?&#x27;No Sales&#x27;:moiSt(x.moi)[0];
 function sig(){try{if(!A)return&#x27;&#x27;;const sl=A.sales()||{},o=sl.officers||[],st=sl.stores||[];
-  return[A.loading||&#x27;&#x27;,A.soh&amp;&amp;A.soh.at,A.soh&amp;&amp;A.soh.rows&amp;&amp;A.soh.rows.length,A.basis,o.length,st.length,o.reduce((a,x)=&gt;a+(+x.sales||0)+(+x.target||0),0),st.reduce((a,x)=&gt;a+(+x.sales||0),0)].join(&#x27;|&#x27;)}catch(e){return&#x27;&#x27;}}
+  return[A.loading||&#x27;&#x27;,A.soh&amp;&amp;A.soh.at,A.soh&amp;&amp;A.soh.rows&amp;&amp;A.soh.rows.length,A.basis,o.length,st.length,o.reduce((a,x)=&gt;a+(+(x.sales!=null?x.sales:x.net_sales)||0)+(+x.target||0),0),st.reduce((a,x)=&gt;a+(+x.sales||0),0)].join(&#x27;|&#x27;)}catch(e){return&#x27;&#x27;}}
 function paint(){SIG=sig();setCols();MD=MODE==&#x27;officer&#x27;?officerModel():storeModel();
   const msg=$(&#x27;msg&#x27;),body=$(&#x27;body&#x27;);
   if(MD.msg){msg.style.display=&#x27;block&#x27;;msg.textContent=MD.msg;body.style.display=&#x27;none&#x27;;return}
