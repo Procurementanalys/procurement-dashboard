@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Procurement Dashboard — Alpro</title><style>
+  <title>Procurement Dashboard — Alpro</title><script>try{if(localStorage.getItem("alpro_theme")==="dark")document.documentElement.classList.add("alpro-dark")}catch(e){}</script><style>
   /* =========================================================
     ALPRO · Procurement Dashboard
     Tema  : Ocean Sunset — Orange · Putih · Biru (berlapis)
@@ -672,9 +672,86 @@
     #hd #pt{font-size:13.5px}
   }
 
-  </style></head><body class="lock">
-  <div id="lgn"><div class="lgn-split"><aside class="lgn-promo"><div class="lgn-mark"><img class="lg-img" alt="Alpro"><div><b>Alpro Group</b><small>Procurement Dashboard</small></div></div><div><h2>Selamat datang kembali</h2><p>Pantau penjualan, persediaan, MOI, Pareto item, OOS, dan SLA supplier dalam satu tempat terpusat.</p><ul class="lgn-feat"><li>Rekapan procurement real-time &amp; akurat</li><li>Analisis Pareto &amp; MOI otomatis</li><li>Manajemen SLA supplier terpusat</li><li>Hak akses berbasis peran (Admin / Staf)</li></ul></div><div class="lgn-foot">© 2026 Alpro Group · v2</div></aside><form id="lgf" autocomplete="on" class="lgn-form"><div class="l-head"><img class="lg-img lgn-logo" alt="Alpro"><h1>Masuk ke akun Anda</h1><p>Silakan login untuk melanjutkan</p></div><div class="l-field"><label for="lu">Username</label><div class="l-input"><svg class="ico" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><input id="lu" placeholder="Username" autocomplete="username"></div></div><div class="l-field"><label for="lp">Password</label><div class="l-input pwd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><input id="lp" type="password" placeholder="Password" autocomplete="current-password"><button type="button" id="le-eye" class="l-eye" tabindex="-1" aria-label="Tampilkan password"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div><button type="submit" id="lb">Masuk</button><div id="le"></div></form></div></div><aside id="sb"><div class="brand"><img class="lg-img" alt="Alpro"><div><b>Procurement Dashboard</b><small>Alpro Group</small></div></div><div class="mh">UTAMA</div><a data-f="home" data-s="" data-t="Home">⌂ Home</a><div class="mh">INVENTORY</div><a data-f="f0" data-s="soh" data-t="Upload SOH">⬆ Upload SOH</a><a data-f="f0" data-s="stock" data-t="Stock Inventory">▤ Stock Inventory</a><a data-f="f0" data-s="moi" data-t="MOI">◷ MOI</a><a data-f="f0" data-s="par" data-t="Pareto Item">▥ Pareto Item</a><div class="mh">PERFORMANCE</div><a data-f="f1" data-s="" data-t="Sales">↗ Sales</a><a data-f="f2" data-s="" data-t="Budget">$ Budget</a><a data-f="f3" data-s="" data-t="OOS (Out of Stock)">⚠ OOS (Out of Stock)</a><a data-f="f4" data-s="" data-t="SLA Supplier">◎ SLA Supplier</a><div class="mh" id="mhA" style="display:none">ADMIN</div><a data-f="usr" data-s="" data-t="Kelola User" data-admin="1" style="display:none">👤 Kelola User</a></aside>
-  <div id="mn"><header id="hd"><button id="bt">☰</button> <button id="tg" class="tb" title="Sembunyikan / tampilkan menu" aria-label="Toggle sidebar"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button><span id="pt"></span><span id="ld" style="margin-left:auto;font-size:12px;opacity:.9"></span><span id="who" style="margin-left:12px"></span></header><div id="ct"><div id="home" class="fr"><div class="hm"><div class="hm-hero"><img class="hm-logo lg-img" alt="Alpro"><div><div class="hm-kick">Alpro Dashboard</div><h1>Procurement Dashboard</h1><p>Rekapan procurement — penjualan, persediaan (SOH), MOI dan Pareto item.</p></div></div><div class="hm-t">Rekapan Procurement</div><div id="recap"></div></div></div><div id="usr" class="fr"></div><iframe allow="fullscreen" id="f0" class="fr" data-doc="&lt;!DOCTYPE html&gt;
+  
+  /* =========================================================
+     DARK MODE (opsional) — toggle di header (#dm) & halaman login (#dm0)
+     Teknik: area utama (#mn, termasuk semua iframe) dibalik lewat filter,
+     sidebar sudah gelap jadi tidak disentuh. Gambar dibalik lagi supaya
+     warna aslinya tetap. Pilihan tersimpan di localStorage (alpro_theme).
+     ========================================================= */
+  #mn{transition:filter .25s ease}
+  html.alpro-dark #mn{filter:invert(1) hue-rotate(180deg) contrast(.88)}
+  html.alpro-dark #mn img,
+  html.alpro-dark .lgn-form img{filter:invert(1) hue-rotate(180deg)}
+  html.alpro-dark .lgn-form{background:#fff;filter:invert(1) hue-rotate(180deg) contrast(.88)}
+  html.alpro-dark #sb{box-shadow:6px 0 30px rgba(0,0,0,.5),inset -1px 0 0 rgba(255,255,255,.04)}
+  #dm svg{display:block}
+  #dm .i-sun{display:none}
+  html.alpro-dark #dm .i-sun{display:block}
+  html.alpro-dark #dm .i-moon{display:none}
+  #dm0{
+    position:absolute;top:16px;right:16px;z-index:5;
+    width:40px;height:40px;border-radius:50%;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,.18);color:#fff;
+    border:1px solid rgba(255,255,255,.35);
+    backdrop-filter:blur(6px);transition:background .15s,transform .1s;
+  }
+  #dm0:hover{background:rgba(255,255,255,.3)}
+  #dm0:active{transform:scale(.94)}
+  #dm0 svg{display:block}
+  #dm0 .i-sun{display:none}
+  html.alpro-dark #dm0 .i-sun{display:block}
+  html.alpro-dark #dm0 .i-moon{display:none}
+  @media print{html.alpro-dark #mn,html.alpro-dark .lgn-form{filter:none!important}}
+  /* ===================== PENYIMPANAN (Spreadsheet & Google Drive) ===================== */
+  #stg{overflow:auto;padding:28px 30px 44px;background:transparent}
+  .stg{max-width:1100px;margin:0 auto}
+  .stg-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .stg-top h2{margin:0;font-size:24px;font-weight:800;color:var(--tx);letter-spacing:-.02em}
+  .stg-top p{margin:6px 0 0;color:var(--mu);font-size:13.5px;max-width:62ch}
+  #stg .stg-btn{font:inherit;font-size:13px;font-weight:700;border-radius:10px;padding:9px 16px;cursor:pointer;border:1px solid var(--bd);background:#fff;color:var(--tx-2);text-decoration:none;display:inline-flex;align-items:center;transition:border-color .15s,color .15s,filter .15s,background .15s}
+  #stg .stg-btn:hover{border-color:var(--orange-300);color:var(--orange-d)}
+  #stg .stg-btn.stg-pri{background:linear-gradient(135deg,var(--orange),var(--orange-d));color:#fff;border-color:transparent;box-shadow:var(--shadow-1)}
+  #stg .stg-btn.stg-pri:hover{filter:brightness(1.07);color:#fff}
+  #stg .stg-btn.stg-del:hover{border-color:#fecaca;color:var(--er);background:#fef2f2}
+  #stg .stg-btn:disabled{opacity:.6;cursor:default}
+  #stg :focus-visible{outline:none;box-shadow:var(--ring-blue)}
+  .stg-bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:22px 0 4px}
+  .stg-q{flex:1 1 280px;min-width:0;padding:11px 14px;border:1px solid var(--bd);border-radius:12px;font:inherit;font-size:13.5px;background:#fff;color:var(--tx)}
+  .stg-cats{display:flex;gap:6px;flex-wrap:wrap}
+  #stg .stg-chip{font:inherit;font-size:12.5px;font-weight:700;padding:7px 13px;border-radius:999px;border:1px solid var(--bd);background:#fff;color:var(--mu);cursor:pointer}
+  #stg .stg-chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+  .stg-warn{margin-top:12px;padding:11px 14px;border-radius:12px;background:#fffbeb;border:1px solid #fde68a;color:#92400e;font-size:12.5px}
+  .stg-g{font-size:13px;font-weight:800;color:var(--tx-2);margin:24px 0 0;display:flex;gap:8px;align-items:center}
+  .stg-g span{font-weight:700;font-size:11.5px;color:var(--orange-xd);background:var(--orange-100);border-radius:999px;padding:1px 9px}
+  .stg-rows{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .stg-r{display:flex;align-items:center;gap:14px;background:linear-gradient(180deg,#fff,#fffaf3);border:1px solid rgba(253,186,116,.4);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-xs)}
+  .stg-r:hover{border-color:var(--orange-300)}
+  .stg-ic{flex:none;width:42px;height:42px;border-radius:11px;display:grid;place-items:center}
+  .stg-ic.sheet{background:#dcfce7;color:#15803d}
+  .stg-ic.drive{background:var(--blue-100);color:var(--blue-2)}
+  .stg-b{flex:1;min-width:0}
+  .stg-t{font-weight:700;font-size:14.5px;color:var(--tx);overflow-wrap:anywhere}
+  .stg-d{font-size:13px;color:var(--mu);margin-top:2px;overflow-wrap:anywhere}
+  .stg-h{font-size:11.5px;color:var(--mu-2);margin-top:4px}
+  .stg-a{display:flex;gap:6px;flex:none;flex-wrap:wrap;justify-content:flex-end}
+  .stg-empty{margin-top:18px;background:linear-gradient(180deg,#fff,#fff7ed);border:1.5px dashed rgba(249,115,22,.45);border-radius:18px;padding:34px;text-align:center;color:var(--mu);font-size:13.5px}
+  .stg-empty b{color:var(--tx)}
+  .stg-ov{position:fixed;inset:0;background:rgba(15,23,42,.45);display:grid;place-items:center;padding:16px;z-index:60}
+  .stg-m{background:#fff;border-radius:18px;padding:24px;width:min(480px,100%);box-shadow:var(--shadow-3);display:flex;flex-direction:column;gap:14px;max-height:92vh;overflow:auto}
+  .stg-m h3{margin:0;font-size:17px;font-weight:800;color:var(--tx)}
+  .stg-m label{display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:700;color:var(--tx-2)}
+  .stg-m input,.stg-m textarea{font:inherit;font-weight:500;font-size:13.5px;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;color:var(--tx);background:#fff;resize:vertical}
+  .stg-err{color:var(--er);font-size:12.5px}
+  .stg-err:empty{display:none}
+  .stg-fa{display:flex;gap:8px;justify-content:flex-end}
+  .stg-toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,12px);background:#0f172a;color:#fff;padding:10px 18px;border-radius:12px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:70}
+  .stg-toast.on{opacity:1;transform:translate(-50%,0)}
+  @media(max-width:760px){#stg{padding:16px 14px 32px}.stg-r{flex-wrap:wrap}.stg-a{width:100%;justify-content:flex-start}}
+</style></head><body class="lock">
+  <div id="lgn"><button id="dm0" type="button" title="Mode gelap / terang" aria-label="Ganti mode gelap atau terang"><svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button><div class="lgn-split"><aside class="lgn-promo"><div class="lgn-mark"><img class="lg-img" alt="Alpro"><div><b>Alpro Group</b><small>Procurement Dashboard</small></div></div><div><h2>Selamat datang kembali</h2><p>Pantau penjualan, persediaan, MOI, Pareto item, OOS, dan SLA supplier dalam satu tempat terpusat.</p><ul class="lgn-feat"><li>Rekapan procurement real-time &amp; akurat</li><li>Analisis Pareto &amp; MOI otomatis</li><li>Manajemen SLA supplier terpusat</li><li>Hak akses berbasis peran (Admin / Staf)</li></ul></div><div class="lgn-foot">© 2026 Alpro Group · v2</div></aside><form id="lgf" autocomplete="on" class="lgn-form"><div class="l-head"><img class="lg-img lgn-logo" alt="Alpro"><h1>Masuk ke akun Anda</h1><p>Silakan login untuk melanjutkan</p></div><div class="l-field"><label for="lu">Username</label><div class="l-input"><svg class="ico" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><input id="lu" placeholder="Username" autocomplete="username"></div></div><div class="l-field"><label for="lp">Password</label><div class="l-input pwd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><input id="lp" type="password" placeholder="Password" autocomplete="current-password"><button type="button" id="le-eye" class="l-eye" tabindex="-1" aria-label="Tampilkan password"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div><button type="submit" id="lb">Masuk</button><div id="le"></div></form></div></div><aside id="sb"><div class="brand"><img class="lg-img" alt="Alpro"><div><b>Procurement Dashboard</b><small>Alpro Group</small></div></div><div class="mh">UTAMA</div><a data-f="home" data-s="" data-t="Home">⌂ Home</a><div class="mh">INVENTORY</div><a data-f="f0" data-s="soh" data-t="Upload SOH">⬆ Upload SOH</a><a data-f="f0" data-s="stock" data-t="Stock Inventory">▤ Stock Inventory</a><a data-f="f0" data-s="moi" data-t="MOI">◷ MOI</a><a data-f="f0" data-s="par" data-t="Pareto Item">▥ Pareto Item</a><div class="mh">PERFORMANCE</div><a data-f="f1" data-s="" data-t="Sales">↗ Sales</a><a data-f="f2" data-s="" data-t="Budget">$ Budget</a><a data-f="f3" data-s="" data-t="OOS (Out of Stock)">⚠ OOS (Out of Stock)</a><a data-f="f4" data-s="" data-t="SLA Supplier">◎ SLA Supplier</a><div class="mh">PENYIMPANAN</div><a data-f="stg" data-s="" data-t="Spreadsheet" data-k="sheet">▦ Spreadsheet</a><a data-f="stg" data-s="" data-t="Google Drive" data-k="drive">☁ Google Drive</a><div class="mh" id="mhA" style="display:none">ADMIN</div><a data-f="usr" data-s="" data-t="Kelola User" data-admin="1" style="display:none">👤 Kelola User</a></aside>
+  <div id="mn"><header id="hd"><button id="bt">☰</button> <button id="tg" class="tb" title="Sembunyikan / tampilkan menu" aria-label="Toggle sidebar"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button><span id="pt"></span><span id="ld" style="margin-left:auto;font-size:12px;opacity:.9"></span><span id="who" style="margin-left:12px"></span><button id="dm" class="tb" type="button" title="Mode gelap / terang" aria-label="Ganti mode gelap atau terang"><svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button></header><div id="ct"><div id="home" class="fr"><div class="hm"><div class="hm-hero"><img class="hm-logo lg-img" alt="Alpro"><div><div class="hm-kick">Alpro Dashboard</div><h1>Procurement Dashboard</h1><p>Rekapan procurement — penjualan, persediaan (SOH), MOI dan Pareto item.</p></div></div><div class="hm-t">Rekapan Procurement</div><div id="recap"></div></div></div><div id="usr" class="fr"></div><div id="stg" class="fr"></div><iframe allow="fullscreen" id="f0" class="fr" data-doc="&lt;!DOCTYPE html&gt;
   &lt;html lang=&quot;id&quot; data-theme=&quot;light&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;
   &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, viewport-fit=cover&quot;&gt;
   &lt;title&gt;Dashboard Inventory&lt;/title&gt;
@@ -9291,7 +9368,7 @@ const LOCK_CSS={
 
 
   /* ===== API Apps Script (database akun & SOH). Isi URL Web App di bawah setelah deploy. Kosong = mode lokal (tanpa database). ===== */
-  const API_URL="https://script.google.com/macros/s/AKfycby2aKlanbShPpl3dQRqqwcf4AW2xRb69ImYimHjgsHOSePXoL4q1ji8jjiEiD3HCFWPBw/exec";
+  const API_URL="https://script.google.com/macros/s/AKfycbysh15RMqabzd_0crI-PW1KFFLdO8VBelYAIdwXn7XkuLSPtic7MB3VJATjGeF_dFf6Qw/exec";
   let TOKEN=null;
   async function api(action,data){
   const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({action,token:TOKEN},data||{}))});
@@ -9405,6 +9482,90 @@ if(k=="perm")c.onchange=()=>{ps(u,"Menyimpan…","#64748b");go(()=>api("userSet"
   $("#na").onclick=()=>go(async()=>{await api("userAdd",{u:$("#nu").value,n:$("#nn").value,role:$("#nr").value,p:$("#np").value,perms:[...document.querySelectorAll("#npm input:checked")].map(i=>i.value)});}, "✓ User ditambahkan.")};
   try{draw((await api("users")).users)}catch(e){$("#ub").textContent="⚠ "+e.message}}
 
+    /* ===== Penyimpanan link: Spreadsheet & Google Drive =====
+     Semua user login bisa melihat & membuka. Hanya admin yang bisa tambah / ubah / hapus.
+     Data disimpan di database Apps Script (action linkList / linkSave / linkDelete). */
+  const STG={items:null,mode:"db",type:"sheet",q:"",cat:"",LK:"alpro_links_local",
+  META:{sheet:{t:"Spreadsheet",d:"Semua link Google Spreadsheet dalam satu tempat. Klik Buka untuk langsung masuk ke filenya.",ph:"https://docs.google.com/spreadsheets/d/…"},
+  drive:{t:"Google Drive",d:"Semua link folder dan file Google Drive dalam satu tempat. Klik Buka untuk langsung masuk.",ph:"https://drive.google.com/drive/folders/…"}}};
+  const stgLocal={get(){try{return JSON.parse(localStorage.getItem(STG.LK)||"[]")}catch(e){return[]}},set(a){try{localStorage.setItem(STG.LK,JSON.stringify(a));return true}catch(e){return false}}};
+  const stgNoAct=e=>!e.code&&/action|aksi|unknown|tidak dikenal|invalid|not found|tidak ditemukan/i.test(e.message||"");
+  const stgUrl=v=>{v=String(v||"").trim();if(!v)return null;if(!/^[a-z][a-z0-9+.-]*:/i.test(v))v="https://"+v;let u;try{u=new URL(v)}catch(e){return null}return u.protocol=="https:"||u.protocol=="http:"?u.href:null};
+  const stgGoogle=u=>{try{return/(^|\.)google\.com$/i.test(new URL(u).hostname)}catch(e){return false}};
+  const stgHost=u=>{try{return new URL(u).hostname.replace(/^www\./,"")}catch(e){return""}};
+  const stgDate=s=>{const d=new Date(s);return isNaN(d)?"":d.toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"})};
+  const stgSvg=p=>'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>';
+  const stgIcon={sheet:stgSvg('<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M4 15h16M10 9v12"/>'),drive:stgSvg('<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>')};
+
+  async function stgLoad(){
+  if(!API_URL){STG.mode="local";STG.items=stgLocal.get();return}
+  try{const r=await api("linkList");if(!Array.isArray(r.links))throw new Error("action tidak dikenal");STG.mode="db";STG.items=r.links}
+  catch(e){if(stgNoAct(e)){STG.mode="local";STG.items=stgLocal.get();return}throw e}}
+  async function stgSave(it){
+  if(STG.mode=="db"){const r=await api("linkSave",{link:it}),s=r.link||it,i=STG.items.findIndex(x=>x.id==s.id);if(i<0)STG.items.push(s);else STG.items[i]=s;return}
+  const a=stgLocal.get(),i=a.findIndex(x=>x.id==it.id);if(i<0)a.push(it);else a[i]=it;
+  if(!stgLocal.set(a))throw new Error("Browser menolak menyimpan data");STG.items=a}
+  async function stgDel(id){
+  if(STG.mode=="db"){await api("linkDelete",{id});STG.items=STG.items.filter(x=>x.id!=id);return}
+  const a=stgLocal.get().filter(x=>x.id!=id);stgLocal.set(a);STG.items=a}
+
+  function renderStorage(type){
+  const el=$("#stg"),M=STG.META[type],adm=APP.role=="admin";
+  if(STG.type!=type){STG.q="";STG.cat=""}STG.type=type;
+  el.innerHTML=`<div class="hm stg"><div class="stg-top"><div><h2>${M.t}</h2><p>${M.d}</p></div>${adm?'<button class="stg-btn stg-pri" data-a="add">＋ Tambah link</button>':""}</div>
+  <div class="stg-bar"><input class="stg-q" type="search" placeholder="Cari judul, kategori, atau deskripsi…" aria-label="Cari link" value="${esc(STG.q)}"><div class="stg-cats"></div></div>
+  <div class="stg-note"></div><div class="stg-list"><div class="stg-empty">Memuat…</div></div></div><div class="stg-toast" role="status"></div>`;
+  const q=el.querySelector(".stg-q"),list=el.querySelector(".stg-list"),cats=el.querySelector(".stg-cats"),note=el.querySelector(".stg-note");
+  let tt;const toast=m=>{const t=el.querySelector(".stg-toast");if(!t)return;t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),2600)};
+  const row=x=>{const hu=stgUrl(x.url)||"#";return`<div class="stg-r" data-id="${esc(x.id)}"><div class="stg-ic ${type}">${stgIcon[type]}</div><div class="stg-b"><div class="stg-t">${esc(x.title)}</div>${x.desc?`<div class="stg-d">${esc(x.desc)}</div>`:""}<div class="stg-h">${esc(stgHost(hu))}${x.by?" · ditambah oleh "+esc(x.by):""}${x.at&&stgDate(x.at)?" pada "+esc(stgDate(x.at)):""}</div></div><div class="stg-a"><a class="stg-btn stg-pri" href="${esc(hu)}" target="_blank" rel="noopener noreferrer">Buka</a><button class="stg-btn" data-a="copy">Salin link</button>${adm?'<button class="stg-btn" data-a="edit">Ubah</button><button class="stg-btn stg-del" data-a="del">Hapus</button>':""}</div></div>`};
+  const draw=()=>{if(STG.type!=type)return;
+  const all=(STG.items||[]).filter(x=>x.type==type);
+  note.innerHTML=STG.mode=="local"&&adm?'<div class="stg-warn">Server belum mendukung penyimpanan link, jadi link hanya tersimpan di browser ini dan tidak terlihat oleh user lain. Pasang update Code.gs agar link tersimpan di database bersama.</div>':"";
+  const cs=[...new Set(all.map(x=>x.cat).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id"));
+  if(STG.cat&&!cs.includes(STG.cat))STG.cat="";
+  cats.innerHTML=cs.length>1?[""].concat(cs).map(c=>`<button class="stg-chip${STG.cat==c?" on":""}" data-cat="${esc(c)}">${c?esc(c):"Semua"}</button>`).join(""):"";
+  const s=STG.q.trim().toLowerCase(),rows=all.filter(x=>(!STG.cat||x.cat==STG.cat)&&(!s||[x.title,x.cat,x.desc,x.url].some(v=>String(v||"").toLowerCase().includes(s))));
+  if(!all.length){list.innerHTML=`<div class="stg-empty"><b>Belum ada link ${M.t}</b><br>${adm?"Klik Tambah link untuk menyimpan link pertama.":"Admin belum menambahkan link."}</div>`;return}
+  if(!rows.length){list.innerHTML='<div class="stg-empty">Tidak ada link yang cocok dengan pencarian ini.</div>';return}
+  const g=new Map;rows.sort((a,b)=>String(a.title).localeCompare(String(b.title),"id")).forEach(x=>{const k=x.cat||"Umum";if(!g.has(k))g.set(k,[]);g.get(k).push(x)});
+  const ks=[...g.keys()].sort((a,b)=>a=="Umum"?1:b=="Umum"?-1:a.localeCompare(b,"id"));
+  list.innerHTML=ks.map(k=>`${cs.length?`<h3 class="stg-g">${esc(k)} <span>${g.get(k).length}</span></h3>`:""}<div class="stg-rows">${g.get(k).map(row).join("")}</div>`).join("")};
+
+  const copy=async u=>{try{await navigator.clipboard.writeText(u);toast("Link disalin.")}catch(e){const t=document.createElement("textarea");t.value=u;t.style.cssText="position:fixed;opacity:0";document.body.appendChild(t);t.select();try{document.execCommand("copy");toast("Link disalin.")}catch(_){toast("Gagal menyalin link.")}t.remove()}};
+  const del=async it=>{if(!confirm('Hapus link "'+it.title+'"?\nUser tidak akan melihatnya lagi.'))return;try{await stgDel(it.id);draw();toast("Link dihapus.")}catch(e){toast("⚠ "+e.message)}};
+  const form=it=>{
+  const cl=[...new Set((STG.items||[]).map(x=>x.cat).filter(Boolean))],ov=document.createElement("div");ov.className="stg-ov";
+  ov.innerHTML=`<form class="stg-m" novalidate><h3>${it?"Ubah link":"Tambah link"} ${M.t}</h3>
+  <label>Judul<input name="title" maxlength="120" placeholder="Contoh: Rekap budget Oktober" value="${esc(it?it.title:"")}"></label>
+  <label>Link<input name="url" inputmode="url" placeholder="${esc(M.ph)}" value="${esc(it?it.url:"")}"></label>
+  <label>Kategori (opsional)<input name="cat" list="stgcl" maxlength="40" placeholder="Contoh: Sales, Gudang, Supplier" value="${esc(it?it.cat||"":"")}"><datalist id="stgcl">${cl.map(c=>`<option value="${esc(c)}">`).join("")}</datalist></label>
+  <label>Deskripsi (opsional)<textarea name="desc" rows="3" maxlength="300" placeholder="Isi file ini untuk apa?">${esc(it?it.desc||"":"")}</textarea></label>
+  <div class="stg-err" role="alert"></div><div class="stg-fa"><button type="button" class="stg-btn" data-m="x">Batal</button><button type="submit" class="stg-btn stg-pri">Simpan</button></div></form>`;
+  const f=ov.firstElementChild,err=f.querySelector(".stg-err"),close=()=>{ov.remove();document.removeEventListener("keydown",esc_)},esc_=e=>{if(e.key=="Escape")close()};
+  document.addEventListener("keydown",esc_);
+  ov.onmousedown=e=>{if(e.target==ov)close()};f.querySelector('[data-m="x"]').onclick=close;
+  f.onsubmit=async e=>{e.preventDefault();
+  const v=n=>f.elements[n].value.trim(),title=v("title"),url=stgUrl(v("url"));
+  if(!title){err.textContent="Judul wajib diisi.";f.elements.title.focus();return}
+  if(!url){err.textContent="Link tidak valid. Tempel alamat lengkap, misalnya yang diawali https://";f.elements.url.focus();return}
+  if(STG.items.some(x=>x.type==type&&(!it||x.id!=it.id)&&stgUrl(x.url)==url)){err.textContent="Link ini sudah ada di daftar "+M.t+".";return}
+  if(!stgGoogle(url)&&!confirm("Link ini bukan dari Google ("+stgHost(url)+"). Tetap simpan?"))return;
+  const obj={id:it?it.id:"l"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),type,title,url,cat:v("cat"),desc:v("desc"),by:it&&it.by||APP.user.n,at:it&&it.at||new Date().toISOString()};
+  const sb=f.querySelector('[type="submit"]');sb.disabled=true;sb.textContent="Menyimpan…";err.textContent="";
+  try{await stgSave(obj);close();draw();toast("Link disimpan.")}catch(x){err.textContent=x.message;sb.disabled=false;sb.textContent="Simpan"}};
+  el.appendChild(ov);f.elements.title.focus()};
+
+  q.oninput=()=>{STG.q=q.value;draw()};
+  el.onclick=ev=>{const b=ev.target.closest("[data-a],[data-cat]");if(!b||!el.contains(b))return;
+  if(b.dataset.cat!==undefined){STG.cat=b.dataset.cat;draw();return}
+  const a=b.dataset.a;if(a=="retry"){renderStorage(type);return}
+  if(a=="add"){if(adm)form(null);return}
+  const r=b.closest(".stg-r"),it=r&&(STG.items||[]).find(x=>x.id==r.dataset.id);if(!it)return;
+  if(a=="copy")copy(it.url);else if(adm&&a=="edit")form(it);else if(adm&&a=="del")del(it)};
+
+  if(STG.items)draw();
+  stgLoad().then(draw).catch(e=>{if(STG.type!=type)return;if(!STG.items)list.innerHTML=`<div class="stg-empty" style="color:#b91c1c">⚠ Gagal memuat link: ${esc(e.message)}<br><button class="stg-btn" data-a="retry" style="margin-top:12px">Coba lagi</button></div>`;else toast("⚠ Gagal menyegarkan: "+e.message)})}
+
   /* ===== Navigasi ===== */
   function ensure(f){if(!f._p)f._p=new Promise(r=>{f.addEventListener("load",()=>{lockFrame(f);r()},{once:true});f.srcdoc=f.dataset.doc});return f._p}
   function run(f,a){try{if(a.dataset.s&&f.contentWindow.go)f.contentWindow.go(a.dataset.s);f.contentWindow.dispatchEvent(new Event("resize"))}catch(e){}}
@@ -9412,6 +9573,7 @@ if(k=="perm")c.onchange=()=>{ps(u,"Menyimpan…","#64748b");go(()=>api("userSet"
   $("#pt").textContent=a.dataset.t;$("#sb").classList.remove("open");
   if(a.dataset.f=="home"){renderHome();return}
   if(a.dataset.f=="usr"){renderUsers();return}
+  if(a.dataset.f=="stg"){renderStorage(a.dataset.k);return}
   const f=document.getElementById(a.dataset.f);f._a=a;ensure(f).then(()=>{if(f._a===a)run(f,a)})}
   links.forEach(a=>a.onclick=()=>open_(a));$("#bt").onclick=()=>$("#sb").classList.toggle("open");
 
@@ -9527,6 +9689,38 @@ if(k=="perm")c.onchange=()=>{ps(u,"Menyimpan…","#64748b");go(()=>api("userSet"
     }
   })();
   /* ===== End Procuroot v2 UI ===== */
-  </script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+  </script><script>
+/* ===== Dark mode ===== */
+(function(){
+  var KEY="alpro_theme",root=document.documentElement;
+  var FRAME_CSS='html.alpro-dark img,html.alpro-dark video,html.alpro-dark picture{filter:invert(1) hue-rotate(180deg)}'+
+    /* tombol tema bawaan modul (Budget & SLA) disembunyikan: sekarang pakai satu toggle global di header */
+    '.theme-switch-card,button.theme-toggle[onclick*="toggleTheme"]{display:none!important}';
+  function isDark(){return root.classList.contains("alpro-dark")}
+  function syncFrame(f){
+    try{
+      var d=f.contentDocument; if(!d||!d.documentElement) return;
+      if(!d.getElementById("alpro-dark-css")){
+        var st=d.createElement("style"); st.id="alpro-dark-css"; st.textContent=FRAME_CSS;
+        (d.head||d.documentElement).appendChild(st);
+      }
+      d.documentElement.classList.toggle("alpro-dark",isDark());
+    }catch(e){}
+  }
+  function syncAll(){document.querySelectorAll("iframe.fr").forEach(syncFrame)}
+  function label(){
+    var t=isDark()?"Ganti ke mode terang":"Ganti ke mode gelap";
+    ["dm","dm0"].forEach(function(id){var b=document.getElementById(id);if(b){b.title=t;b.setAttribute("aria-label",t);b.setAttribute("aria-pressed",isDark()?"true":"false")}});
+  }
+  function setDark(on){
+    root.classList.toggle("alpro-dark",!!on);
+    try{localStorage.setItem(KEY,on?"dark":"light")}catch(e){}
+    syncAll(); label();
+  }
+  document.querySelectorAll("iframe.fr").forEach(function(f){f.addEventListener("load",function(){syncFrame(f)})});
+  ["dm","dm0"].forEach(function(id){var b=document.getElementById(id);if(b)b.addEventListener("click",function(){setDark(!isDark())})});
+  syncAll(); label();
+})();
+</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
   </body></html>
