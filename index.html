@@ -438,6 +438,48 @@
   #usr tr:nth-child(even) td{background:rgba(255,247,237,.45)}
   #usr tr:hover td{background:rgba(255,237,213,.55)}
 
+  /* ===== Kelola User — polish tampilan (hanya CSS) ===== */
+  #usr .rc-box{padding:0;overflow:auto;border-radius:20px;box-shadow:var(--shadow-2)}
+  #usr .rc-h{margin-top:4px}
+  #usr #ub{padding:18px}
+  #usr table{width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;box-shadow:var(--shadow-1)}
+  #usr th{padding:13px 16px;font-size:10.5px;letter-spacing:.1em;white-space:nowrap}
+  #usr td{padding:13px 16px;vertical-align:middle;font-size:13px;color:var(--tx-2)}
+  #usr td:first-child{font-weight:700;color:var(--tx)}
+  #usr tr:hover td{background:rgba(255,237,213,.6)}
+  #usr select{padding:8px 32px 8px 12px;border-radius:999px;font-weight:600;font-size:12.5px;min-width:112px;
+    -webkit-appearance:none;appearance:none;
+    background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ea580c' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center}
+  #usr input[type=checkbox]{accent-color:var(--orange-d);width:15px;height:15px;padding:0;margin:0 6px 0 0;vertical-align:-3px;cursor:pointer;box-shadow:none}
+  #usr td label{display:inline-flex;align-items:center;margin:2px 6px 2px 0!important;padding:5px 11px;border-radius:999px;
+    background:var(--orange-50);border:1px solid var(--orange-200);font-size:12px;font-weight:600;color:var(--tx-2);cursor:pointer;
+    transition:background .15s,border-color .15s}
+  #usr td label:hover{background:var(--orange-100);border-color:var(--orange-300)}
+  #usr td label:has(input:checked){background:linear-gradient(135deg,var(--orange-100),#ffe4cc);border-color:var(--orange-3);color:var(--orange-xd)}
+  #usr td button{border-radius:999px;padding:8px 16px;font-size:12px}
+  #usr button[data-k="act"][data-v="0"]{background:linear-gradient(135deg,#dcfce7,#bbf7d0);color:#166534;border:1px solid #86efac;box-shadow:none}
+  #usr button[data-k="act"][data-v="0"]:hover{background:linear-gradient(135deg,#bbf7d0,#86efac);box-shadow:0 6px 16px rgba(22,163,74,.25)}
+  #usr button[data-k="act"][data-v="1"]{background:linear-gradient(135deg,#f1f5f9,#e2e8f0);color:#475569;border:1px solid #cbd5e1;box-shadow:none}
+  #usr button[data-k="act"][data-v="1"]:hover{background:linear-gradient(135deg,#e2e8f0,#cbd5e1)}
+  #usr button[data-k="pw"]{padding:8px 16px}
+  #usr #na{padding:10px 24px;border-radius:12px}
+  #usr #ub > div:last-of-type{margin-top:18px!important;padding:16px 18px;gap:10px!important;
+    background:linear-gradient(135deg,#fff7ed,#fff 60%,#eff6ff);border:1px dashed var(--orange-300);border-radius:16px}
+  #usr #ub > div:last-of-type > b{font-size:13px!important;color:var(--orange-xd);margin-right:4px}
+  #usr #npm{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap;color:var(--mu)}
+  #usr #npm label{display:inline-flex;align-items:center;margin:0!important;padding:5px 10px;border-radius:999px;background:#fff;
+    border:1px solid var(--orange-200);font-weight:600;cursor:pointer}
+  #usr #npm label:has(input:checked){background:var(--orange-100);border-color:var(--orange-3);color:var(--orange-xd)}
+  #usr #um{padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.7);font-weight:600;min-height:0}
+  #usr #um:empty{display:none}
+  #usr [data-ps]{display:inline-block;vertical-align:middle}
+  @media(max-width:760px){#usr #ub{padding:10px}#usr th,#usr td{padding:10px}}
+  /* scrollbar halus */
+  *{scrollbar-width:thin;scrollbar-color:var(--orange-300) transparent}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:var(--orange-300);border-radius:10px;border:2px solid transparent;background-clip:content-box}
+  ::-webkit-scrollbar-thumb:hover{background:var(--orange-3);background-clip:content-box;border:2px solid transparent}
+
   /* ===================== LOGIN (split-screen) ===================== */
   body.lock #sb,body.lock #mn{display:none}
   #lgn{
@@ -9368,7 +9410,7 @@ const LOCK_CSS={
 
 
   /* ===== API Apps Script (database akun & SOH). Isi URL Web App di bawah setelah deploy. Kosong = mode lokal (tanpa database). ===== */
-  const API_URL="https://script.google.com/macros/s/AKfycbysh15RMqabzd_0crI-PW1KFFLdO8VBelYAIdwXn7XkuLSPtic7MB3VJATjGeF_dFf6Qw/exec";
+  const API_URL="https://script.google.com/macros/s/AKfycbwTtOa6aJnZ72vijzusaH5-qOW6ItBcpu5wk8kl0U7fcKi2CI8hT2AnoxP-0TGEKZHnhw/exec";
   let TOKEN=null;
   async function api(action,data){
   const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({action,token:TOKEN},data||{}))});
@@ -9471,7 +9513,7 @@ const LOCK_CSS={
   if(!API_URL){el.innerHTML='<div class="hm"><div class="rc-empty">Kelola User aktif setelah <code>API_URL</code> Apps Script diisi di dashboard.</div></div>';return}
   el.innerHTML='<div class="hm"><div class="rc-h">Kelola User</div><div class="rc-box" id="ub">Memuat…</div></div>';
   const draw=us=>{$("#ub").innerHTML=`<table><tr><th>Username</th><th>Nama</th><th>Role</th><th>Akses upload</th><th>Status</th><th></th></tr>${us.map(x=>`<tr><td>${esc(x.u)}</td><td>${esc(x.n)}</td><td><select data-u="${esc(x.u)}" data-k="role"><option value="admin"${x.role=="admin"?" selected":""}>Admin</option><option value="user"${x.role=="user"?" selected":""}>User (view)</option></select></td><td>${x.role=="admin"?'<i style="color:#64748b">Semua</i>':PERMS.map(([k,l])=>`<label style="margin-right:8px;white-space:nowrap"><input type="checkbox" data-u="${esc(x.u)}" data-k="perm" value="${k}"${normPerms(x.perms).includes(k)?" checked":""}> ${l}</label>`).join("")}<span data-ps="${esc(x.u)}" style="font-size:11px;margin-left:6px;font-weight:600"></span></td><td><button data-u="${esc(x.u)}" data-k="act" data-v="${x.active?0:1}">${x.active?"Aktif · nonaktifkan":"Nonaktif · aktifkan"}</button></td><td><button data-u="${esc(x.u)}" data-k="pw">Reset password</button></td></tr>`).join("")}</table>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center"><b style="font-size:13px">Tambah user:</b><input id="nu" placeholder="username"><input id="nn" placeholder="nama"><select id="nr"><option value="user">User (view)</option><option value="admin">Admin</option></select><span id="npm" style="font-size:12px">Akses upload: ${PERMS.map(([k,l])=>`<label style="margin-right:6px"><input type="checkbox" value="${k}"> ${l}</label>`).join("")}</span><input id="np" type="password" placeholder="password (min 6)"><button id="na">Tambah</button></div><div id="um" style="margin-top:8px;font-size:12px;color:#64748b"></div>`;
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center"><b style="font-size:13px">Tambah user:</b><input id="nu" placeholder="username" autocomplete="off" spellcheck="false"><input id="nn" placeholder="nama lengkap" autocomplete="off"><select id="nr"><option value="user">User (view)</option><option value="admin">Admin</option></select><span id="npm" style="font-size:12px">Akses upload: ${PERMS.map(([k,l])=>`<label style="margin-right:6px"><input type="checkbox" value="${k}"> ${l}</label>`).join("")}</span><input id="np" type="password" placeholder="password (min 6)" autocomplete="new-password"><button id="na">Tambah</button></div><div id="um" style="margin-top:8px;font-size:12px;color:#64748b"></div>`;
   if(us.length&&us.every(x=>x.perms===undefined))$("#um").textContent="⚠ Apps Script belum menyimpan akses per akun (kolom perms). Update Code.gs dulu, kalau tidak pilihan checkbox tidak tersimpan.";
 const msg=t=>{const m=$("#um");if(m){m.style.color="#64748b";m.textContent=t}},ps=(u,t,c)=>{const e=u&&$('[data-ps="'+u+'"]');if(e){e.style.color=c||"#16a34a";e.textContent=t}},go=async(fn,ok,u)=>{try{await fn();const r=await api("users");draw(r.users);const bad=r.users.length&&r.users.every(x=>x.perms===undefined);if(bad&&u){ps(u,"⚠ Tidak tersimpan (Code.gs belum di-update)","#dc2626")}else{ps(u,"✓ Tersimpan");if(ok){const m=$("#um");if(m){m.style.color="#16a34a";m.textContent=ok}}}}catch(e){try{draw((await api("users")).users)}catch(_){}msg("⚠ "+e.message);ps(u,"⚠ Gagal, dikembalikan","#dc2626")}};
   $("#ub").querySelectorAll("[data-k]").forEach(c=>{const u=c.dataset.u,k=c.dataset.k;
