@@ -10024,7 +10024,7 @@ $(&#x27;rf&#x27;).onclick=load;load();
 &lt;/script&gt;&lt;/body&gt;&lt;/html&gt;"></iframe><iframe allow="fullscreen" id="f6" class="fr" data-doc="&lt;!DOCTYPE html&gt;&lt;html lang=&quot;id&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;&lt;title&gt;Officer Scorecard&lt;/title&gt;
 &lt;style&gt;
 :root{--bg:#f4f6fa;--card:#fff;--tx:#0f172a;--mu:#64748b;--bd:#e5e8ef;--bd2:#f1f4f9;--pr:#2563eb;--ok:#16a34a;--wa:#f59e0b;--er:#dc2626;--hd:#f8fafc;--trk:#eef1f6}
-html.alpro-dark{--bg:#0b1220;--card:#121b2e;--tx:#e6ebf5;--mu:#93a1b8;--bd:#24304a;--bd2:#1b2740;--hd:#16223a;--trk:#1f2c47}
+
 *{box-sizing:border-box;margin:0}
 body{font-family:Inter,&#x27;Segoe UI&#x27;,system-ui,sans-serif;background:var(--bg);color:var(--tx);padding:22px;font-size:13px}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:16px}
@@ -10036,7 +10036,7 @@ button.on{background:var(--pr);border-color:var(--pr);color:#fff}
 .g{display:grid;gap:12px;margin-bottom:14px}.k{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}.two{grid-template-columns:repeat(auto-fit,minmax(380px,1fr))}
 .bx{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px 18px;box-shadow:0 1px 3px rgba(15,23,42,.05);min-width:0}
 .bx h2{font-size:15px;margin-bottom:3px}.sub{color:var(--mu);font-size:12px;margin-bottom:12px;line-height:1.5}
-.l{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);font-weight:700}.v{font-size:21px;font-weight:800;margin-top:6px}.s{color:var(--mu);font-size:11.5px;margin-top:3px}
+.bx>.l{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);font-weight:700}.v{font-size:21px;font-weight:800;margin-top:6px}.s{color:var(--mu);font-size:11.5px;margin-top:3px}
 .tb{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
 .tb input,.tb select{padding:7px 10px;border:1px solid var(--bd);border-radius:10px;background:var(--card)}.tb input{min-width:200px}
 .cnt{margin-left:auto;color:var(--mu);font-size:12px}
@@ -10048,7 +10048,7 @@ td{padding:9px 10px;border-bottom:1px solid var(--bd2);white-space:nowrap;text-a
 tbody tr:hover{background:var(--hd)}
 .b{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700}
 .ok{background:#dcfce7;color:#15803d}.wr{background:#fef3c7;color:#b45309}.er{background:#fee2e2;color:#b91c1c}.mu{background:var(--trk);color:var(--mu)}
-html.alpro-dark .ok{background:#12351f;color:#4ade80}html.alpro-dark .wr{background:#3a2d0a;color:#fbbf24}html.alpro-dark .er{background:#401616;color:#f87171}
+
 .tx-ok{color:var(--ok)}.tx-wr{color:var(--wa)}.tx-er{color:var(--er)}
 .bar{height:7px;background:var(--trk);border-radius:9px;overflow:hidden;min-width:80px;display:flex}.bar i{display:block;height:100%;background:var(--pr)}.bar i.ok2{background:var(--ok)}.bar i.wr2{background:var(--wa)}.bar i.er2{background:var(--er)}
 .pm{display:flex;height:9px;border-radius:9px;overflow:hidden;min-width:110px;background:var(--trk)}.pm i{display:block;height:100%}
@@ -10057,9 +10057,9 @@ html.alpro-dark .ok{background:#12351f;color:#4ade80}html.alpro-dark .wr{backgro
 ul{padding-left:18px;line-height:1.7}
 .n{color:var(--mu);font-size:12px;margin-top:10px;line-height:1.6}
 #msg{padding:12px 14px;border-radius:12px;background:#fffbeb;border:1px solid #fde68a;color:#92400e;margin-bottom:14px}
-html.alpro-dark #msg{background:#3a2d0a;border-color:#6b4f12;color:#fbbf24}
+
 .warn{padding:10px 12px;border-radius:10px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:12.5px;margin-bottom:12px;line-height:1.5}
-html.alpro-dark .warn{background:#3a2412;border-color:#6b3a12;color:#fdba74}
+
 &lt;/style&gt;&lt;/head&gt;&lt;body&gt;
 &lt;div class=&quot;top&quot;&gt;&lt;div&gt;&lt;h1&gt;Officer Scorecard&lt;/h1&gt;&lt;p&gt;Kinerja tiap procurement officer dalam satu tampilan: sales vs target, proyeksi bulan ini, nilai SOH, MOI, dan komposisi Pareto. Dihitung otomatis dari data SOH dan Sales yang sudah ada, tanpa data tambahan.&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;span class=&quot;tgl&quot; id=&quot;tgB&quot;&gt;&lt;/span&gt; &lt;button id=&quot;rf&quot; style=&quot;margin-left:6px&quot;&gt;⟳ Muat ulang&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;div id=&quot;msg&quot; style=&quot;display:none&quot;&gt;&lt;/div&gt;
@@ -10227,7 +10227,7 @@ function paint(){SIG=sig();setCols();MD=MODE==&#x27;officer&#x27;?officerModel()
 "></iframe><iframe allow="fullscreen" id="f7" class="fr" data-doc="&lt;!DOCTYPE html&gt;&lt;html lang=&quot;id&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;&lt;title&gt;Store Health&lt;/title&gt;
 &lt;style&gt;
 :root{--bg:#f4f6fa;--card:#fff;--tx:#0f172a;--mu:#64748b;--bd:#e5e8ef;--bd2:#f1f4f9;--pr:#2563eb;--ok:#16a34a;--wa:#f59e0b;--er:#dc2626;--hd:#f8fafc;--trk:#eef1f6}
-html.alpro-dark{--bg:#0b1220;--card:#121b2e;--tx:#e6ebf5;--mu:#93a1b8;--bd:#24304a;--bd2:#1b2740;--hd:#16223a;--trk:#1f2c47}
+
 *{box-sizing:border-box;margin:0}
 body{font-family:Inter,&#x27;Segoe UI&#x27;,system-ui,sans-serif;background:var(--bg);color:var(--tx);padding:22px;font-size:13px}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:16px}
@@ -10239,7 +10239,7 @@ button.on{background:var(--pr);border-color:var(--pr);color:#fff}
 .g{display:grid;gap:12px;margin-bottom:14px}.k{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}.two{grid-template-columns:repeat(auto-fit,minmax(380px,1fr))}
 .bx{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px 18px;box-shadow:0 1px 3px rgba(15,23,42,.05);min-width:0}
 .bx h2{font-size:15px;margin-bottom:3px}.sub{color:var(--mu);font-size:12px;margin-bottom:12px;line-height:1.5}
-.l{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);font-weight:700}.v{font-size:21px;font-weight:800;margin-top:6px}.s{color:var(--mu);font-size:11.5px;margin-top:3px}
+.bx>.l{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);font-weight:700}.v{font-size:21px;font-weight:800;margin-top:6px}.s{color:var(--mu);font-size:11.5px;margin-top:3px}
 .tb{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
 .tb input,.tb select{padding:7px 10px;border:1px solid var(--bd);border-radius:10px;background:var(--card)}.tb input{min-width:200px}
 .cnt{margin-left:auto;color:var(--mu);font-size:12px}
@@ -10251,7 +10251,7 @@ td{padding:9px 10px;border-bottom:1px solid var(--bd2);white-space:nowrap;text-a
 tbody tr:hover{background:var(--hd)}
 .b{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700}
 .ok{background:#dcfce7;color:#15803d}.wr{background:#fef3c7;color:#b45309}.er{background:#fee2e2;color:#b91c1c}.mu{background:var(--trk);color:var(--mu)}
-html.alpro-dark .ok{background:#12351f;color:#4ade80}html.alpro-dark .wr{background:#3a2d0a;color:#fbbf24}html.alpro-dark .er{background:#401616;color:#f87171}
+
 .tx-ok{color:var(--ok)}.tx-wr{color:var(--wa)}.tx-er{color:var(--er)}
 .bar{height:7px;background:var(--trk);border-radius:9px;overflow:hidden;min-width:80px;display:flex}.bar i{display:block;height:100%;background:var(--pr)}.bar i.ok2{background:var(--ok)}.bar i.wr2{background:var(--wa)}.bar i.er2{background:var(--er)}
 .pm{display:flex;height:9px;border-radius:9px;overflow:hidden;min-width:110px;background:var(--trk)}.pm i{display:block;height:100%}
@@ -10260,9 +10260,9 @@ html.alpro-dark .ok{background:#12351f;color:#4ade80}html.alpro-dark .wr{backgro
 ul{padding-left:18px;line-height:1.7}
 .n{color:var(--mu);font-size:12px;margin-top:10px;line-height:1.6}
 #msg{padding:12px 14px;border-radius:12px;background:#fffbeb;border:1px solid #fde68a;color:#92400e;margin-bottom:14px}
-html.alpro-dark #msg{background:#3a2d0a;border-color:#6b4f12;color:#fbbf24}
+
 .warn{padding:10px 12px;border-radius:10px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:12.5px;margin-bottom:12px;line-height:1.5}
-html.alpro-dark .warn{background:#3a2412;border-color:#6b3a12;color:#fdba74}
+
 &lt;/style&gt;&lt;/head&gt;&lt;body&gt;
 &lt;div class=&quot;top&quot;&gt;&lt;div&gt;&lt;h1&gt;Store Health&lt;/h1&gt;&lt;p&gt;Ranking kesehatan stok per toko: MOI, status Low / OK / Overstock, serta estimasi nilai kelebihan dan kekurangan stok. Dihitung otomatis dari data SOH dan Sales yang sudah ada.&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;span class=&quot;tgl&quot; id=&quot;tgB&quot;&gt;&lt;/span&gt; &lt;button id=&quot;rf&quot; style=&quot;margin-left:6px&quot;&gt;⟳ Muat ulang&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;div id=&quot;msg&quot; style=&quot;display:none&quot;&gt;&lt;/div&gt;
