@@ -10468,7 +10468,7 @@ const LOCK_CSS={
 
 
   /* ===== API Apps Script (database akun & SOH). Isi URL Web App di bawah setelah deploy. Kosong = mode lokal (tanpa database). ===== */
-  const API_URL="https://script.google.com/macros/s/AKfycbwtmd9K0qgS9U-ltyUtmYvgcsgOMcc8AAK45EfXoDG9Nc9Z1Bo4RZSK73L0CeCL9Cx_1w/exec";
+  const API_URL="https://script.google.com/macros/s/AKfycbwuj_fWQfWShw0hrOWCZfg2OLiPQv_NsI_qnxJUu4caitIS8o8X__WPVlWBNXw24pbXIg/exec";
   let TOKEN=null;
   async function api(action,data){
   const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({action,token:TOKEN},data||{}))});
