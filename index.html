@@ -14265,6 +14265,227 @@ ${SG.R.apdN ? "" : '<div class="sg-warn">Lokasi APD/warehouse tidak terdeteksi d
         .wrp {
           padding: 0 0 calc(3 * var(--u));
         }
+
+        /* ===== AGENDA: klik edit, status selesai, MOM, arsip MOM ===== */
+        .pill.clk {
+          cursor: pointer;
+        }
+        .pill.clk:hover {
+          filter: brightness(0.94);
+          text-decoration: underline;
+        }
+        .pill.done {
+          opacity: 0.72;
+        }
+        .ic.clk {
+          cursor: pointer;
+          transition: 0.18s;
+        }
+        .ic.clk:hover {
+          transform: translateY(calc(-0.125 * var(--u)));
+          box-shadow: 0 calc(0.75 * var(--u)) calc(1.25 * var(--u)) calc(-0.875 * var(--u)) var(--c);
+        }
+        .chip.dn {
+          --c: #16a34a;
+        }
+        .sb {
+          display: inline-flex;
+          align-items: center;
+          gap: calc(0.375 * var(--u));
+          padding: calc(0.3125 * var(--u)) calc(0.75 * var(--u));
+          border-radius: calc(6.1875 * var(--u));
+          border: 1px solid var(--ln);
+          background: var(--in);
+          font-size: calc(0.75 * var(--u));
+          font-weight: 700;
+          cursor: pointer;
+          text-decoration: none;
+          color: var(--tx);
+          transition: 0.18s;
+        }
+        .sb:hover {
+          border-color: var(--p);
+          color: var(--p);
+        }
+        .sb.p {
+          background: var(--p);
+          border-color: var(--p);
+          color: #fff;
+        }
+        .sb.p:hover {
+          filter: brightness(1.1);
+          color: #fff;
+        }
+        .sb.r:hover {
+          border-color: var(--co);
+          color: var(--co);
+        }
+        .sb:disabled {
+          opacity: 0.6;
+          cursor: default;
+        }
+        .mm {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: calc(0.5 * var(--u));
+          margin-top: calc(0.625 * var(--u));
+          padding-top: calc(0.625 * var(--u));
+          border-top: 1px dashed color-mix(in srgb, var(--c) 35%, transparent);
+          font-size: calc(0.8125 * var(--u));
+          color: var(--mu);
+          font-weight: 600;
+        }
+        .mm.no {
+          font-weight: 500;
+        }
+        .mm .mn {
+          color: var(--p);
+          font-weight: 700;
+          overflow-wrap: anywhere;
+          text-decoration: none;
+        }
+        .mm .mn:hover {
+          text-decoration: underline;
+        }
+        .momt {
+          grid-column: 1/-1;
+          padding: calc(1.5 * var(--u)) calc(1.625 * var(--u));
+        }
+        .mth {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: calc(0.75 * var(--u));
+          flex-wrap: wrap;
+          margin-bottom: calc(0.875 * var(--u));
+        }
+        .mth h3 {
+          font-size: calc(1.25 * var(--u));
+          font-weight: 800;
+        }
+        .mth small {
+          display: block;
+          color: var(--mu);
+          font-weight: 500;
+          font-size: calc(0.8125 * var(--u));
+        }
+        .mth input {
+          max-width: calc(21 * var(--u));
+        }
+        .atabs {
+          display: flex;
+          gap: calc(0.5 * var(--u));
+          flex-wrap: wrap;
+          margin-bottom: calc(0.875 * var(--u));
+        }
+        .alist {
+          display: flex;
+          flex-direction: column;
+          gap: calc(0.625 * var(--u));
+        }
+        .mrow {
+          display: flex;
+          align-items: center;
+          gap: calc(0.875 * var(--u));
+          padding: calc(0.75 * var(--u)) calc(0.875 * var(--u));
+          background: var(--in);
+          border: 1px solid var(--ln);
+          border-radius: calc(1.375 * var(--u));
+          cursor: pointer;
+          transition: 0.18s;
+        }
+        .mrow:hover {
+          border-color: var(--c);
+          box-shadow: 0 calc(0.875 * var(--u)) calc(1.5 * var(--u)) calc(-1.125 * var(--u)) var(--c);
+        }
+        .mrt {
+          flex: 1;
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+        }
+        .mrt b {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .mrt small {
+          color: var(--mu);
+          font-weight: 500;
+          font-size: calc(0.8125 * var(--u));
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .mra {
+          display: flex;
+          align-items: center;
+          gap: calc(0.5 * var(--u));
+          flex: none;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        }
+        .mfn {
+          font-size: calc(0.75 * var(--u));
+          color: var(--mu);
+          max-width: calc(15 * var(--u));
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .mmore {
+          display: flex;
+          justify-content: center;
+          margin-top: calc(0.75 * var(--u));
+        }
+        .mdi {
+          display: flex;
+          flex-wrap: wrap;
+          gap: calc(0.375 * var(--u));
+          margin: calc(0.625 * var(--u)) 0 calc(0.375 * var(--u));
+        }
+        .mfile {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: calc(0.625 * var(--u));
+          padding: calc(0.75 * var(--u)) calc(0.875 * var(--u));
+          border: 1px solid var(--ln);
+          border-radius: calc(1 * var(--u));
+          background: var(--in);
+        }
+        .mfile .mt0 {
+          flex: 1;
+          min-width: calc(10 * var(--u));
+          display: flex;
+          flex-direction: column;
+          font-weight: 700;
+          overflow-wrap: anywhere;
+        }
+        .mfile .mt0 small {
+          color: var(--mu);
+          font-weight: 500;
+        }
+        .mfile.no {
+          border-style: dashed;
+          color: var(--mu);
+        }
+        @media (max-width: 720px) {
+          .mrow {
+            flex-wrap: wrap;
+          }
+          .mra {
+            width: 100%;
+            justify-content: flex-start;
+          }
+          .mfn {
+            max-width: 100%;
+          }
+          .momt {
+            padding: calc(1.25 * var(--u));
+          }
+        }
       </style>
       <div id="app">
         <div class="wrp">
@@ -14332,11 +14553,41 @@ ${SG.R.apdN ? "" : '<div class="sg-warn">Lokasi APD/warehouse tidak terdeteksi d
               <h3>Agenda Mendatang</h3>
               <div class="ups" id="upl"></div>
             </section>
+            <section class="cd momt">
+              <div class="mth">
+                <div>
+                  <h3>Arsip MOM</h3>
+                  <small id="asub"></small>
+                </div>
+                <input
+                  id="aq"
+                  type="search"
+                  placeholder="Cari judul meeting atau nama file MOM…"
+                  oninput="__ag.setAQ(this.value)"
+                />
+              </div>
+              <div class="atabs" id="atabs"></div>
+              <div class="alist" id="alist"></div>
+            </section>
           </main>
         </div>
       </div>
 
       <div id="toast" class="toast hide" role="status"></div>
+      <input
+        id="mf"
+        type="file"
+        class="hide"
+        accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        onchange="__ag.upMom(this)"
+      />
+      <div id="mmodal" class="modal hide" onclick="if (event.target === this) __ag.closeMom()">
+        <div class="mb" role="dialog" aria-modal="true" aria-label="Detail meeting dan MOM">
+          <h3 class="serif" id="mm_t"></h3>
+          <div id="mm_b"></div>
+          <div class="acts"><button class="btn" onclick="__ag.closeMom()">Tutup</button></div>
+        </div>
+      </div>
       <div id="modal" class="modal hide">
         <div class="mb" role="dialog" aria-modal="true" aria-label="Tambah jadwal">
           <h3 class="serif" id="mtitle">Tambah jadwal</h3>
@@ -14442,7 +14693,7 @@ ${SG.R.apdN ? "" : '<div class="sg-warn">Lokasi APD/warehouse tidak terdeteksi d
         };
         const API_KEY = "admin123"; // harus sama dengan ADMIN_PASSWORD di Code.gs
         const API_URL =
-          "https://script.google.com/macros/s/AKfycby6or9lrbko_1AxoSWCCWR1C8IwfyOr9HiHGnSMRg_KyQZ83KV7VrQnjnR_FO3E8vAKmQ/exec"; // tempel URL Web App dari Apps Script di sini
+          "https://script.google.com/macros/s/AKfycbzoZSrEcd-Bz7b7VnUhiIgjlcCoyeKGy4nSq0yy9AFgF-fUE2H3u1tLW_D9mlCoe9f8cA/exec"; // tempel URL Web App dari Apps Script di sini
         const $ = (s) => sr.querySelector(s);
         const esc = (s) =>
           String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
@@ -14470,7 +14721,14 @@ ${SG.R.apdN ? "" : '<div class="sg-warn">Lokasi APD/warehouse tidak terdeteksi d
           E = [],
           K = [],
           EM = [],
-          EID = null;
+          EID = null,
+          M = {}, // MOM per agenda: { idAgenda: { i, n(nama file), u(url), at(tanggal unggah) } }
+          MID = null,
+          BUSY = null,
+          AF = "all",
+          AQ = "",
+          AN = 8;
+        const MAXMOM = 5 * 1024 * 1024;
         let EDIT = (host.dataset.mode || "lihat") === "edit";
         const can = () => EDIT;
         const RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -14497,6 +14755,8 @@ ${SG.R.apdN ? "" : '<div class="sg-warn">Lokasi APD/warehouse tidak terdeteksi d
           eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>',
           key: '<circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 21 2M16 7l3 3"/>',
           mail: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/>',
+          file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>',
+          upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>',
         };
         const sv = (n) => '<svg viewBox="0 0 24 24" aria-hidden="true">' + IC[n] + "</svg>";
         sr.querySelectorAll("[data-i]").forEach((e) => (e.innerHTML = sv(e.dataset.i)));
@@ -14521,6 +14781,13 @@ ${SG.R.apdN ? "" : '<div class="sg-warn">Lokasi APD/warehouse tidak terdeteksi d
             if (!r.ok) throw new Error(r.error || "Gagal memuat data");
             E = r.agenda;
             K = r.kategori || [];
+            if (Array.isArray(r.mom)) setMom(r.mom);
+            else if (EDIT) {
+              try {
+                const q = await api({ action: "momList" });
+                if (q.ok && Array.isArray(q.mom)) setMom(q.mom);
+              } catch (_) {}
+            }
             render();
           } catch (err) {
             $("#list").innerHTML =
@@ -14556,6 +14823,7 @@ ${SG.R.apdN ? "" : '<div class="sg-warn">Lokasi APD/warehouse tidak terdeteksi d
           hero();
           stats();
           upc();
+          arc();
           clk();
         }
         function fl() {
@@ -14767,9 +15035,17 @@ ${SG.R.apdN ? "" : '<div class="sg-warn">Lokasi APD/warehouse tidak terdeteksi d
                 .slice(0, 2)
                 .map(
                   (e) =>
-                    '<span class="pill" style="--c:' +
+                    '<span class="pill' +
+                    (over(e) ? " done" : "") +
+                    (can() || over(e) ? " clk" : "") +
+                    '" onclick="__ag.ev(\'' +
+                    esc(e.i) +
+                    '\',event)" title="' +
+                    (over(e) ? "Meeting selesai · klik untuk MOM" : can() ? "Klik untuk edit" : "") +
+                    '" style="--c:' +
                     esc(kat(e.c).c) +
                     '">' +
+                    (M[e.i] ? "📄 " : over(e) ? "✓ " : "") +
                     esc(e.j + " " + e.t) +
                     "</span>",
                 )
@@ -14790,7 +15066,9 @@ ${SG.R.apdN ? "" : '<div class="sg-warn">Lokasi APD/warehouse tidak terdeteksi d
         function item(e) {
           const k = kat(e.c),
             em = e.e ? e.e.split(",").join(", ") : "",
-            hp = e.h ? (/^8\d{8,}$/.test(e.h) ? "0" + e.h : e.h) : "";
+            hp = e.h ? (/^8\d{8,}$/.test(e.h) ? "0" + e.h : e.h) : "",
+            fin = over(e),
+            clk = fin || can("edit");
           return (
             '<div class="fi" style="--c:' +
             esc(k.c) +
@@ -14801,7 +15079,8 @@ ${SG.R.apdN ? "" : '<div class="sg-warn">Lokasi APD/warehouse tidak terdeteksi d
             '</span><span class="chip g">' +
             (e.x === "external" ? "External" : "Internal") +
             "</span>" +
-            (can("edit")
+            (fin ? '<span class="chip dn"><i></i>Selesai</span>' : "") +
+            (can("edit") && !fin
               ? '<button class="x ed" title="Edit agenda" onclick="__ag.edit(\'' +
                 esc(e.i) +
                 "')\">Edit</button>"
@@ -14811,7 +15090,17 @@ ${SG.R.apdN ? "" : '<div class="sg-warn">Lokasi APD/warehouse tidak terdeteksi d
                 esc(e.i) +
                 "')\">Hapus</button>"
               : "") +
-            '</div><div class="ic"><div class="tt">' +
+            '</div><div class="ic' +
+            (clk ? " clk" : "") +
+            '"' +
+            (clk
+              ? " onclick=\"__ag.ev('" +
+                esc(e.i) +
+                "',event)\" title=\"" +
+                (fin ? "Klik untuk lihat / kelola MOM" : "Klik untuk edit") +
+                '"'
+              : "") +
+            '><div class="tt">' +
             esc(e.t) +
             "</div>" +
             (e.on
@@ -14825,6 +15114,7 @@ ${SG.R.apdN ? "" : '<div class="sg-warn">Lokasi APD/warehouse tidak terdeteksi d
                 : "") +
             (em ? '<div class="ml">' + esc(em) + "</div>" : "") +
             (hp ? '<div class="ml">' + esc(hp) + "</div>" : "") +
+            (fin ? momMini(e) : "") +
             "</div></div>"
           );
         }
@@ -14981,10 +15271,21 @@ ${SG.R.apdN ? "" : '<div class="sg-warn">Lokasi APD/warehouse tidak terdeteksi d
         }
         function edit(i) {
           const e = E.find((x) => x.i === i);
-          if (e) openM(e);
+          if (!e) return;
+          if (over(e)) {
+            toast("Meeting sudah selesai, tidak bisa diedit lagi");
+            openMom(e);
+            return;
+          }
+          openM(e);
         }
         function openM(ed) {
           ed = ed && ed.i ? ed : null;
+          if (ed && over(ed)) {
+            toast("Meeting sudah selesai, tidak bisa diedit lagi");
+            openMom(ed);
+            return;
+          }
           EID = ed ? ed.i : null;
           ["f_t", "f_l", "f_k", "f_h", "f_e", "nk_n"].forEach((i) => ($("#" + i).value = ""));
           EM = [];
@@ -15015,7 +15316,10 @@ ${SG.R.apdN ? "" : '<div class="sg-warn">Lokasi APD/warehouse tidak terdeteksi d
           $("#modal").classList.add("hide");
         }
         document.addEventListener("keydown", (e) => {
-          if (e.key === "Escape") closeM();
+          if (e.key === "Escape") {
+            closeM();
+            closeMom();
+          }
         });
         function modeUI() {
           const on = $("#f_m").value === "online";
@@ -15023,6 +15327,12 @@ ${SG.R.apdN ? "" : '<div class="sg-warn">Lokasi APD/warehouse tidak terdeteksi d
           $("#g_loc").classList.toggle("hide", on);
         }
         async function save() {
+          const orig = EID ? E.find((x) => x.i === EID) : null;
+          if (orig && over(orig)) {
+            $("#err").textContent = "Meeting sudah selesai, tidak bisa diedit lagi.";
+            $("#err").classList.remove("hide");
+            return;
+          }
           addEm();
           const eid = EID,
             t = $("#f_t").value.trim(),
@@ -15100,6 +15410,285 @@ ${SG.R.apdN ? "" : '<div class="sg-warn">Lokasi APD/warehouse tidak terdeteksi d
             btn.textContent = lbl;
           }
         }
+        /* ===== MOM: status selesai, upload Word, arsip ===== */
+        const endT = (e) =>
+          e.s
+            ? new Date(e.d + "T" + e.s + ":00").getTime()
+            : new Date(e.d + "T" + e.j + ":00").getTime() + 36e5;
+        function over(e) {
+          return endT(e) <= Date.now();
+        }
+        function setMom(a) {
+          M = {};
+          a.forEach((m) => {
+            if (m && m.i) M[m.i] = m;
+          });
+        }
+        const okUrl = (u) => /^https?:\/\//i.test(u || "");
+        function fdt(s) {
+          const d = new Date(s);
+          return isNaN(d) ? "" : d.getDate() + " " + MN[d.getMonth()].slice(0, 3) + " " + d.getFullYear();
+        }
+        function ev(i, evt) {
+          if (evt) {
+            if (evt.target && evt.target.closest && evt.target.closest("a,.x,.sb")) return;
+            evt.stopPropagation();
+          }
+          const e = E.find((x) => x.i === i);
+          if (!e) return;
+          if (S.sel !== e.d) {
+            S.sel = e.d;
+            render();
+          }
+          if (over(e)) openMom(e);
+          else if (can()) openM(e);
+        }
+        function om(i, evt) {
+          if (evt && evt.target && evt.target.closest && evt.target.closest("a,.sb")) return;
+          const e = E.find((x) => x.i === i);
+          if (e) openMom(e);
+        }
+        function momMini(e) {
+          const m = M[e.i],
+            id = esc(e.i);
+          if (BUSY === e.i) return '<div class="mm no">Mengunggah MOM…</div>';
+          if (m)
+            return (
+              '<div class="mm">' +
+              sv("file") +
+              (okUrl(m.u)
+                ? '<a class="mn" href="' + esc(m.u) + '" target="_blank" rel="noopener">' + esc(m.n) + "</a>"
+                : '<span class="mn">' + esc(m.n) + "</span>") +
+              "</div>"
+            );
+          return (
+            '<div class="mm no">Belum ada MOM' +
+            (can()
+              ? " <button class=\"sb p\" onclick=\"__ag.pickMom('" + id + "')\">" + sv("upload") + "Upload MOM</button>"
+              : "") +
+            "</div>"
+          );
+        }
+        function momBox(e) {
+          const m = M[e.i],
+            id = esc(e.i);
+          if (BUSY === e.i) return '<div class="mfile no">Mengunggah MOM, mohon tunggu…</div>';
+          if (m)
+            return (
+              '<div class="mfile">' +
+              sv("file") +
+              '<span class="mt0">' +
+              esc(m.n) +
+              "<small>" +
+              (m.at ? "Diunggah " + esc(fdt(m.at)) : "MOM tersimpan") +
+              "</small></span>" +
+              (okUrl(m.u)
+                ? '<a class="sb p" href="' + esc(m.u) + '" target="_blank" rel="noopener">Buka</a>'
+                : "") +
+              (can()
+                ? "<button class=\"sb\" onclick=\"__ag.pickMom('" +
+                  id +
+                  "')\">Ganti</button><button class=\"sb r\" onclick=\"__ag.delMom('" +
+                  id +
+                  "')\">Hapus</button>"
+                : "") +
+              "</div>"
+            );
+          return (
+            '<div class="mfile no">Belum ada MOM untuk meeting ini.' +
+            (can()
+              ? " <button class=\"sb p\" onclick=\"__ag.pickMom('" + id + "')\">" + sv("upload") + "Upload MOM</button>"
+              : "") +
+            "</div>"
+          );
+        }
+        function openMom(e) {
+          MID = e.i;
+          const k = kat(e.c),
+            q = e.d.split("-").map(Number),
+            dt = new Date(q[0], q[1] - 1, q[2]);
+          $("#mm_t").textContent = e.t;
+          $("#mm_b").innerHTML =
+            '<div class="mdi"><span class="chip" style="--c:' +
+            esc(k.c) +
+            '"><i></i>' +
+            esc(k.n) +
+            '</span><span class="chip g">' +
+            (e.x === "external" ? "External" : "Internal") +
+            "</span>" +
+            (over(e) ? '<span class="chip dn"><i></i>Selesai</span>' : "") +
+            '</div><div class="ml">' +
+            esc(DN[dt.getDay()] + ", " + q[2] + " " + MN[q[1] - 1] + " " + q[0] + " · " + rng(e)) +
+            "</div>" +
+            (e.on
+              ? '<div class="ml">' +
+                (okUrl(e.k)
+                  ? '<a href="' + esc(e.k) + '" target="_blank" rel="noopener">Meeting online</a>'
+                  : "Meeting online") +
+                "</div>"
+              : e.l
+                ? '<div class="ml">' + esc(e.l) + "</div>"
+                : "") +
+            "<label>Minutes of Meeting (MOM)</label>" +
+            momBox(e) +
+            (can() && over(e) ? '<p class="note">Format Word (.doc / .docx), maksimal 5 MB.</p>' : "");
+          $("#mmodal").classList.remove("hide");
+        }
+        function closeMom() {
+          $("#mmodal").classList.add("hide");
+          MID = null;
+        }
+        function refreshMom() {
+          if ($("#mmodal").classList.contains("hide") || !MID) return;
+          const e = E.find((x) => x.i === MID);
+          if (e) openMom(e);
+        }
+        function pickMom(i) {
+          const e = E.find((x) => x.i === i);
+          if (!e) return;
+          if (!can()) return toast("Hanya admin yang bisa mengunggah MOM");
+          if (!over(e)) return toast("MOM baru bisa diunggah setelah meeting selesai");
+          MID = i;
+          const f = $("#mf");
+          f.value = "";
+          f.click();
+        }
+        async function upMom(inp) {
+          const f = inp.files && inp.files[0],
+            i = MID,
+            e = E.find((x) => x.i === i);
+          inp.value = "";
+          if (!f || !e) return;
+          if (!can()) return toast("Hanya admin yang bisa mengunggah MOM");
+          if (!over(e)) return toast("MOM baru bisa diunggah setelah meeting selesai");
+          if (!/\.docx?$/i.test(f.name)) return toast("File harus berformat Word (.doc / .docx)");
+          if (f.size > MAXMOM) return toast("Ukuran file maksimal 5 MB");
+          BUSY = i;
+          render();
+          refreshMom();
+          try {
+            const data = await new Promise((res, rej) => {
+              const r = new FileReader();
+              r.onload = () => res(String(r.result).split(",")[1]);
+              r.onerror = () => rej(new Error("Gagal membaca file"));
+              r.readAsDataURL(f);
+            });
+            const r = await api({
+              action: "momUpload",
+              id: i,
+              name: f.name,
+              mime: f.type || "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+              data,
+              password: PW,
+            });
+            if (!r.ok) throw new Error(r.error || "Gagal mengunggah");
+            M[i] = r.mom;
+            toast("MOM berhasil diunggah");
+          } catch (err) {
+            toast("Gagal mengunggah MOM: " + err.message);
+          } finally {
+            BUSY = null;
+            render();
+            refreshMom();
+          }
+        }
+        async function delMom(i) {
+          if (!can()) return;
+          if (!confirm("Hapus file MOM ini?")) return;
+          try {
+            const r = await api({ action: "momDelete", id: i, password: PW });
+            if (!r.ok) throw new Error(r.error || "Gagal menghapus");
+            delete M[i];
+            toast("MOM dihapus");
+          } catch (err) {
+            toast("Gagal menghapus MOM: " + err.message);
+          }
+          render();
+          refreshMom();
+        }
+        function setAQ(v) {
+          AQ = v;
+          AN = 8;
+          arc();
+        }
+        function setAF(f) {
+          AF = f;
+          AN = 8;
+          arc();
+        }
+        function moreA() {
+          AN += 8;
+          arc();
+        }
+        function arc() {
+          const lst = $("#alist");
+          if (!lst) return;
+          const all = V()
+              .filter(over)
+              .sort((a, b) => (b.d + b.j).localeCompare(a.d + a.j)),
+            ada = all.filter((e) => M[e.i]).length,
+            q = AQ.trim().toLowerCase(),
+            rows = all
+              .filter((e) => (AF === "ada" ? M[e.i] : AF === "belum" ? !M[e.i] : true))
+              .filter((e) => !q || (e.t + " " + (M[e.i] ? M[e.i].n : "")).toLowerCase().includes(q));
+          $("#asub").textContent =
+            all.length + " meeting selesai · " + ada + " sudah ada MOM · " + (all.length - ada) + " belum";
+          const T = (f, l, n) =>
+            '<button class="fp' + (AF === f ? " on" : "") + "\" onclick=\"__ag.setAF('" + f + "')\">" + l + " (" + n + ")</button>";
+          $("#atabs").innerHTML =
+            T("all", "Semua selesai", all.length) +
+            T("ada", "Sudah ada MOM", ada) +
+            T("belum", "Belum ada MOM", all.length - ada);
+          lst.innerHTML = rows.length
+            ? rows
+                .slice(0, AN)
+                .map((e) => {
+                  const p = e.d.split("-").map(Number),
+                    k = kat(e.c),
+                    m = M[e.i],
+                    id = esc(e.i);
+                  return (
+                    '<div class="mrow" style="--c:' +
+                    esc(k.c) +
+                    "\" onclick=\"__ag.om('" +
+                    id +
+                    '\',event)"><span class="ud"><b class="serif">' +
+                    p[2] +
+                    "</b>" +
+                    MN[p[1] - 1].slice(0, 3) +
+                    '</span><span class="mrt"><b>' +
+                    esc(e.t) +
+                    "</b><small>" +
+                    esc(rng(e) + " · " + k.n + " · " + p[0]) +
+                    '</small></span><span class="mra">' +
+                    (m
+                      ? '<span class="mfn" title="' +
+                        esc(m.n) +
+                        '">' +
+                        esc(m.n) +
+                        "</span>" +
+                        (okUrl(m.u)
+                          ? '<a class="sb p" href="' + esc(m.u) + '" target="_blank" rel="noopener">Buka MOM</a>'
+                          : "")
+                      : '<span class="chip" style="--c:var(--co)">Belum ada MOM</span>' +
+                        (can()
+                          ? "<button class=\"sb p\" onclick=\"__ag.pickMom('" + id + "')\">" + sv("upload") + "Upload</button>"
+                          : "")) +
+                    "</span></div>"
+                  );
+                })
+                .join("") +
+              (rows.length > AN
+                ? '<div class="mmore"><button class="btn" onclick="__ag.moreA()">Tampilkan lebih banyak (' +
+                  (rows.length - AN) +
+                  ")</button></div>"
+                : "")
+            : '<div class="emp"><b>' +
+              (all.length ? "Tidak ada hasil" : "Belum ada meeting yang selesai") +
+              "</b>" +
+              (all.length ? "Ubah kata kunci atau filter di atas." : "MOM akan muncul di sini setelah meeting selesai.") +
+              "</div>";
+        }
         function setMode(m) {
           EDIT = m === "edit";
           ["#add", "#addh"].forEach((i) => $(i).classList.toggle("hide", !EDIT));
@@ -15118,6 +15707,8 @@ ${SG.R.apdN ? "" : '<div class="sg-warn">Lokasi APD/warehouse tidak terdeteksi d
           day();
           hero();
           upc();
+          cal();
+          arc();
         }, 30000);
         ["#add", "#addh"].forEach((i) => $(i).classList.toggle("hide", !EDIT));
         render();
@@ -15142,6 +15733,15 @@ ${SG.R.apdN ? "" : '<div class="sg-warn">Lokasi APD/warehouse tidak terdeteksi d
           jump,
           del,
           rmEm,
+          ev,
+          om,
+          closeMom,
+          pickMom,
+          upMom,
+          delMom,
+          setAQ,
+          setAF,
+          moreA,
         });
         window.Agenda = {
           refresh: () => {
