@@ -1541,6 +1541,10 @@
   if(cK){try{const fw=window.parent.document.getElementById("f1").contentWindow;SI=fw.getSalesItems?fw.getSalesItems():null}catch(e){SI=null}
   if(!SI||!SI.map){toast("Data sales per item belum tersedia. Upload ulang Excel Sales (menu Sales) atau tunggu data selesai dimuat, lalu coba lagi.",7000);return false}
   const pm=m.meta||{};if(pm.period_start&amp;&amp;SI.ps&amp;&amp;(String(pm.period_start).slice(0,10)!==SI.ps||String(pm.period_end).slice(0,10)!==SI.pe)){toast("Periode data item ("+SI.ps+" s/d "+SI.pe+") berbeda dengan data Sales toko. Upload ulang Excel Sales.",7000);return false}}
+  if(!cK){try{const fw=window.parent.document.getElementById("f1").contentWindow;SI=fw.getSalesItems?fw.getSalesItems():null}catch(e){SI=null}}
+  const siOk=!!(SI&amp;&amp;SI.ex&amp;&amp;m.meta&amp;&amp;SI.ps===String(m.meta.period_start||"").slice(0,10));
+  // [BARU] SKU Non Merchandise, General Item dan bernama ALPRO tidak ikut export
+  const exI=x=&gt;/alpro/i.test(String(x[3]||""))||/^\s*general\s+item\s*$/i.test(String(x[3]||""))||(siOk&amp;&amp;!!SI.ex[zc2(x[2])]);
   const bn=bs=="hpp"?"COGS/bln":"Net Sales/bln",sk=r=&gt;[r.sale.code||r.s.code||"",r.sale.name||r.s.name||r.s.code||""];
   const mx=r=&gt;[Math.round(r.base),r.moi==null?"":+r.moi.toFixed(2),stat(r.moi)[0]];
   const H=[],data=[];
@@ -1549,7 +1553,7 @@
   const idx=new Map(src.map(r=&gt;[r.s.key,r])),per=new Map();
   for(const x of APP.soh.rows){const r=idx.get(x[0]||x[1]);if(!r)continue;let a=per.get(r);if(!a){a=[];per.set(r,a)}a.push(x)}
   for(const r of src){const a=(per.get(r)||[]).sort((p1,p2)=&gt;p2[5]-p1[5]);
-  for(const x of a){const w=[...sk(r),x[2],x[3]];if(cS)w.push(+x[4]||0,Math.round(+x[5]||0));if(cP)w.push(Math.round(r.salesM));if(cM)w.push(...mx(r));
+  for(const x of a){if(exI(x))continue;const w=[...sk(r),x[2],x[3]];if(cS)w.push(+x[4]||0,Math.round(+x[5]||0));if(cP)w.push(Math.round(r.salesM));if(cM)w.push(...mx(r));
   if(cK){const it=SI.map[zc2(r.sale.code||r.s.code)+"|"+zc2(x[2])],kk=m.k||1,sv=+x[5]||0;
   const q=it?it[0]:0,nsv=it?it[1]:0,cg=it?(it[3]&gt;0?it[3]:it[1]-it[2]):0,bsk=(bs=="hpp"?cg:nsv)*kk,mo=bsk&gt;0?sv/bsk:null,st=stat(mo)[0];
   if(cO&amp;&amp;!(sv&gt;0&amp;&amp;(st=="Overstock"||st=="No Sales")))continue;
@@ -1557,7 +1561,7 @@
   data.push(w)}}}
   else if(It){H.push("Kode Item","Nama Item");if(cS)H.push("SOH Qty","SOH Value");H.push("Jumlah Toko");
   const idx=new Set(src.map(r=&gt;r.s.key)),im=new Map();
-  for(const x of APP.soh.rows){if(!idx.has(x[0]||x[1]))continue;let a=im.get(x[2]);if(!a){a={c:x[2],n:x[3],q:0,v:0,t:0};im.set(x[2],a)}a.q+=+x[4]||0;a.v+=+x[5]||0;a.t++}
+  for(const x of APP.soh.rows){if(!idx.has(x[0]||x[1])||exI(x))continue;let a=im.get(x[2]);if(!a){a={c:x[2],n:x[3],q:0,v:0,t:0};im.set(x[2],a)}a.q+=+x[4]||0;a.v+=+x[5]||0;a.t++}
   [...im.values()].sort((p1,p2)=&gt;p2.v-p1.v).forEach(a=&gt;{const w=[a.c,a.n];if(cS)w.push(+a.q.toFixed(2),Math.round(a.v));w.push(a.t);data.push(w)})}
   else{H.push("Kode Toko","Nama Toko");if(cS)H.push("SOH Qty","SOH Value");if(cP)H.push("Sales/bln");if(cM)H.push(bn,"MOI (bln)","Status");
   for(const r of src){const w=[...sk(r)];if(cS)w.push(+(+r.s.qty||0).toFixed(2),Math.round(r.s.val));if(cP)w.push(Math.round(r.salesM));if(cM)w.push(...mx(r));data.push(w)}}
@@ -1573,6 +1577,7 @@
   ["Filter tabel",fd],["Cakupan",sc=="a"?"Semua toko":"Sesuai filter saat ini"],["Jumlah toko",src.length],["Jumlah baris",data.length],[],["Catatan"]];
   if(T&amp;&amp;It&amp;&amp;!cK)info.push(["Sales dan MOI hanya tersedia per toko (data Sales tidak memuat detail per item). Pada export Toko × Item angkanya berulang di setiap baris item, jangan dijumlahkan."]);
   if(cK)info.push(["Level item (toko x SKU). Sales Qty, Sales Value dan COGS = total periode sales ("+(m.meta.period_start||"-")+" s/d "+(m.meta.period_end||"-")+"). MOI = SOH Value SKU ÷ ("+(bs=="hpp"?"COGS":"Sales Value")+" SKU per bulan, periode x "+F(m.k,2)+"). Status: &lt; 1,5 Low, 1,5 - 4 OK, &gt; 4 Overstock, tanpa sales = No Sales."]);
+  if(It)info.push(["SKU Non Merchandise, General Item dan item bernama ALPRO tidak ikut export."]);
   if(cO)info.push(["Hanya SKU Overstock / tanpa sales (SOH Value &gt; 0) yang diexport."]);
   if(itemOnly)info.push(["SOH item adalah total dari toko yang diexport. Sales tidak tersedia per item."]);
   info.push(["Toko APD dan toko SOH yang tidak ditemukan di data Sales tidak ikut, sama seperti tabel MOI."]);
@@ -2590,13 +2595,14 @@ th{background:var(--u-navy)!important}
   // ===== [BARU] SALES PER ITEM =====
   const _zc=s=&gt;String(s==null?&apos;&apos;:s).trim().replace(/^0+/,&apos;&apos;);
   function buildItems(ps,pe,rows){
-    const map={};
+    const map={}, ex={};
     rows.forEach(r=&gt;{
+      if(r[2]===&apos;__EXCL__&apos;){ ex[_zc(r[1])]=1; return; }
       const k=_zc(r[0])+&apos;|&apos;+_zc(r[1]), a=map[k];
       if(a){ a[0]+=+r[3]||0; a[1]+=+r[4]||0; a[2]+=+r[5]||0; a[3]+=+r[6]||0; if(!a[4]&amp;&amp;r[2]) a[4]=r[2]; }
       else map[k]=[+r[3]||0,+r[4]||0,+r[5]||0,+r[6]||0,r[2]||&apos;&apos;];
     });
-    return {ps:ps,pe:pe,n:rows.length,map:map};
+    return {ps:ps,pe:pe,n:rows.length,map:map,ex:ex};
   }
   async function pushItems(ps,pe,rows){
     if(!GAS_URL||GAS_URL.includes(&apos;ISI_URL&apos;)||!rows.length) return;
@@ -2960,7 +2966,7 @@ th{background:var(--u-navy)!important}
       const _ks=Object.keys(colMap);
       const itemCodeCol=_ks.find(k=&gt;[&apos;itemcode&apos;,&apos;skucode&apos;,&apos;sku&apos;,&apos;skunumber&apos;,&apos;productcode&apos;,&apos;itemno&apos;,&apos;itemid&apos;,&apos;articlecode&apos;,&apos;plu&apos;,&apos;kodeitem&apos;,&apos;kodebarang&apos;].includes(_nk(k)))||_ks.find(k=&gt;/(item|sku|product|article)/i.test(k)&amp;&amp;/(code|kode|id|no)/i.test(k));
       const itemNameCol=_ks.find(k=&gt;[&apos;itemname&apos;,&apos;itemdescription&apos;,&apos;skuname&apos;,&apos;skudescription&apos;,&apos;productname&apos;,&apos;productdescription&apos;,&apos;description&apos;,&apos;namaitem&apos;,&apos;namabarang&apos;].includes(_nk(k)))||_ks.find(k=&gt;/(item|sku|product|article)/i.test(k)&amp;&amp;/(name|nama|desc)/i.test(k));
-      const itemAgg=new Map();
+      const itemAgg=new Map(), exclSet=new Set();
       for(let i=headerIdx+1;i&lt;rows.length;i++){
         const r=rows[i];
         if(!r||r.length===0) continue;
@@ -2991,7 +2997,12 @@ th{background:var(--u-navy)!important}
         // [BARU] agregasi per toko x item
         if(itemCodeCol!==undefined){
           const ic=String(r[colMap[itemCodeCol]]==null?&apos;&apos;:r[colMap[itemCodeCol]]).trim();
-          if(store&amp;&amp;ic){
+          // [BARU] khusus data per SKU: buang Non Merchandise, General Item, dan item ber-nama ALPRO
+          const _nm=itemNameCol!==undefined?String(r[colMap[itemNameCol]]==null?&apos;&apos;:r[colMap[itemNameCol]]):&apos;&apos;;
+          const _gp=(colMap[&apos;Group&apos;]!==undefined?String(r[colMap[&apos;Group&apos;]]||&apos;&apos;):&apos;&apos;)+&apos; &apos;+division;
+          const _ex=/non\s*merchandise/i.test(_gp)||/alpro/i.test(_nm)||/^\s*general\s+item\s*$/i.test(_nm);
+          if(_ex&amp;&amp;ic) exclSet.add(ic);
+          if(store&amp;&amp;ic&amp;&amp;!_ex){
             const ik=store+&apos;|&apos;+ic; let ia=itemAgg.get(ik);
             if(!ia){ ia=[store,ic,itemNameCol!==undefined?String(r[colMap[itemNameCol]]==null?&apos;&apos;:r[colMap[itemNameCol]]).trim():&apos;&apos;,0,0,0,0]; itemAgg.set(ik,ia); }
             ia[3]+=qty; ia[4]+=ns; ia[5]+=gp; ia[6]+=cost;
@@ -3078,6 +3089,7 @@ th{background:var(--u-navy)!important}
       showToast(&apos;⚠️ Kolom kode item tidak ditemukan di Excel, MOI per SKU tidak tersedia. Kolom terbaca: &apos;+Object.keys(colMap).join(&apos;, &apos;),10000);
     }else{
       const itemRows=[...itemAgg.values()].filter(a=&gt;a[3]||a[4]||a[5]||a[6]); // baris tanpa sales dilewati (dianggap 0)
+      exclSet.forEach(c=&gt;itemRows.push([&apos;*&apos;,c,&apos;__EXCL__&apos;,0,0,0,0])); // penanda item yang dibuang (supaya tetap dikenal setelah refresh)
       ITEMS=buildItems(periodStart,periodEnd,itemRows); notifyParent();
       await pushItems(periodStart,periodEnd,itemRows);
     }
