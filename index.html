@@ -4,6 +4,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Procurement Dashboard — Alpro</title>
+    <!-- ======================================================================
+         DAFTAR API (Google Apps Script)
+         Cara cari: tekan Ctrl+F lalu ketik tagnya, contoh: API-SALES
+         Hasil pertama = daftar ini, hasil berikutnya (Enter) = lokasi URL di kode.
+         ======================================================================
+         TAG             TAB / BAGIAN                          VARIABEL
+         [API-SALES]     Sales (Kaizen Spirit)                 GAS_URL
+         [API-BUDGET]    Budget                                PROCUREMENT_API_URL
+         [API-OOS]       OOS (Out of Stock)                    API_URL
+         [API-OTB]       Outstanding dan OTB                   API
+         [API-AKUN-SOH]  Database akun login dan SOH (utama)  API_URL
+         (tanpa tag)     Agenda / Procurement Calendar         cari: const API_KEY
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         Catatan:
+         - URL BUDGET dan OTB saat ini SAMA (satu Apps Script untuk dua tab).
+         - Tab tanpa API sendiri: Inventory, Suggested Order, SLA Supplier,
+           Officer Scorecard, Store Health.
+         - Ganti URL hanya di baris yang tepat di bawah komentar bertag.
+         ====================================================================== -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -1475,6 +1494,93 @@
   if(isS)mkTable("st-tb",[["Store","l"],["Nama Store","l"],["Baris Item"],["SOH Qty"],["SOH Value"],["Share %"]],arr,{cells:x=&gt;[esc(x.code||"-"),esc(x.name||"-"),I(x.n),F(x.qty,2),I(x.val),F(tv?x.val/tv*100:0,2)],s:x=&gt;x.code+" "+x.name});
   else mkTable("st-tb",[["Item Code","l"],["Item Name","l"],["Jml Store"],["SOH Qty"],["SOH Value"],["Share %"],["Pareto","c"]],arr,{cells:x=&gt;[esc(x.code),esc(x.name),I(x.n),F(x.qty,2),I(x.val),F(tv?x.val/tv*100:0,2),badge(x.cls)],s:x=&gt;x.code+" "+x.name,f:x=&gt;x.cls,filter:[["","Semua Pareto"]].concat(d.classes.map(k=&gt;[k,"Pareto "+k]))})};
 
+  // ---- EXPORT MOI (Excel) : filter + pilihan kolom Toko / Item / SOH / Sales ----
+  function moiXFilter(rows){const S=TV.mt||{q:"",f:""},q=(S.q||"").toLowerCase();
+  return rows.filter(x=&gt;(!S.f||stat(x.moi)[0]===S.f)&amp;&amp;(!q||((x.sale.code||"")+" "+(x.sale.name||"")+" "+x.s.code+" "+x.s.name).toLowerCase().includes(q)))}
+  function moiXDesc(){const S=TV.mt||{q:"",f:""};return [S.f?"Status "+S.f:"",S.q?"Cari: "+S.q:""].filter(Boolean).join(" · ")||"Tanpa filter"}
+  function moiXBtn(rows,bs,m){const bar=$("mt")&amp;&amp;$("mt").querySelector(".tb");if(!bar)return;
+  const b=document.createElement("button");b.className="btn";b.id="mxb";b.textContent="⬇ Export Excel";b.onclick=()=&gt;moiXOpen(rows,bs,m);bar.appendChild(b)}
+  function moiXOpen(rows,bs,m){const old=$("mxo");if(old)old.remove();
+  const flt=moiXFilter(rows),fd=moiXDesc(),bn=bs=="hpp"?"COGS/bln":"Net Sales/bln";
+  const o=document.createElement("div");o.id="mxo";
+  o.style.cssText="position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px";
+  const lb="display:flex;align-items:center;gap:8px;margin:0 0 6px;cursor:pointer",hd="font-weight:700;font-size:13px;margin:12px 0 6px";
+  o.innerHTML=`&lt;div style="background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:12px;padding:18px;width:100%;max-width:440px;max-height:92vh;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.3)"&gt;
+  &lt;h2 style="margin:0 0 4px;font-size:16px"&gt;Export MOI ke Excel&lt;/h2&gt;
+  &lt;div style="color:var(--mu);font-size:12px"&gt;Filter aktif di tabel: &lt;b style="color:var(--tx)"&gt;${esc(fd)}&lt;/b&gt;&lt;/div&gt;
+  &lt;div style="${hd}"&gt;Data yang diexport&lt;/div&gt;
+  &lt;label style="${lb}"&gt;&lt;input type="radio" name="mxs" value="f" checked&gt; Sesuai filter saat ini (${I(flt.length)} toko)&lt;/label&gt;
+  &lt;label style="${lb}"&gt;&lt;input type="radio" name="mxs" value="a"&gt; Semua toko (${I(rows.length)} toko)&lt;/label&gt;
+  &lt;div style="${hd}"&gt;Kolom&lt;/div&gt;
+  &lt;label style="${lb}"&gt;&lt;input type="checkbox" id="mxT" checked&gt; Toko (kode dan nama)&lt;/label&gt;
+  &lt;label style="${lb}"&gt;&lt;input type="checkbox" id="mxI" checked&gt; Item (kode dan nama)&lt;/label&gt;
+  &lt;label style="${lb}"&gt;&lt;input type="checkbox" id="mxS" checked&gt; SOH (qty dan value)&lt;/label&gt;
+  &lt;label style="${lb}"&gt;&lt;input type="checkbox" id="mxP" checked&gt; Sales per bulan (data level toko)&lt;/label&gt;
+  &lt;label style="${lb}"&gt;&lt;input type="checkbox" id="mxM"&gt; Tambahan: ${esc(bn)}, MOI dan Status&lt;/label&gt;
+  &lt;label style="${lb}"&gt;&lt;input type="checkbox" id="mxK" checked&gt; Per SKU: SOH, Sales Qty, Sales Value, COGS, MOI dan Status (level item)&lt;/label&gt;
+  &lt;label style="${lb};margin-left:22px"&gt;&lt;input type="checkbox" id="mxO"&gt; Hanya SKU Overstock (MOI SKU &amp;gt; 4 bln atau tanpa sales)&lt;/label&gt;
+  &lt;div id="mxh" style="margin:10px 0 0;padding:8px 10px;border-radius:8px;background:rgba(37,99,235,.08);font-size:12px;color:var(--tx)"&gt;&lt;/div&gt;
+  &lt;div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"&gt;&lt;button class="btn" id="mxc"&gt;Batal&lt;/button&gt;&lt;button class="btn" id="mxg" style="background:var(--pr);border-color:var(--pr);color:#fff"&gt;⬇ Export&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;`;
+  document.body.appendChild(o);
+  const g=i=&gt;$(i),upd=()=&gt;{const T=g("mxT").checked,It=g("mxI").checked,itemOnly=It&amp;&amp;!T;
+  g("mxP").disabled=itemOnly;g("mxM").disabled=itemOnly;g("mxK").disabled=!(T&amp;&amp;It);g("mxO").disabled=!(T&amp;&amp;It)||!g("mxK").checked;g("mxK").parentNode.style.opacity=T&amp;&amp;It?"1":".45";g("mxO").parentNode.style.opacity=T&amp;&amp;It&amp;&amp;g("mxK").checked?"1":".45";
+  g("mxP").parentNode.style.opacity=g("mxM").parentNode.style.opacity=itemOnly?".45":"1";
+  if(T&amp;&amp;It&amp;&amp;g("mxK").checked){g("mxP").disabled=g("mxM").disabled=true;g("mxP").parentNode.style.opacity=g("mxM").parentNode.style.opacity=".45"}
+  g("mxh").textContent=T&amp;&amp;It?(g("mxK").checked?"1 baris = 1 toko × 1 item. SOH, Sales Qty, Sales Value, COGS dan MOI sudah per item (Sales = total periode, MOI = per bulan). Angka level toko tidak ikut.":"1 baris = 1 toko × 1 item. Angka Sales/MOI hanya ada per toko, jadi berulang di tiap baris item — jangan dijumlahkan per baris.")
+  :It?"1 baris = 1 item (SOH dijumlah dari toko yang diexport). Sales dan MOI tidak tersedia per item."
+  :T?"1 baris = 1 toko.":"Pilih minimal Toko atau Item."};
+  o.addEventListener("change",upd);upd();
+  o.onclick=e=&gt;{if(e.target===o)o.remove()};g("mxc").onclick=()=&gt;o.remove();
+  g("mxg").onclick=()=&gt;{try{if(moiXRun(rows,bs,m,flt,fd,o.querySelector("input[name=mxs]:checked").value))o.remove()}catch(e){toast("Export gagal: "+e.message)}}}
+  function moiXRun(rows,bs,m,flt,fd,sc){
+  const T=$("mxT").checked,It=$("mxI").checked,itemOnly=It&amp;&amp;!T,cS=$("mxS").checked,cP=$("mxP").checked&amp;&amp;!itemOnly&amp;&amp;!($("mxK").checked&amp;&amp;T&amp;&amp;It),cM=$("mxM").checked&amp;&amp;!itemOnly&amp;&amp;!($("mxK").checked&amp;&amp;T&amp;&amp;It);
+  if(!T&amp;&amp;!It){toast("Pilih minimal Toko atau Item");return false}
+  const src=sc=="a"?rows:flt;if(!src.length){toast("Tidak ada data untuk diexport");return false}
+  // [BARU] MOI per SKU: ambil sales per item dari modul Sales
+  const cK=$("mxK").checked&amp;&amp;T&amp;&amp;It,cO=cK&amp;&amp;$("mxO").checked,zc2=s=&gt;String(s==null?"":s).trim().replace(/^0+/,"");let SI=null;
+  if(cK){try{const fw=window.parent.document.getElementById("f1").contentWindow;SI=fw.getSalesItems?fw.getSalesItems():null}catch(e){SI=null}
+  if(!SI||!SI.map){toast("Data sales per item belum tersedia. Upload ulang Excel Sales (menu Sales) atau tunggu data selesai dimuat, lalu coba lagi.",7000);return false}
+  const pm=m.meta||{};if(pm.period_start&amp;&amp;SI.ps&amp;&amp;(String(pm.period_start).slice(0,10)!==SI.ps||String(pm.period_end).slice(0,10)!==SI.pe)){toast("Periode data item ("+SI.ps+" s/d "+SI.pe+") berbeda dengan data Sales toko. Upload ulang Excel Sales.",7000);return false}}
+  const bn=bs=="hpp"?"COGS/bln":"Net Sales/bln",sk=r=&gt;[r.sale.code||r.s.code||"",r.sale.name||r.s.name||r.s.code||""];
+  const mx=r=&gt;[Math.round(r.base),r.moi==null?"":+r.moi.toFixed(2),stat(r.moi)[0]];
+  const H=[],data=[];
+  if(T&amp;&amp;It){H.push("Kode Toko","Nama Toko","Kode Item","Nama Item");if(cS)H.push("SOH Qty","SOH Value");if(cP)H.push("Sales/bln (level toko)");if(cM)H.push(bn+" (level toko)","MOI (bln)","Status");
+  if(cK)H.push("Sales Qty","Sales Value","COGS","MOI (bln)","Status");
+  const idx=new Map(src.map(r=&gt;[r.s.key,r])),per=new Map();
+  for(const x of APP.soh.rows){const r=idx.get(x[0]||x[1]);if(!r)continue;let a=per.get(r);if(!a){a=[];per.set(r,a)}a.push(x)}
+  for(const r of src){const a=(per.get(r)||[]).sort((p1,p2)=&gt;p2[5]-p1[5]);
+  for(const x of a){const w=[...sk(r),x[2],x[3]];if(cS)w.push(+x[4]||0,Math.round(+x[5]||0));if(cP)w.push(Math.round(r.salesM));if(cM)w.push(...mx(r));
+  if(cK){const it=SI.map[zc2(r.sale.code||r.s.code)+"|"+zc2(x[2])],kk=m.k||1,sv=+x[5]||0;
+  const q=it?it[0]:0,nsv=it?it[1]:0,cg=it?(it[3]&gt;0?it[3]:it[1]-it[2]):0,bsk=(bs=="hpp"?cg:nsv)*kk,mo=bsk&gt;0?sv/bsk:null,st=stat(mo)[0];
+  if(cO&amp;&amp;!(sv&gt;0&amp;&amp;(st=="Overstock"||st=="No Sales")))continue;
+  w.push(+q.toFixed(2),Math.round(nsv),Math.round(cg),mo==null?"":+mo.toFixed(2),st)}
+  data.push(w)}}}
+  else if(It){H.push("Kode Item","Nama Item");if(cS)H.push("SOH Qty","SOH Value");H.push("Jumlah Toko");
+  const idx=new Set(src.map(r=&gt;r.s.key)),im=new Map();
+  for(const x of APP.soh.rows){if(!idx.has(x[0]||x[1]))continue;let a=im.get(x[2]);if(!a){a={c:x[2],n:x[3],q:0,v:0,t:0};im.set(x[2],a)}a.q+=+x[4]||0;a.v+=+x[5]||0;a.t++}
+  [...im.values()].sort((p1,p2)=&gt;p2.v-p1.v).forEach(a=&gt;{const w=[a.c,a.n];if(cS)w.push(+a.q.toFixed(2),Math.round(a.v));w.push(a.t);data.push(w)})}
+  else{H.push("Kode Toko","Nama Toko");if(cS)H.push("SOH Qty","SOH Value");if(cP)H.push("Sales/bln");if(cM)H.push(bn,"MOI (bln)","Status");
+  for(const r of src){const w=[...sk(r)];if(cS)w.push(+(+r.s.qty||0).toFixed(2),Math.round(r.s.val));if(cP)w.push(Math.round(r.salesM));if(cM)w.push(...mx(r));data.push(w)}}
+  if(!data.length){toast("Tidak ada data untuk diexport");return false}
+  if(data.length&gt;1048575){toast("Baris melebihi batas Excel ("+I(data.length)+"). Persempit filter atau lepas kolom Item.");return false}
+  const ws=XLSX.utils.aoa_to_sheet([H,...data]);
+  ws["!cols"]=H.map(h=&gt;({wch:/Nama/.test(h)?36:/Kode/.test(h)?12:/Status/.test(h)?11:18}));
+  ws["!autofilter"]={ref:XLSX.utils.encode_range({s:{r:0,c:0},e:{r:data.length,c:H.length-1}})};
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"MOI");
+  const dt=new Date(),p2=n=&gt;String(n).padStart(2,"0"),ds=dt.getFullYear()+"-"+p2(dt.getMonth()+1)+"-"+p2(dt.getDate());
+  const info=[["Export MOI"],["Tanggal export",ds+" "+p2(dt.getHours())+":"+p2(dt.getMinutes())],["Sumber SOH",(APP.soh&amp;&amp;APP.soh.file)||""],
+  ["Periode Sales",(m.meta.period_start||"-")+" s/d "+(m.meta.period_end||"-")],["Basis MOI",bs=="hpp"?"COGS (Sales Cost)":"Net Sales"],
+  ["Filter tabel",fd],["Cakupan",sc=="a"?"Semua toko":"Sesuai filter saat ini"],["Jumlah toko",src.length],["Jumlah baris",data.length],[],["Catatan"]];
+  if(T&amp;&amp;It&amp;&amp;!cK)info.push(["Sales dan MOI hanya tersedia per toko (data Sales tidak memuat detail per item). Pada export Toko × Item angkanya berulang di setiap baris item, jangan dijumlahkan."]);
+  if(cK)info.push(["Level item (toko x SKU). Sales Qty, Sales Value dan COGS = total periode sales ("+(m.meta.period_start||"-")+" s/d "+(m.meta.period_end||"-")+"). MOI = SOH Value SKU ÷ ("+(bs=="hpp"?"COGS":"Sales Value")+" SKU per bulan, periode x "+F(m.k,2)+"). Status: &lt; 1,5 Low, 1,5 - 4 OK, &gt; 4 Overstock, tanpa sales = No Sales."]);
+  if(cO)info.push(["Hanya SKU Overstock / tanpa sales (SOH Value &gt; 0) yang diexport."]);
+  if(itemOnly)info.push(["SOH item adalah total dari toko yang diexport. Sales tidak tersedia per item."]);
+  info.push(["Toko APD dan toko SOH yang tidak ditemukan di data Sales tidak ikut, sama seperti tabel MOI."]);
+  const wi=XLSX.utils.aoa_to_sheet(info);wi["!cols"]=[{wch:18},{wch:60}];XLSX.utils.book_append_sheet(wb,wi,"Info");
+  const part=sc=="a"||!TV.mt||!TV.mt.f?"Semua":TV.mt.f.replace(/\s+/g,"");
+  XLSX.writeFile(wb,"MOI_"+(bs=="hpp"?"COGS":"NetSales")+"_"+part+"_"+ds+".xlsx");
+  toast("Export berhasil: "+I(data.length)+" baris");return true}
+
   // ---- MOI (sales toko vs SOH toko) ----
   R.moi=()=&gt;{const d=APP.derived();if(!d)return empty("moi");
   const bs=APP.basis,m=APP.moi(bs);
@@ -1497,7 +1603,7 @@
   mk("m2",{type:"doughnut",data:{labels:["Low","OK","Overstock","No Sales"],datasets:[{data:[cnt.Low,cnt.OK,cnt.Overstock,cnt["No Sales"]],backgroundColor:[E,O,W,G],borderWidth:0}]},options:{plugins:{legend:{position:"right"}}}});
   mkTable("mt",[["Kode","l"],["Store","l"],["Sales/bln"],[bs=="hpp"?"COGS/bln":"Net Sales/bln"],["SOH Value"],["MOI (bln)"],["Status","c"]],rows,
   {cells:r=&gt;{const[sn,sc]=stat(r.moi);return[esc(r.sale.code||r.s.code||"-"),esc(r.sale.name||r.s.name||r.s.code),I(r.salesM),I(r.base),I(r.s.val),r.moi==null?"–":F(r.moi,2),`&lt;span class="b ${sc}"&gt;${sn}&lt;/span&gt;`]},
-  s:r=&gt;(r.sale.code||"")+" "+(r.sale.name||"")+" "+r.s.code+" "+r.s.name,f:r=&gt;stat(r.moi)[0],filter:[["","Semua Status"],["Low","Low"],["OK","OK"],["Overstock","Overstock"],["No Sales","No Sales"]]})};
+  s:r=&gt;(r.sale.code||"")+" "+(r.sale.name||"")+" "+r.s.code+" "+r.s.name,f:r=&gt;stat(r.moi)[0],filter:[["","Semua Status"],["Low","Low"],["OK","OK"],["Overstock","Overstock"],["No Sales","No Sales"]]});moiXBtn(rows,bs,m)};
 
   // ---- PARETO ITEM (acuan: SOH upload) ----
   function pcalc(d,m){const a=[...d.items].sort((x,y)=&gt;y[m]-x[m]),pos=sum(a.map(i=&gt;i[m]&gt;0?i[m]:0));let c=0;
@@ -2412,7 +2518,8 @@ th{background:var(--u-navy)!important}
   // ============================================================
   // KONFIGURASI
   // ============================================================
-  const GAS_URL = &apos;https://script.google.com/macros/s/AKfycbzssOmdiskkPNuezKMJ4EgSofAEwomK8a34zKMzqZ5dZbi-YvP2ck-V80plwejeOKQ0sA/exec&apos;;
+  // [API-SALES] URL Apps Script SALES (tab Sales / Kaizen Spirit), milik Sales. Ganti hanya baris GAS_URL di bawah ini.
+  const GAS_URL = &apos;https://script.google.com/macros/s/AKfycbxHjLlhGwjXW_DZWelfDWuG5gSvpxZgErfdbkf-nbEXKyGZ-6BelEclZUVl_Ij6c9LpEQ/exec&apos;;
 
   // window.storage hanya ada di artifact Claude. Di browser biasa dibuat versi localStorage
   // supaya cache data Sales/GAS benar-benar tersimpan (cadangan kalau AppScript tidak terjangkau).
@@ -2440,6 +2547,7 @@ th{background:var(--u-navy)!important}
   let DATA     = JSON.parse(JSON.stringify(DEFAULT_DATA));
   let SETTINGS = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
   let GAS_DATA = null;
+  let ITEMS = null; // [BARU] sales per item {ps,pe,map:{&apos;store|item&apos;:[qty,net,gp,cost,name]}} untuk export MOI per SKU
 
   // ============================================================
   // HELPERS
@@ -2471,6 +2579,7 @@ th{background:var(--u-navy)!important}
     try{ const s=await window.storage.get(&apos;settings_v3&apos;); if(s&amp;&amp;s.value) SETTINGS=Object.assign({},DEFAULT_SETTINGS,JSON.parse(s.value)); }catch(e){}
     try{ const d=await window.storage.get(&apos;dataset_v3&apos;); if(d&amp;&amp;d.value) DATA=JSON.parse(d.value); }catch(e){}
     await fetchAppScriptData();
+    loadItems();
   }
   async function saveSettings(){ try{ await window.storage.set(&apos;settings_v3&apos;,JSON.stringify(SETTINGS)); }catch(e){} }
   async function saveDataset(){  try{ await window.storage.set(&apos;dataset_v3&apos;, JSON.stringify(DATA));     }catch(e){} }
@@ -2478,6 +2587,48 @@ th{background:var(--u-navy)!important}
   // ============================================================
   // FETCH DARI APPSCRIPT
   // ============================================================
+  // ===== [BARU] SALES PER ITEM =====
+  const _zc=s=&gt;String(s==null?&apos;&apos;:s).trim().replace(/^0+/,&apos;&apos;);
+  function buildItems(ps,pe,rows){
+    const map={};
+    rows.forEach(r=&gt;{
+      const k=_zc(r[0])+&apos;|&apos;+_zc(r[1]), a=map[k];
+      if(a){ a[0]+=+r[3]||0; a[1]+=+r[4]||0; a[2]+=+r[5]||0; a[3]+=+r[6]||0; if(!a[4]&amp;&amp;r[2]) a[4]=r[2]; }
+      else map[k]=[+r[3]||0,+r[4]||0,+r[5]||0,+r[6]||0,r[2]||&apos;&apos;];
+    });
+    return {ps:ps,pe:pe,n:rows.length,map:map};
+  }
+  async function pushItems(ps,pe,rows){
+    if(!GAS_URL||GAS_URL.includes(&apos;ISI_URL&apos;)||!rows.length) return;
+    const CHK=5000,total=rows.length;
+    try{
+      for(let i=0;i&lt;total;i+=CHK){
+        showToast(&apos;⏳ Menyimpan data item ke Sheets... &apos;+Math.min(i+CHK,total).toLocaleString(&apos;id-ID&apos;)+&apos; / &apos;+total.toLocaleString(&apos;id-ID&apos;),30000);
+        const res=await fetch(GAS_URL,{method:&apos;POST&apos;,headers:{&apos;Content-Type&apos;:&apos;text/plain&apos;},
+          body:JSON.stringify({action:&apos;salesItemChunk&apos;,period_start:ps,period_end:pe,reset:i===0,total:total,rows:rows.slice(i,i+CHK)})});
+        const j=await res.json(); if(!j.success) throw new Error(j.error||&apos;AppScript error&apos;);
+      }
+      showToast(&apos;✅ Data item tersimpan (&apos;+total.toLocaleString(&apos;id-ID&apos;)+&apos; baris), MOI per SKU siap di-export.&apos;,6000);
+    }catch(err){
+      console.error(err);
+      showToast(&apos;⚠️ Data item gagal tersimpan ke Sheets: &apos;+err.message+&apos; (MOI per SKU tetap bisa dipakai selama halaman tidak di-refresh)&apos;,9000);
+    }
+  }
+  async function loadItems(){
+    if(ITEMS||!GAS_URL||GAS_URL.includes(&apos;ISI_URL&apos;)) return;
+    try{
+      const rows=[]; let off=0, meta=null;
+      for(;;){
+        const res=await fetch(GAS_URL+&apos;?action=salesItems&amp;offset=&apos;+off+&apos;&amp;limit=20000&apos;);
+        const j=await res.json(); if(!j.success||!j.complete) return;
+        meta=j; if(!j.rows.length) break;
+        j.rows.forEach(r=&gt;rows.push(r)); off+=j.rows.length;
+        if(off&gt;=j.total) break;
+      }
+      if(rows.length&amp;&amp;meta&amp;&amp;!ITEMS){ ITEMS=buildItems(meta.period_start,meta.period_end,rows); notifyParent(); }
+    }catch(err){ console.warn(&apos;Load item gagal:&apos;,err); }
+  }
+
   async function fetchAppScriptData(){
     if(!GAS_URL||GAS_URL.includes(&apos;ISI_URL&apos;)){ render(); return; }
     showToast(&apos;🔄 Mengambil data dari Google Sheets...&apos;, 5000);
@@ -2804,6 +2955,12 @@ th{background:var(--u-navy)!important}
       let totalNet=0, totalGross=0, totalGP=0, totalQty=0;
 
       const costCol=Object.keys(colMap).find(k=&gt;/sales\s*cost|^cogs$|^hpp$/i.test(String(k).trim()));
+      // [BARU] kolom item (untuk MOI per SKU) - hanya tambahan, agregasi lama tidak diubah
+      const _nk=h=&gt;String(h||&apos;&apos;).toLowerCase().replace(/[^a-z0-9]/g,&apos;&apos;);
+      const _ks=Object.keys(colMap);
+      const itemCodeCol=_ks.find(k=&gt;[&apos;itemcode&apos;,&apos;skucode&apos;,&apos;sku&apos;,&apos;skunumber&apos;,&apos;productcode&apos;,&apos;itemno&apos;,&apos;itemid&apos;,&apos;articlecode&apos;,&apos;plu&apos;,&apos;kodeitem&apos;,&apos;kodebarang&apos;].includes(_nk(k)))||_ks.find(k=&gt;/(item|sku|product|article)/i.test(k)&amp;&amp;/(code|kode|id|no)/i.test(k));
+      const itemNameCol=_ks.find(k=&gt;[&apos;itemname&apos;,&apos;itemdescription&apos;,&apos;skuname&apos;,&apos;skudescription&apos;,&apos;productname&apos;,&apos;productdescription&apos;,&apos;description&apos;,&apos;namaitem&apos;,&apos;namabarang&apos;].includes(_nk(k)))||_ks.find(k=&gt;/(item|sku|product|article)/i.test(k)&amp;&amp;/(name|nama|desc)/i.test(k));
+      const itemAgg=new Map();
       for(let i=headerIdx+1;i&lt;rows.length;i++){
         const r=rows[i];
         if(!r||r.length===0) continue;
@@ -2831,6 +2988,15 @@ th{background:var(--u-navy)!important}
         const sKey=String(storeName).trim();
         if(!storeMap[sKey]) storeMap[sKey]={code:store,name:sKey,sales:0,qty:0,gp:0,gross:0,cost:0};
         storeMap[sKey].sales+=ns; storeMap[sKey].qty+=qty; storeMap[sKey].gp+=gp; storeMap[sKey].gross+=gs; storeMap[sKey].cost+=cost;
+        // [BARU] agregasi per toko x item
+        if(itemCodeCol!==undefined){
+          const ic=String(r[colMap[itemCodeCol]]==null?&apos;&apos;:r[colMap[itemCodeCol]]).trim();
+          if(store&amp;&amp;ic){
+            const ik=store+&apos;|&apos;+ic; let ia=itemAgg.get(ik);
+            if(!ia){ ia=[store,ic,itemNameCol!==undefined?String(r[colMap[itemNameCol]]==null?&apos;&apos;:r[colMap[itemNameCol]]).trim():&apos;&apos;,0,0,0,0]; itemAgg.set(ik,ia); }
+            ia[3]+=qty; ia[4]+=ns; ia[5]+=gp; ia[6]+=cost;
+          }
+        }
       }
 
       const officers = Object.values(offMap).map(o=&gt;({
@@ -2907,6 +3073,14 @@ th{background:var(--u-navy)!important}
       } else {
         showToast(`✅ Dashboard diperbarui! ${stores.length} toko, ${officers.length} officer.`);
       }
+    // [BARU] simpan sales per item: lokal (langsung bisa dipakai export) + kirim bertahap ke sheet SalesItem
+    if(itemCodeCol===undefined){
+      showToast(&apos;⚠️ Kolom kode item tidak ditemukan di Excel, MOI per SKU tidak tersedia. Kolom terbaca: &apos;+Object.keys(colMap).join(&apos;, &apos;),10000);
+    }else{
+      const itemRows=[...itemAgg.values()].filter(a=&gt;a[3]||a[4]||a[5]||a[6]); // baris tanpa sales dilewati (dianggap 0)
+      ITEMS=buildItems(periodStart,periodEnd,itemRows); notifyParent();
+      await pushItems(periodStart,periodEnd,itemRows);
+    }
     }catch(err){
       console.error(err);
       showToast(&apos;❌ Gagal proses Excel: &apos;+err.message);
@@ -2949,7 +3123,7 @@ th{background:var(--u-navy)!important}
   .header *::before,.header *::after{display:none!important}.header *{filter:none!important;box-shadow:none!important}
   .kpi-value{font-size:22px!important}.badge,.section-title .tag{box-shadow:none!important}
   .kpi-value{font-size:18px!important;word-break:keep-all}
-  &lt;/style&gt;&lt;script&gt;window.getSales=function(){return DATA}&lt;/script&gt;&lt;style id="alpro-unify"&gt;
+  &lt;/style&gt;&lt;script&gt;window.getSales=function(){return DATA};window.getSalesItems=function(){return typeof ITEMS===&apos;undefined&apos;?null:ITEMS}&lt;/script&gt;&lt;style id="alpro-unify"&gt;
 @import url(&apos;https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap&apos;);
 /* ===== ALPRO UNIFIED THEME v2 — Navy · Oranye · Putih (CSS-only) ===== */
 @media screen{
@@ -5204,6 +5378,7 @@ footer{background:var(--u-navy)!important;border-radius:14px!important;box-shado
       &lt;/div&gt;
 
       &lt;script&gt;
+          // [API-BUDGET] URL Apps Script BUDGET (tab Budget). Saat ini URL-nya SAMA dengan API-OTB.
           const PROCUREMENT_API_URL = 'https://script.google.com/macros/s/AKfycbyaDXCnvwcRnBxpbbKhas_qq_nc2ZrAsz2n15fYj9psvWT4srrOeK0zhEWLR64Ax5Id/exec';
 
           let rawTrackingData = [];
@@ -7430,6 +7605,7 @@ thead th:last-child{border-top-right-radius:11px!important}
     &lt;script src=&quot;https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js&quot;&gt;&lt;/script&gt;
     &lt;script src=&quot;https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js&quot;&gt;&lt;/script&gt;
     &lt;script&gt;
+      // [API-OOS] URL Apps Script OOS (tab OOS / Out of Stock).
       const API_URL = 'https://script.google.com/macros/s/AKfycbzVs-UhC0kbzcf3IH_A5fMTD0EioGbUShuS94kv_Mkh-7hrY1hH6Yoq4XJobUZBTU5nlA/exec';
 
       let dashboardData = null;
@@ -10314,6 +10490,7 @@ ul{padding-left:18px;line-height:1.7}.tr{display:flex;align-items:flex-end;gap:1
 &lt;div class="top"&gt;&lt;div&gt;&lt;h1&gt;Outstanding PO &amp;amp; Open-to-Buy&lt;/h1&gt;&lt;p&gt;Berapa PO yang masih outstanding dan berapa free budget (OTB) yang benar-benar masih bisa dipakai untuk PO baru. Dihitung dari Budget Tracking dan Top Supplier di menu Budget, tanpa data tambahan.&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;button id="rf"&gt;⟳ Refresh&lt;/button&gt;&lt;span id="up"&gt;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;div id="msg"&gt;&lt;/div&gt;&lt;div id="out"&gt;&lt;/div&gt;
 &lt;script&gt;
+// [API-OTB] URL Apps Script Outstanding dan OTB (tab Outstanding dan OTB). Saat ini URL-nya SAMA dengan API-BUDGET.
 const API=&#x27;https://script.google.com/macros/s/AKfycbyaDXCnvwcRnBxpbbKhas_qq_nc2ZrAsz2n15fYj9psvWT4srrOeK0zhEWLR64Ax5Id/exec&#x27;;
 const $=i=&gt;document.getElementById(i),esc=s=&gt;String(s==null?&#x27;&#x27;:s).replace(/[&amp;&lt;&gt;"]/g,c=&gt;({&#x27;&amp;&#x27;:&#x27;&amp;amp;&#x27;,&#x27;&lt;&#x27;:&#x27;&amp;lt;&#x27;,&#x27;&gt;&#x27;:&#x27;&amp;gt;&#x27;,&#x27;"&#x27;:&#x27;&amp;quot;&#x27;}[c]));
 const N=v=&gt;Number(v)||0,F=n=&gt;Math.round(n).toLocaleString(&#x27;id-ID&#x27;),P1=n=&gt;n.toLocaleString(&#x27;id-ID&#x27;,{maximumFractionDigits:1})+&#x27;%&#x27;;
@@ -10963,6 +11140,7 @@ function paint(){SIG=sig();setCols();MD=MODE==&#x27;officer&#x27;?officerModel()
         };
       })();
 
+      // [API-AKUN-SOH] URL Apps Script database akun login dan SOH (halaman utama).
       /* ===== API Apps Script (database akun & SOH). Isi URL Web App di bawah setelah deploy. Kosong = mode lokal (tanpa database). ===== */
       const API_URL =
         "https://script.google.com/macros/s/AKfycbyF2lZ4tvGsEcl_CBm86I88S9AWJKUT3LwrTBE-M9-iRJvnuovEbwfFMGiMWOSqqv-GrA/exec";
