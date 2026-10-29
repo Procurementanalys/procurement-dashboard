@@ -5438,6 +5438,8 @@ footer{background:var(--u-navy)!important;border-radius:14px!important;box-shado
       &lt;script&gt;
           // [API-BUDGET] URL Apps Script BUDGET (tab Budget). Saat ini URL-nya SAMA dengan API-OTB.
           const PROCUREMENT_API_URL = 'https://script.google.com/macros/s/AKfycbyaDXCnvwcRnBxpbbKhas_qq_nc2ZrAsz2n15fYj9psvWT4srrOeK0zhEWLR64Ax5Id/exec';
+          // Prefetch: request data langsung dikirim sekarang, tidak menunggu halaman selesai dimuat
+          window.__budgetPre = fetch(PROCUREMENT_API_URL).catch(function(){ return null; });
 
           let rawTrackingData = [];
           let filteredTrackingData = [];
@@ -6166,7 +6168,9 @@ footer{background:var(--u-navy)!important;border-radius:14px!important;box-shado
                   loadingEl.classList.add('active');
                   document.getElementById('heroSyncStatus').textContent = 'Loading';
 
-                  const response = await fetch(PROCUREMENT_API_URL);
+                  let response = null;
+                  if (window.__budgetPre) { response = await window.__budgetPre; window.__budgetPre = null; }
+                  if (!response || !response.ok) response = await fetch(PROCUREMENT_API_URL);
                   if (!response.ok) throw new Error('Gagal mengambil data dari web app');
 
                   const result = await response.json();
@@ -6227,7 +6231,7 @@ footer{background:var(--u-navy)!important;border-radius:14px!important;box-shado
               }
           }
 
-          window.addEventListener('load', () =&gt; {
+          document.addEventListener('DOMContentLoaded', () =&gt; {
               loadSavedTheme();
               loadDashboard();
           });
@@ -7742,18 +7746,21 @@ thead th:last-child{border-top-right-radius:11px!important}
 
       async function loadDashboard() {
         try {
+          // Tiga request dikirim BERSAMAAN (sebelumnya berurutan: dashboard -> feedback -> histori)
+          const feedbackP = loadFeedbackFromServer();
+          const historyP = loadHistory();
           const data = await fetchApi('dashboard');
 
           dashboardData = data;
           const newUpdatedAt = data.databaseUpdatedAt || data.generatedAt || null;
-          await loadFeedbackFromServer();
+          await feedbackP;
           renderSummary();
           renderTopStores();
           renderOfficerTable();
           populateCategoryFilter();
           renderTopItems();
           initExportSelectors();
-          loadHistory();
+          await historyP;
         } catch (err) {
           console.error(err);
           alert('Gagal load dashboard: ' + err.message);
@@ -12221,14 +12228,17 @@ function paint(){SIG=sig();setCols();MD=MODE==&#x27;officer&#x27;?officerModel()
               }
             })
             .catch(() => {});
+        // Sales (f1) & Budget (f2) dimuat BERSAMAAN supaya fetch datanya jalan paralel
         ensure($("#f1")).then(renderHome);
+        ensure($("#f2")); // Budget
+        ensure($("#f3")); // OOS
         preloadTabs();
       }
       /* Muat semua tab di belakang layar satu per satu (tidak membekukan layar), supaya saat diklik sudah siap */
       function preloadTabs() {
         if (window.__preloading) return;
         window.__preloading = true;
-        const order = ["f1", "f0", "f2", "f3", "f4", "f5", "f6", "f7"],
+        const order = ["f0", "f4", "f5", "f6", "f7"],
           idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 80)),
           cap = (p, ms) => Promise.race([p, new Promise((r) => setTimeout(r, ms))]);
         let i = 0;
@@ -12259,8 +12269,11 @@ function paint(){SIG=sig();setCols();MD=MODE==&#x27;officer&#x27;?officerModel()
               }
             }, 500);
           });
-        cap(ensure($("#f1")), 20000)
-          .catch(() => {})
+        Promise.all(
+          ["#f1", "#f2", "#f3"].map((id) =>
+            cap(ensure($(id)), 20000).catch(() => {}),
+          ),
+        )
           .then(waitSales)
           .then(() => setTimeout(next, 250));
       }
