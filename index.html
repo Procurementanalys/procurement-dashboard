@@ -28,7 +28,15 @@
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
     <script>
       try {
         if (localStorage.getItem("alpro_theme") === "dark")
@@ -1181,7 +1189,7 @@
       <a data-f="home" data-s="" data-t="Home">⌂ Home</a
       ><a data-f="agd" data-s="" data-t="Agenda">📅 Agenda</a>
       <div class="mh">INVENTORY</div>
-      <a data-f="f0" data-s="soh" data-t="Upload SOH">⬆ Upload SOH</a
+      <a data-f="f0" data-s="soh" data-t="SOH (Stock On Hand)">⬆ SOH (Stock On Hand)</a
       ><a data-f="f0" data-s="stock" data-t="Stock Inventory">▤ Stock Inventory</a
       ><a data-f="f0" data-s="moi" data-t="MOI">◷ MOI</a
       ><a data-f="f0" data-s="par" data-t="Pareto Item">▥ Pareto Item</a
@@ -1301,7 +1309,7 @@
              ================================================================== -->
         <div id="agd" class="fr"><div id="agenda-root" data-mode="lihat"></div></div>
         <!-- ==================================================================
-             === TAB: INVENTORY — Upload SOH, Stock Inventory, MOI, Pareto Item (satu modul untuk 4 menu) ===
+             === TAB: INVENTORY — SOH (Stock On Hand), Stock Inventory, MOI, Pareto Item (satu modul untuk 4 menu) ===
              iframe id="f0" — isi halaman ada di atribut data-doc (HTML lengkap modul ini)
              ================================================================== -->
         <iframe
@@ -1388,16 +1396,18 @@
 
   // ================= TABEL (search + filter + paging) =================
   const TV={};
-  function mkTable(id,head,rows,o){o=o||{};const el=$(id),size=o.size||100,S=TV[id]={q:"",pg:0,f:""};
+  function mkTable(id,head,rows,o){o=o||{};const el=$(id),size=o.size||100,S=TV[id]={q:"",pg:0,f:"",sk:null,sd:-1};
   el.innerHTML=`&lt;div class="tb"&gt;&lt;input class="sr" placeholder="Cari…"&gt;${o.filter?`&lt;select class="fl"&gt;${o.filter.map(x=&gt;`&lt;option value="${x[0]}"&gt;${x[1]}&lt;/option&gt;`).join("")}&lt;/select&gt;`:""}&lt;span class="cnt"&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class="tw"&gt;&lt;table&gt;&lt;/table&gt;&lt;/div&gt;&lt;div class="pgr"&gt;&lt;/div&gt;`;
   const tbl=el.querySelector("table"),cnt=el.querySelector(".cnt"),pgr=el.querySelector(".pgr"),sr=el.querySelector(".sr"),fl=el.querySelector(".fl");
-  const draw=()=&gt;{const q=S.q.toLowerCase();const r=rows.filter(x=&gt;(!S.f||o.f(x)===S.f)&amp;&amp;(!q||o.s(x).toLowerCase().includes(q)));
+  const draw=()=&gt;{const q=S.q.toLowerCase();let r=rows.filter(x=&gt;(!S.f||o.f(x)===S.f)&amp;&amp;(!q||o.s(x).toLowerCase().includes(q)));
+  if(o.sort&amp;&amp;S.sk!=null&amp;&amp;o.sort[S.sk]){const fn=o.sort[S.sk],dr=S.sd;r=r.map(x=&gt;[fn(x),x]).sort((a,b)=&gt;(a[0]&lt;b[0]?-1:a[0]&gt;b[0]?1:0)*dr).map(x=&gt;x[1])}
   const pages=Math.max(1,Math.ceil(r.length/size));if(S.pg&gt;=pages)S.pg=pages-1;if(S.pg&lt;0)S.pg=0;
   const sl=r.slice(S.pg*size,S.pg*size+size);
   tbl.innerHTML="&lt;thead&gt;&lt;tr&gt;"+head.map(h=&gt;`&lt;th class="${h[1]||""}"&gt;${h[0]}&lt;/th&gt;`).join("")+"&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;"+(sl.length?sl.map(x=&gt;"&lt;tr&gt;"+o.cells(x).map((c,i)=&gt;`&lt;td class="${head[i][1]||""}"&gt;${c}&lt;/td&gt;`).join("")+"&lt;/tr&gt;").join(""):`&lt;tr&gt;&lt;td colspan="${head.length}" class="c" style="color:var(--mu);padding:20px"&gt;Tidak ada data&lt;/td&gt;&lt;/tr&gt;`)+"&lt;/tbody&gt;";
   cnt.textContent=I(r.length)+" baris"+(r.length!==rows.length?" (dari "+I(rows.length)+")":"");
   pgr.innerHTML=pages&gt;1?`&lt;button class="btn" data-d="-1" ${S.pg==0?"disabled":""}&gt;‹ Prev&lt;/button&gt;&lt;span&gt;Hal ${S.pg+1} / ${I(pages)}&lt;/span&gt;&lt;button class="btn" data-d="1" ${S.pg&gt;=pages-1?"disabled":""}&gt;Next ›&lt;/button&gt;`:"";
-  pgr.querySelectorAll("button").forEach(b=&gt;b.onclick=()=&gt;{S.pg+=+b.dataset.d;draw();tbl.parentNode.scrollTop=0})};
+  pgr.querySelectorAll("button").forEach(b=&gt;b.onclick=()=&gt;{S.pg+=+b.dataset.d;draw();tbl.parentNode.scrollTop=0});
+  if(o.sort)tbl.querySelectorAll("th").forEach((th,i)=&gt;{if(!o.sort[i])return;th.style.cursor="pointer";th.title="Klik untuk mengurutkan";if(S.sk===i)th.textContent+=S.sd&gt;0?" ▲":" ▼";else th.textContent+=" ↕";th.onclick=()=&gt;{if(S.sk===i)S.sd=-S.sd;else{S.sk=i;S.sd=-1}S.pg=0;draw()}})};
   let dt;sr.oninput=()=&gt;{clearTimeout(dt);dt=setTimeout(()=&gt;{S.q=sr.value;S.pg=0;draw()},180)};
   if(fl)fl.onchange=()=&gt;{S.f=fl.value;S.pg=0;draw()};
   draw()}
@@ -1448,14 +1458,30 @@
 
   // ================= HALAMAN =================
   const R={};let cur="soh",ST={view:"store"},PA={m:"val"},retry=0;
-  const empty=(p,msg)=&gt;{if(APP.loading){$("p-"+p).innerHTML=`&lt;div class="card empty"&gt;&lt;b&gt;${esc(APP.loading)}&lt;/b&gt;Data SOH sedang diambil dari database.&lt;/div&gt;`;return}if(!APP.can("write")){$("p-"+p).innerHTML=`&lt;div class="card empty"&gt;&lt;b&gt;${msg||"Belum ada data SOH"}&lt;/b&gt;&lt;/div&gt;`;return}$("p-"+p).innerHTML=`&lt;div class="card empty"&gt;&lt;b&gt;${msg||"Belum ada data SOH"}&lt;/b&gt;Upload file Excel SOH terlebih dulu di menu &lt;b&gt;Upload SOH&lt;/b&gt;.&lt;br&gt;&lt;button class="btn pr" id="goUp"&gt;⬆ Ke Upload SOH&lt;/button&gt;&lt;/div&gt;`;$("goUp").onclick=()=&gt;APP&amp;&amp;APP.goto("Upload SOH")};
+  const empty=(p,msg)=&gt;{if(APP.loading){$("p-"+p).innerHTML=`&lt;div class="card empty"&gt;&lt;b&gt;${esc(APP.loading)}&lt;/b&gt;Data SOH sedang diambil dari database.&lt;/div&gt;`;return}if(!APP.can("write")){$("p-"+p).innerHTML=`&lt;div class="card empty"&gt;&lt;b&gt;${msg||"Belum ada data SOH"}&lt;/b&gt;&lt;/div&gt;`;return}$("p-"+p).innerHTML=`&lt;div class="card empty"&gt;&lt;b&gt;${msg||"Belum ada data SOH"}&lt;/b&gt;Upload file Excel SOH terlebih dulu di menu &lt;b&gt;SOH (Stock On Hand)&lt;/b&gt;.&lt;br&gt;&lt;button class="btn pr" id="goUp"&gt;⬆ Ke SOH (Stock On Hand)&lt;/button&gt;&lt;/div&gt;`;$("goUp").onclick=()=&gt;APP&amp;&amp;APP.goto("SOH (Stock On Hand)")};
   const tgl=(id,opts,val)=&gt;`&lt;span class="tg" id="${id}"&gt;${opts.map(o=&gt;`&lt;button data-v="${o[0]}" class="${o[0]==val?"on":""}"&gt;${o[1]}&lt;/button&gt;`).join("")}&lt;/span&gt;`;
   const bind=(id,fn)=&gt;{document.querySelectorAll("#"+id+" button").forEach(b=&gt;b.onclick=()=&gt;fn(b.dataset.v))};
 
+
+  // ---- [BARU] MOI per item di store (kolom MOI di tabel SOH (Stock On Hand)) ----
+  function itemMoiCtx(){const bs=APP.basis;let m=null,SI=null;try{m=APP.moi(bs)}catch(e){m=null}
+  const none=why=&gt;({why,bs,get:()=&gt;null});
+  if(!m)return none("data Sales toko belum tersedia");
+  try{const fw=window.parent.document.getElementById("f1").contentWindow;SI=fw.getSalesItems?fw.getSalesItems():null}catch(e){SI=null}
+  if(!SI||!SI.map)return none("data sales per item belum tersedia (upload ulang Excel Sales di menu Sales)");
+  const pm=m.meta||{};if(pm.period_start&amp;&amp;SI.ps&amp;&amp;(String(pm.period_start).slice(0,10)!==SI.ps||String(pm.period_end).slice(0,10)!==SI.pe))return none("periode data item ("+SI.ps+" s/d "+SI.pe+") berbeda dengan data Sales toko");
+  const zc=x=&gt;String(x==null?"":x).trim().replace(/^0+/,""),idx=new Map(m.rows.map(r=&gt;[r.s.key,r])),cache=new Map(),kk=m.k||1;
+  const get=r=&gt;{let v=cache.get(r);if(v!==undefined)return v;const st=idx.get(r[0]||r[1]);
+  if(!st)v=null;else{const it=SI.map[zc(st.sale.code||st.s.code)+"|"+zc(r[2])],sv=+r[5]||0,cg=it?(it[3]&gt;0?it[3]:it[1]-it[2]):0,b=(bs=="hpp"?cg:(it?it[1]:0))*kk;v=b&gt;0?sv/b:"NS"}
+  cache.set(r,v);return v};
+  return{why:"",bs,get}}
+  const moiKey=v=&gt;v==null?-1e12:v==="NS"?1e12:v;
+  const moiCell=v=&gt;v==null?"–":v==="NS"?&apos;&lt;span class="b gr"&gt;No Sales&lt;/span&gt;&apos;:&apos;&lt;span class="&apos;+({er:"er",wa:"wa",ok:"ok"}[stat(v)[1]]||"")+&apos;"&gt;&apos;+F(v,2)+&apos;&lt;/span&gt;&apos;;
+
   // ---- UPLOAD SOH ----
   R.soh=()=&gt;{if(!APP.can("write")){$("p-soh").innerHTML=&apos;&lt;div class="card empty"&gt;&lt;b&gt;Akses khusus Admin&lt;/b&gt;Upload SOH hanya bisa dilakukan oleh Admin. Data SOH tetap bisa dilihat di menu Stock, MOI dan Pareto.&lt;/div&gt;&apos;;return}const s=APP.soh,d=APP.derived();
-  $("p-soh").innerHTML=`&lt;div class="bc"&gt;Inventory / Upload SOH&lt;/div&gt;
-  &lt;div class="card" style="margin-bottom:12px"&gt;&lt;h2&gt;Upload SOH (Excel)&lt;/h2&gt;
+  $("p-soh").innerHTML=`&lt;div class="bc"&gt;Inventory / SOH (Stock On Hand)&lt;/div&gt;
+  &lt;div class="card" style="margin-bottom:12px"&gt;&lt;h2&gt;SOH (Stock On Hand) (Excel)&lt;/h2&gt;
   &lt;div class="drop" id="drop"&gt;&lt;div style="font-size:28px;line-height:1"&gt;⬆&lt;/div&gt;&lt;b&gt;Tarik file Excel ke sini&lt;/b&gt; atau &lt;button class="btn pr" id="pick"&gt;Pilih File&lt;/button&gt;
   &lt;div class="n"&gt;Format .xlsx / .xls / .csv — sheet pertama. Kolom: &lt;code&gt;Store Code&lt;/code&gt; &lt;code&gt;Store Name&lt;/code&gt; &lt;code&gt;Item Code&lt;/code&gt; &lt;code&gt;Item Name&lt;/code&gt; &lt;code&gt;SOH Qty&lt;/code&gt; &lt;code&gt;SOH Value&lt;/code&gt; &lt;code&gt;Procurement Officer&lt;/code&gt; &lt;code&gt;Pareto&lt;/code&gt;&lt;br&gt;Wajib: Store Code, Item Code, SOH Qty, SOH Value. Kolom &lt;code&gt;Pareto&lt;/code&gt; diambil dari file; jika dikosongkan, dihitung otomatis dari SOH Value per item (A ≤80% · B ≤95% · C sisanya).&lt;/div&gt;
   &lt;input type="file" id="fi" accept=".xlsx,.xls,.csv" hidden&gt;&lt;/div&gt;
@@ -1468,31 +1494,44 @@
   $("tpl").onclick=tpl;const cl=$("clr");if(cl)cl.onclick=async()=&gt;{if(confirm("Hapus data SOH yang tersimpan?")){await APP.clear();toast("Data SOH dihapus")}};
   if(!s||!d)return;
   const tv=sum(d.stores.map(x=&gt;x.val)),tq=sum(d.stores.map(x=&gt;x.qty));
+  const apdK=new Set(d.stores.filter(x=&gt;x.apd).map(x=&gt;x.key)),rowsT=s.rows.filter(r=&gt;!apdK.has(r[0]||r[1])),apdHid=s.rows.length-rowsT.length;
   $("soh-body").innerHTML=`&lt;div class="bc"&gt;File aktif: &lt;b&gt;${esc(s.file)}&lt;/b&gt; · diupload ${new Date(s.at).toLocaleString("id-ID")}&lt;/div&gt;`
-  +kpi(sohK(d,s.rows.length))
-  +`&lt;div class="n" style="margin:-4px 0 12px"&gt;${d.stores.some(x=&gt;x.apd)?"Lokasi APD terdeteksi: "+d.stores.filter(x=&gt;x.apd).slice(0,8).map(x=&gt;esc(x.code&amp;&amp;x.name?x.code+" · "+x.name:(x.code||x.name))).join("; "):"Belum ada lokasi APD terdeteksi — dikenali dari kode &lt;code&gt;1001&lt;/code&gt; atau kata &lt;code&gt;APD&lt;/code&gt; pada Store Code / Store Name. Semua SOH dihitung sebagai Store."}&lt;/div&gt;`
-  +`&lt;div class="card"&gt;&lt;h2&gt;Data SOH&lt;/h2&gt;&lt;div id="soh-tb"&gt;&lt;/div&gt;&lt;/div&gt;`;
-  const pf=r=&gt;r[7]||d.cls.get(r[2])||"C",pl=[...new Set(s.rows.map(pf))].sort();
-  mkTable("soh-tb",[["Store","l"],["Item Code","l"],["Item Name","l"],["Procurement Officer","l"],["SOH Qty"],["SOH Value"],["Pareto","c"]],s.rows,
-  {cells:r=&gt;[esc(r[1]?r[0]+" · "+r[1]:r[0]),esc(r[2]),esc(r[3]),esc(r[6]||"-"),F(r[4],2),I(r[5]),badge(pf(r))],
-  s:r=&gt;r[0]+" "+r[1]+" "+r[2]+" "+r[3]+" "+(r[6]||""),f:r=&gt;pf(r),filter:[["","Semua Pareto"]].concat(pl.map(x=&gt;[x,"Pareto "+x]))})};
+  +kpi(sohK(d,rowsT.length))
+  +`&lt;div class="n" style="margin:-4px 0 12px"&gt;${d.stores.some(x=&gt;x.apd)?"Lokasi APD terdeteksi: "+d.stores.filter(x=&gt;x.apd).slice(0,8).map(x=&gt;esc(x.code&amp;&amp;x.name?x.code+" · "+x.name:(x.code||x.name))).join("; ")+" — "+I(apdHid)+" baris APD/1001 tidak ditampilkan di tabel Data SOH":"Belum ada lokasi APD terdeteksi — dikenali dari kode &lt;code&gt;1001&lt;/code&gt; atau kata &lt;code&gt;APD&lt;/code&gt; pada Store Code / Store Name. Semua SOH dihitung sebagai Store."}&lt;/div&gt;`
+  +`&lt;div class="card"&gt;&lt;h2&gt;Data SOH&lt;/h2&gt;&lt;div id="soh-tb"&gt;&lt;/div&gt;&lt;div class="n" id="soh-moi-n"&gt;&lt;/div&gt;&lt;/div&gt;`;
+  const mx=itemMoiCtx();
+  const pf=r=&gt;r[7]||d.cls.get(r[2])||"C",pl=[...new Set(rowsT.map(pf))].sort();
+  mkTable("soh-tb",[["Store","l"],["Item Code","l"],["Item Name","l"],["Procurement Officer","l"],["SOH Qty"],["SOH Value"],["MOI (bln)"],["Pareto","c"]],rowsT,
+  {sort:{6:r=&gt;moiKey(mx.get(r))},cells:r=&gt;[esc(r[1]?r[0]+" · "+r[1]:r[0]),esc(r[2]),esc(r[3]),esc(r[6]||"-"),F(r[4],2),I(r[5]),moiCell(mx.get(r)),badge(pf(r))],
+  s:r=&gt;r[0]+" "+r[1]+" "+r[2]+" "+r[3]+" "+(r[6]||""),f:r=&gt;pf(r),filter:[["","Semua Pareto"]].concat(pl.map(x=&gt;[x,"Pareto "+x]))});
+  if(mx.why&amp;&amp;retry++&lt;10)setTimeout(()=&gt;{if(cur=="soh")R.soh()},1500);else if(!mx.why)retry=0;
+  $("soh-moi-n").innerHTML=mx.why?"Kolom MOI belum bisa dihitung: "+esc(mx.why)+".":"&lt;b&gt;MOI (bln)&lt;/b&gt; = SOH Value item di store tersebut ÷ ("+(mx.bs=="hpp"?"COGS":"Net Sales")+" item di store itu per bulan, periode sales disetarakan ke sebulan). Basis mengikuti pilihan di menu MOI. &lt;b&gt;–&lt;/b&gt; = MOI tidak bisa dihitung karena store tidak ditemukan di data Sales; &lt;b&gt;No Sales&lt;/b&gt; = store ada di data Sales tapi item itu tidak terjual di periode tersebut. Baris APD/1001 tidak ditampilkan. Klik judul kolom MOI untuk mengurutkan."};
 
   // ---- STOCK ----
+  // Split SOH: store (tanpa APD) vs APD (warehouse), agregat per item. Di-cache di objek derived.
+  function stkSplit(d){if(d._sx)return d._sx;const ap=new Set(d.stores.filter(x=&gt;x.apd).map(x=&gt;x.key)),A=new Map(),S=new Map();
+  for(const r of APP.soh.rows){const M=ap.has(r[0]||r[1])?A:S;let a=M.get(r[2]);if(!a){a={code:r[2],name:r[3],qty:0,val:0,n:0};M.set(r[2],a)}a.qty+=r[4];a.val+=r[5];a.n++}
+  const fin=M=&gt;[...M.values()].map(a=&gt;(a.cls=d.cls.get(a.code)||"-",a)).sort((x,y)=&gt;y.val-x.val);
+  return d._sx={apd:fin(A),store:fin(S),loc:d.stores.filter(x=&gt;x.apd)}}
   R.stock=()=&gt;{const d=APP.derived();if(!d)return empty("stock");
-  const isS=ST.view=="store",arr=isS?d.stores:d.items,tv=sum(d.stores.map(x=&gt;x.val)),tq=sum(d.stores.map(x=&gt;x.qty));
-  const byC={};d.classes.forEach(k=&gt;byC[k]=0);d.items.forEach(i=&gt;{if(i.val&gt;0)byC[i.cls]+=i.val});
+  const vw=ST.view=="apd"||ST.view=="item"?ST.view:"store",sx=stkSplit(d),isS=vw=="store",isA=vw=="apd",noApd=isA&amp;&amp;!sx.loc.length;
+  const arr=isS?d.stores.filter(x=&gt;!x.apd):isA?sx.apd:sx.store,tv=sum(arr.map(x=&gt;x.val));
+  const byC={};d.classes.forEach(k=&gt;byC[k]=0);(isA?sx.apd:sx.store).forEach(i=&gt;{if(i.val&gt;0)byC[i.cls]=(byC[i.cls]||0)+i.val});
+  const ket=isS?"Store saja — lokasi APD (warehouse) tidak ikut.":isA?"Stock item di warehouse (lokasi APD) saja"+(sx.loc.length?": "+sx.loc.slice(0,6).map(x=&gt;esc(x.code&amp;&amp;x.name?x.code+" · "+x.name:(x.code||x.name))).join("; "):"."):"Item di store saja — stock warehouse (APD) tidak ikut.";
+  const ttl=isS?"Store":isA?"Item APD (Warehouse)":"Item (Store)";
   $("p-stock").innerHTML=`&lt;div class="bc"&gt;Inventory / Stock Inventory · sumber: ${esc(APP.soh.file)}&lt;/div&gt;
-  &lt;div class="tb"&gt;${tgl("tgS",[["store","Per Store"],["item","Per Item"]],ST.view)}&lt;/div&gt;
+  &lt;div class="tb"&gt;${tgl("tgS",[["store","Store"],["apd","APD"],["item","Item"]],vw)}&lt;span class="n" style="margin:0"&gt;${ket}&lt;/span&gt;&lt;/div&gt;
   ${kpi(sohK(d))}
-  &lt;div class="g c2"&gt;&lt;div class="card"&gt;&lt;h2&gt;Top 10 ${isS?"Store":"Item"} — SOH Value&lt;/h2&gt;&lt;div class="ch"&gt;&lt;canvas id="s1"&gt;&lt;/canvas&gt;&lt;/div&gt;&lt;/div&gt;
-  &lt;div class="card"&gt;&lt;h2&gt;SOH Value per Kelas Pareto&lt;/h2&gt;&lt;div class="ch"&gt;&lt;canvas id="s2"&gt;&lt;/canvas&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
-  &lt;div class="card"&gt;&lt;h2&gt;Detail Stock ${isS?"per Store":"per Item"}&lt;/h2&gt;&lt;div id="st-tb"&gt;&lt;/div&gt;&lt;/div&gt;`;
+  ${noApd?`&lt;div class="card empty"&gt;&lt;b&gt;Belum ada lokasi APD terdeteksi&lt;/b&gt;Lokasi APD dikenali dari kode &lt;code&gt;1001&lt;/code&gt; atau kata &lt;code&gt;APD&lt;/code&gt; pada Store Code / Store Name di file SOH.&lt;/div&gt;`:`&lt;div class="g c2"&gt;&lt;div class="card"&gt;&lt;h2&gt;Top 10 ${ttl} — SOH Value&lt;/h2&gt;&lt;div class="ch"&gt;&lt;canvas id="s1"&gt;&lt;/canvas&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;div class="card"&gt;&lt;h2&gt;SOH Value per Kelas Pareto${isA?" (APD)":" (Store)"}&lt;/h2&gt;&lt;div class="ch"&gt;&lt;canvas id="s2"&gt;&lt;/canvas&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;div class="card"&gt;&lt;h2&gt;Detail Stock ${isS?"per Store":isA?"APD (Warehouse) per Item":"per Item (Store)"}&lt;/h2&gt;&lt;div id="st-tb"&gt;&lt;/div&gt;&lt;/div&gt;`}`;
   bind("tgS",v=&gt;{ST.view=v;R.stock()});
+  if(noApd)return;
   const t10=arr.slice(0,10);
   mk("s1",{type:"bar",data:{labels:t10.map(x=&gt;isS?short(x.name||x.code):x.code),datasets:[{label:"SOH Value",data:t10.map(x=&gt;Math.round(x.val)),backgroundColor:P}]},options:{indexAxis:"y",plugins:{legend:{display:false},tooltip:{callbacks:{label:c=&gt;RP(c.raw)}}},scales:{x:{ticks:{callback:v=&gt;RP(v)}}}}});
   mk("s2",{type:"doughnut",data:{labels:d.classes.map(k=&gt;"Pareto "+k),datasets:[{data:d.classes.map(k=&gt;Math.round(byC[k])),backgroundColor:d.classes.map(kcol),borderWidth:0}]},options:{plugins:{legend:{position:"right"},tooltip:{callbacks:{label:c=&gt;c.label+": "+RP(c.raw)}}}}});
   if(isS)mkTable("st-tb",[["Store","l"],["Nama Store","l"],["Baris Item"],["SOH Qty"],["SOH Value"],["Share %"]],arr,{cells:x=&gt;[esc(x.code||"-"),esc(x.name||"-"),I(x.n),F(x.qty,2),I(x.val),F(tv?x.val/tv*100:0,2)],s:x=&gt;x.code+" "+x.name});
-  else mkTable("st-tb",[["Item Code","l"],["Item Name","l"],["Jml Store"],["SOH Qty"],["SOH Value"],["Share %"],["Pareto","c"]],arr,{cells:x=&gt;[esc(x.code),esc(x.name),I(x.n),F(x.qty,2),I(x.val),F(tv?x.val/tv*100:0,2),badge(x.cls)],s:x=&gt;x.code+" "+x.name,f:x=&gt;x.cls,filter:[["","Semua Pareto"]].concat(d.classes.map(k=&gt;[k,"Pareto "+k]))})};
+  else mkTable("st-tb",[["Item Code","l"],["Item Name","l"],[isA?"Jml Lokasi APD":"Jml Store"],["SOH Qty"],["SOH Value"],["Share %"],["Pareto","c"]],arr,{cells:x=&gt;[esc(x.code),esc(x.name),I(x.n),F(x.qty,2),I(x.val),F(tv?x.val/tv*100:0,2),badge(x.cls)],s:x=&gt;x.code+" "+x.name,f:x=&gt;x.cls,filter:[["","Semua Pareto"]].concat(d.classes.map(k=&gt;[k,"Pareto "+k]))})};
 
   // ---- EXPORT MOI (Excel) : filter + pilihan kolom Toko / Item / SOH / Sales ----
   function moiXFilter(rows){const S=TV.mt||{q:"",f:""},q=(S.q||"").toLowerCase();
@@ -1597,10 +1636,10 @@
   ${noCost?&apos;&lt;div class="warn"&gt;&lt;b&gt;Kolom Sales Cost belum ada di data Sales.&lt;/b&gt; COGS sementara dihitung dari Net Sales − GP. Upload ulang file Sales yang memuat kolom Sales Cost.&lt;/div&gt;&apos;:""}
   &lt;div class="tb"&gt;${tgl("tgM",[["hpp","Basis COGS"],["net","Basis Net Sales"]],bs)}&lt;span class="n" style="margin:0"&gt;Sales periode ${esc(m.meta.period_start||"-")} s/d ${esc(m.meta.period_end||"-")} (${m.days} hari) → disetarakan ke ${m.dim} hari${m.k!=1?" (×"+F(m.k,2)+")":""}&lt;/span&gt;&lt;/div&gt;
   ${un.length?`&lt;div class="warn"&gt;&lt;b&gt;${I(un.length)} store&lt;/b&gt; di file SOH tidak ditemukan di data Sales (SOH ${RP(sum(un.map(x=&gt;x.val)))}) dan tidak ikut dihitung. ${m.salesN&lt;Math.max(30,un.length/2)?"&lt;b&gt;Data Sales hanya berisi "+I(m.salesN)+" store&lt;/b&gt; — kemungkinan Sales belum di-upload / belum tersimpan di database Sales. ":""}Pencocokan lewat kode / nama store — pastikan kolom &lt;code&gt;Store Code&lt;/code&gt; / &lt;code&gt;Store Name&lt;/code&gt; berisi kode atau nama yang sama dengan data Sales.${rows.length?"":" &lt;b&gt;Tidak ada satu pun yang cocok.&lt;/b&gt;"}&lt;br&gt;Contoh di SOH: ${un.slice(0,3).map(slabel).join(" | ")}&lt;br&gt;Contoh di Sales: ${(m.ss||[]).map(slabel).join(" | ")}&lt;/div&gt;`:""}
-  ${kpi([["b1",F(m.tot.moi,2)+" bln","MOI Total","SOH "+RP(m.tot.soh)+" ÷ "+bn+" "+RP(m.tot.base)+"/bln"],["b4",I(cnt.Low),"Store Low (&amp;lt; 1,5)"],["b2",I(cnt.OK),"Store OK (1,5 – 4)"],["b3",I(cnt.Overstock+cnt["No Sales"]),"Store Overstock (&amp;gt; 4)",cnt["No Sales"]?I(cnt["No Sales"])+" tanpa sales":""]])}
+  ${kpi([["b5",F(m.tot.moiAll,2)+" bln","MOI Total (APD + Store)","(SOH APD "+RP(m.tot.apd)+" + SOH Store "+RP(m.tot.soh)+") ÷ "+bn+" "+RP(m.tot.base)+"/bln"],["b1",F(m.tot.moi,2)+" bln","MOI Store","SOH Store "+RP(m.tot.soh)+" ÷ "+bn+" "+RP(m.tot.base)+"/bln"],["b4",I(cnt.Low),"Store Low (&amp;lt; 1,5)"],["b2",I(cnt.OK),"Store OK (1,5 – 4)"],["b3",I(cnt.Overstock+cnt["No Sales"]),"Store Overstock (&amp;gt; 4)",cnt["No Sales"]?I(cnt["No Sales"])+" tanpa sales":""]])}
   &lt;div class="g c2"&gt;&lt;div class="card"&gt;&lt;h2&gt;20 Store dengan MOI Tertinggi&lt;/h2&gt;&lt;div class="ch" style="height:440px"&gt;&lt;canvas id="m1"&gt;&lt;/canvas&gt;&lt;/div&gt;&lt;/div&gt;
   &lt;div class="card"&gt;&lt;h2&gt;Distribusi Status MOI&lt;/h2&gt;&lt;div class="ch" style="height:440px"&gt;&lt;canvas id="m2"&gt;&lt;/canvas&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
-  &lt;div class="card"&gt;&lt;h2&gt;Detail MOI per Store&lt;/h2&gt;&lt;div id="mt"&gt;&lt;/div&gt;&lt;div class="n"&gt;MOI = SOH Value store (tanpa APD) ÷ BE ${bs=="hpp"?"COGS":"Net Sales"} (nilai periode ÷ hari berjalan × hari dalam bulan). &amp;lt;1,5 Low · 1,5–4 OK · &amp;gt;4 Overstock. ${bs=="hpp"?"COGS = kolom Sales Cost di data Sales, dipakai agar SOH (nilai cost) dibandingkan dengan biaya penjualan di basis yang sama.":""}&lt;/div&gt;&lt;/div&gt;
+  &lt;div class="card"&gt;&lt;h2&gt;Detail MOI per Store&lt;/h2&gt;&lt;div id="mt"&gt;&lt;/div&gt;&lt;div class="n"&gt;MOI = SOH Value store (tanpa APD) ÷ BE ${bs=="hpp"?"COGS":"Net Sales"} (nilai periode ÷ hari berjalan × hari dalam bulan). &lt;b&gt;MOI Total (APD + Store)&lt;/b&gt; = (SOH APD + SOH Value store di tabel ini) ÷ BE yang sama. &amp;lt;1,5 Low · 1,5–4 OK · &amp;gt;4 Overstock. ${bs=="hpp"?"COGS = kolom Sales Cost di data Sales, dipakai agar SOH (nilai cost) dibandingkan dengan biaya penjualan di basis yang sama.":""}&lt;/div&gt;&lt;/div&gt;
   ${un.length?`&lt;div class="card" style="margin-top:12px"&gt;&lt;h2&gt;Store SOH Tanpa Data Sales&lt;/h2&gt;&lt;div class="tw" style="max-height:260px"&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th class="l"&gt;Store (di file SOH)&lt;/th&gt;&lt;th&gt;SOH Value&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;${un.slice(0,200).map(x=&gt;`&lt;tr&gt;&lt;td class="l"&gt;${slabel(x)}&lt;/td&gt;&lt;td&gt;${I(x.val)}&lt;/td&gt;&lt;/tr&gt;`).join("")}&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;`:""}`;
   bind("tgM",v=&gt;{APP.setBasis(v)});
   const top=rows.filter(r=&gt;r.moi!=null).slice(0,20);
@@ -10618,7 +10657,7 @@ function salesInfo(sl){const m=sl.meta||{},days=m.days_elapsed&gt;0?m.days_elaps
 function base(){
   if(!A)return{msg:&#x27;Halaman ini harus dibuka lewat dashboard terpadu.&#x27;};
   if(A.loading)return{msg:A.loading+&#x27; — data SOH sedang diambil dari database.&#x27;};
-  if(!A.derived())return{msg:&#x27;Data SOH belum tersedia. Upload SOH dulu di menu Upload SOH.&#x27;};
+  if(!A.derived())return{msg:&#x27;Data SOH belum tersedia. Upload file SOH dulu di menu SOH (Stock On Hand).&#x27;};
   const sl=A.sales();
   if(!sl||!sl.stores||!sl.stores.length)return{msg:&#x27;Data Sales belum tersedia / masih dimuat. Coba klik Muat ulang beberapa detik lagi.&#x27;};
   return{d:A.derived(),sl:sl,si:salesInfo(sl)}
@@ -10830,7 +10869,7 @@ function salesInfo(sl){const m=sl.meta||{},days=m.days_elapsed&gt;0?m.days_elaps
 function base(){
   if(!A)return{msg:&#x27;Halaman ini harus dibuka lewat dashboard terpadu.&#x27;};
   if(A.loading)return{msg:A.loading+&#x27; — data SOH sedang diambil dari database.&#x27;};
-  if(!A.derived())return{msg:&#x27;Data SOH belum tersedia. Upload SOH dulu di menu Upload SOH.&#x27;};
+  if(!A.derived())return{msg:&#x27;Data SOH belum tersedia. Upload file SOH dulu di menu SOH (Stock On Hand).&#x27;};
   const sl=A.sales();
   if(!sl||!sl.stores||!sl.stores.length)return{msg:&#x27;Data Sales belum tersedia / masih dimuat. Coba klik Muat ulang beberapa detik lagi.&#x27;};
   return{d:A.derived(),sl:sl,si:salesInfo(sl)}
@@ -11435,13 +11474,30 @@ function paint(){SIG=sig();setCols();MD=MODE==&#x27;officer&#x27;?officerModel()
             days,
             dim,
             meta: m,
-            tot: { soh: ts, base: tb, moi: tb > 0 ? ts / tb : 0 },
+            tot: {
+              soh: ts,
+              base: tb,
+              moi: tb > 0 ? ts / tb : 0,
+              apd: d.tot.apd,
+              all: ts + d.tot.apd,
+              moiAll: tb > 0 ? (ts + d.tot.apd) / tb : 0,
+            },
           };
         },
       });
 
       async function syncSoh(again) {
-        APP.loading = "Memuat SOH…";
+        /* Cepat: tampilkan SOH dari cache browser dulu, lalu cek versi ke server di belakang layar */
+        if (!again && !APP.soh) {
+          try {
+            const c0 = await idb.get("soh");
+            if (c0 && c0.rows && c0.rows.length) {
+              APP.soh = c0;
+              APP.emit();
+            }
+          } catch (e) {}
+        }
+        APP.loading = APP.soh ? "" : "Memuat SOH…";
         APP.loadErr = "";
         setLd();
         renderHome();
@@ -11451,6 +11507,11 @@ function paint(){SIG=sig();setCols();MD=MODE==&#x27;officer&#x27;?officerModel()
             APP.soh = null;
             APP.loading = "";
             APP.emit();
+            setLd();
+            return;
+          }
+          if (APP.soh && APP.soh.version === m.version && APP.soh.rows && APP.soh.rows.length == m.rows) {
+            APP.loading = "";
             setLd();
             return;
           }
@@ -11536,19 +11597,20 @@ function paint(){SIG=sig();setCols();MD=MODE==&#x27;officer&#x27;?officerModel()
           h += `<div class="rc-empty" style="color:#b91c1c">${esc(APP.loadErr)}</div>`;
         else if (!d)
           h += APP.can("soh")
-            ? `<div class="rc-empty"><b style="color:#1b2430">Belum ada data SOH</b><br>Upload file Excel SOH untuk menampilkan rekap persediaan, MOI dan Pareto.<br><button id="rcUp">⬆ Upload SOH</button></div>`
+            ? `<div class="rc-empty"><b style="color:#1b2430">Belum ada data SOH</b><br>Upload file Excel SOH untuk menampilkan rekap persediaan, MOI dan Pareto.<br><button id="rcUp">⬆ SOH (Stock On Hand)</button></div>`
             : `<div class="rc-empty"><b style="color:#1b2430">Belum ada data SOH</b></div>`;
         else {
           const tv = d.stores.reduce((x, y) => x + y.val, 0),
             tq = d.stores.reduce((x, y) => x + y.qty, 0);
           h += `<div class="rc-grid">${kc("SOH Store", RP(d.tot.store), I(d.tot.store) + " · " + I(d.tot.storeN) + " store")}${kc("SOH APD", RP(d.tot.apd), I(d.tot.apd) + " · " + I(d.tot.apdN) + " lokasi")}${kc("SOH All", RP(d.tot.all), "Store + APD · " + I(d.tot.all))}${kc("Item (SKU)", I(d.items.length))}</div>`;
           /* MOI */
-          h += `<div class="rc-h">MOI<small>SOH toko ÷ sales bulanan toko · basis ${APP.basis == "hpp" ? "COGS" : "Net Sales"}</small></div>`;
+          h += `<div class="rc-h">MOI<small>MOI Store = SOH toko ÷ sales bulanan toko · MOI Total = (SOH APD + SOH Store) ÷ sales bulanan toko · basis ${APP.basis == "hpp" ? "COGS" : "Net Sales"}</small></div>`;
           if (m) {
             const c = { Low: 0, OK: 0, Overstock: 0, "No Sales": 0 };
             m.rows.forEach((r) => c[stat(r.moi)[0]]++);
-            const st = stat(m.tot.moi);
-            h += `<div class="rc-grid">${kc("MOI Total", F(m.tot.moi, 2) + " bln", st[0] + " · target 1,5–4 bln", st[2])}${kc("Store Low", I(c.Low), "MOI &lt; 1,5", "er")}${kc("Store OK", I(c.OK), "MOI 1,5 – 4", "ok")}${kc("Store Overstock", I(c.Overstock + c["No Sales"]), "MOI &gt; 4" + (c["No Sales"] ? " · " + I(c["No Sales"]) + " tanpa sales" : ""), "wa")}</div>`;
+            const st = stat(m.tot.moi),
+              sa = stat(m.tot.moiAll);
+            h += `<div class="rc-grid">${kc("MOI Total (APD + Store)", F(m.tot.moiAll, 2) + " bln", sa[0] + " · target 1,5–4 bln · SOH " + RP(m.tot.all), sa[2])}${kc("MOI Store", F(m.tot.moi, 2) + " bln", st[0] + " · target 1,5–4 bln", st[2])}${kc("Store Low", I(c.Low), "MOI &lt; 1,5", "er")}${kc("Store OK", I(c.OK), "MOI 1,5 – 4", "ok")}${kc("Store Overstock", I(c.Overstock + c["No Sales"]), "MOI &gt; 4" + (c["No Sales"] ? " · " + I(c["No Sales"]) + " tanpa sales" : ""), "wa")}</div>`;
             if (m.unmatched.length)
               h += `<div class="n" style="color:#9a3412;font-size:12px;margin-top:6px">${I(m.unmatched.length)} store SOH tidak cocok dengan data Sales (tidak dihitung).</div>`;
           } else h += `<div class="rc-empty">Menunggu data Sales…</div>`;
@@ -11585,7 +11647,7 @@ function paint(){SIG=sig();setCols();MD=MODE==&#x27;officer&#x27;?officerModel()
         }
         el.innerHTML = h;
         const b = $("#rcUp");
-        if (b) b.onclick = () => APP.goto("Upload SOH");
+        if (b) b.onclick = () => APP.goto("SOH (Stock On Hand)");
       }
 
       /* ===== Kelola User (Admin) ===== */
@@ -12153,6 +12215,47 @@ function paint(){SIG=sig();setCols();MD=MODE==&#x27;officer&#x27;?officerModel()
             })
             .catch(() => {});
         ensure($("#f1")).then(renderHome);
+        preloadTabs();
+      }
+      /* Muat semua tab di belakang layar satu per satu (tidak membekukan layar), supaya saat diklik sudah siap */
+      function preloadTabs() {
+        if (window.__preloading) return;
+        window.__preloading = true;
+        const order = ["f1", "f0", "f2", "f3", "f4", "f5", "f6", "f7"],
+          idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 80)),
+          cap = (p, ms) => Promise.race([p, new Promise((r) => setTimeout(r, ms))]);
+        let i = 0;
+        const next = () => {
+          if (i >= order.length) {
+            try {
+              stgLoad().catch(() => {});
+            } catch (e) {}
+            return;
+          }
+          const f = document.getElementById(order[i++]);
+          if (!f) return next();
+          cap(ensure(f), 20000)
+            .catch(() => {})
+            .then(() => idle(next, { timeout: 600 }));
+        };
+        const waitSales = () =>
+          new Promise((r) => {
+            let n = 0;
+            const t = setInterval(() => {
+              let ok = false;
+              try {
+                ok = !!document.getElementById("f1").contentWindow.getSalesItems();
+              } catch (e) {}
+              if (ok || ++n > 40) {
+                clearInterval(t);
+                r();
+              }
+            }, 500);
+          });
+        cap(ensure($("#f1")), 20000)
+          .catch(() => {})
+          .then(waitSales)
+          .then(() => setTimeout(next, 250));
       }
       const known = (s) =>
         API_URL
@@ -12970,7 +13073,7 @@ function paint(){SIG=sig();setCols();MD=MODE==&#x27;officer&#x27;?officerModel()
       };
       function sgBuild() {
         const d = APP.derived();
-        if (!d) return { err: "Belum ada data SOH. Upload SOH dulu di menu Upload SOH." };
+        if (!d) return { err: "Belum ada data SOH. Upload file SOH dulu di menu SOH (Stock On Hand)." };
         const m = APP.moi();
         if (!m) return { err: "Menunggu data Sales… (dibutuhkan untuk menghitung kecepatan jual toko)" };
         const st = new Map();
