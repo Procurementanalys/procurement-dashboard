@@ -1361,6 +1361,10 @@
   .drop{border:2px dashed #c5cfde;border-radius:12px;padding:26px 16px;text-align:center;background:#f8fafc;transition:.15s}
   .drop.over{border-color:var(--pr);background:#eef2fe}
   .drop b{display:inline-block;margin:6px 6px 8px 0}
+  #soh-tb .tw{overflow:visible;max-height:none}
+  #soh-tb table{min-width:0;table-layout:auto}
+  #soh-tb th,#soh-tb td{white-space:normal;word-break:break-word}
+  #soh-tb th{position:static}
   .pgr{display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:8px;font-size:12px;color:var(--mu)}
   .empty{text-align:center;padding:40px 16px;color:var(--mu)}.empty b{color:var(--tx);font-size:15px}.empty .btn{margin-top:14px}
   .warn{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:8px;padding:10px 12px;font-size:12.5px;margin-bottom:12px;line-height:1.5}
@@ -1400,14 +1404,14 @@
   el.innerHTML=`&lt;div class="tb"&gt;&lt;input class="sr" placeholder="Cari…"&gt;${o.filter?`&lt;select class="fl"&gt;${o.filter.map(x=&gt;`&lt;option value="${x[0]}"&gt;${x[1]}&lt;/option&gt;`).join("")}&lt;/select&gt;`:""}&lt;span class="cnt"&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class="tw"&gt;&lt;table&gt;&lt;/table&gt;&lt;/div&gt;&lt;div class="pgr"&gt;&lt;/div&gt;`;
   const tbl=el.querySelector("table"),cnt=el.querySelector(".cnt"),pgr=el.querySelector(".pgr"),sr=el.querySelector(".sr"),fl=el.querySelector(".fl");
   const draw=()=&gt;{const q=S.q.toLowerCase();let r=rows.filter(x=&gt;(!S.f||o.f(x)===S.f)&amp;&amp;(!q||o.s(x).toLowerCase().includes(q)));
-  if(o.sort&amp;&amp;S.sk!=null&amp;&amp;o.sort[S.sk]){const fn=o.sort[S.sk],dr=S.sd;r=r.map(x=&gt;[fn(x),x]).sort((a,b)=&gt;(a[0]&lt;b[0]?-1:a[0]&gt;b[0]?1:0)*dr).map(x=&gt;x[1])}
+  if(o.sort&amp;&amp;S.sk!=null&amp;&amp;o.sort[S.sk]){const fn=o.sort[S.sk],dr=S.sd;r=r.map(x=&gt;[fn(x),x]).sort((a,b)=&gt;{const an=a[0]==null,bn=b[0]==null;if(an||bn)return an&amp;&amp;bn?0:an?1:-1;return(a[0]&lt;b[0]?-1:a[0]&gt;b[0]?1:0)*dr}).map(x=&gt;x[1])}
   const pages=Math.max(1,Math.ceil(r.length/size));if(S.pg&gt;=pages)S.pg=pages-1;if(S.pg&lt;0)S.pg=0;
   const sl=r.slice(S.pg*size,S.pg*size+size);
   tbl.innerHTML="&lt;thead&gt;&lt;tr&gt;"+head.map(h=&gt;`&lt;th class="${h[1]||""}"&gt;${h[0]}&lt;/th&gt;`).join("")+"&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;"+(sl.length?sl.map(x=&gt;"&lt;tr&gt;"+o.cells(x).map((c,i)=&gt;`&lt;td class="${head[i][1]||""}"&gt;${c}&lt;/td&gt;`).join("")+"&lt;/tr&gt;").join(""):`&lt;tr&gt;&lt;td colspan="${head.length}" class="c" style="color:var(--mu);padding:20px"&gt;Tidak ada data&lt;/td&gt;&lt;/tr&gt;`)+"&lt;/tbody&gt;";
   cnt.textContent=I(r.length)+" baris"+(r.length!==rows.length?" (dari "+I(rows.length)+")":"");
   pgr.innerHTML=pages&gt;1?`&lt;button class="btn" data-d="-1" ${S.pg==0?"disabled":""}&gt;‹ Prev&lt;/button&gt;&lt;span&gt;Hal ${S.pg+1} / ${I(pages)}&lt;/span&gt;&lt;button class="btn" data-d="1" ${S.pg&gt;=pages-1?"disabled":""}&gt;Next ›&lt;/button&gt;`:"";
   pgr.querySelectorAll("button").forEach(b=&gt;b.onclick=()=&gt;{S.pg+=+b.dataset.d;draw();tbl.parentNode.scrollTop=0});
-  if(o.sort)tbl.querySelectorAll("th").forEach((th,i)=&gt;{if(!o.sort[i])return;th.style.cursor="pointer";th.title="Klik untuk mengurutkan";if(S.sk===i)th.textContent+=S.sd&gt;0?" ▲":" ▼";else th.textContent+=" ↕";th.onclick=()=&gt;{if(S.sk===i)S.sd=-S.sd;else{S.sk=i;S.sd=-1}S.pg=0;draw()}})};
+  if(o.sort)tbl.querySelectorAll("th").forEach((th,i)=&gt;{if(!o.sort[i])return;th.style.cursor="pointer";th.title="Klik untuk mengurutkan";if(S.sk===i)th.textContent+=S.sd&gt;0?" ▲":" ▼";else th.textContent+=" ↕";th.onclick=()=&gt;{if(S.sk===i)S.sd=-S.sd;else{S.sk=i;S.sd=-1}S.pg=0;cnt.textContent="⏳ Mengurutkan data…";setTimeout(draw,30)}})};
   let dt;sr.oninput=()=&gt;{clearTimeout(dt);dt=setTimeout(()=&gt;{S.q=sr.value;S.pg=0;draw()},180)};
   if(fl)fl.onchange=()=&gt;{S.f=fl.value;S.pg=0;draw()};
   draw()}
@@ -1472,10 +1476,10 @@
   const pm=m.meta||{};if(pm.period_start&amp;&amp;SI.ps&amp;&amp;(String(pm.period_start).slice(0,10)!==SI.ps||String(pm.period_end).slice(0,10)!==SI.pe))return none("periode data item ("+SI.ps+" s/d "+SI.pe+") berbeda dengan data Sales toko");
   const zc=x=&gt;String(x==null?"":x).trim().replace(/^0+/,""),idx=new Map(m.rows.map(r=&gt;[r.s.key,r])),cache=new Map(),kk=m.k||1;
   const get=r=&gt;{let v=cache.get(r);if(v!==undefined)return v;const st=idx.get(r[0]||r[1]);
-  if(!st)v=null;else{const it=SI.map[zc(st.sale.code||st.s.code)+"|"+zc(r[2])],sv=+r[5]||0,cg=it?(it[3]&gt;0?it[3]:it[1]-it[2]):0,b=(bs=="hpp"?cg:(it?it[1]:0))*kk;v=b&gt;0?sv/b:"NS"}
+  if(!st)v=null;else{const it=SI.map[zc(st.sale.code||st.s.code)+"|"+zc(r[2])],sv=+r[5]||0,cg=it?(it[3]&gt;0?it[3]:it[1]-it[2]):0,b=(bs=="hpp"?cg:(it?it[1]:0))*kk;v=b&gt;0?Math.max(0,sv)/b:"NS"}
   cache.set(r,v);return v};
   return{why:"",bs,get}}
-  const moiKey=v=&gt;v==null?-1e12:v==="NS"?1e12:v;
+  const moiKey=v=&gt;(v==null||v==="NS")?null:v;
   const moiCell=v=&gt;v==null?"–":v==="NS"?&apos;&lt;span class="b gr"&gt;No Sales&lt;/span&gt;&apos;:&apos;&lt;span class="&apos;+({er:"er",wa:"wa",ok:"ok"}[stat(v)[1]]||"")+&apos;"&gt;&apos;+F(v,2)+&apos;&lt;/span&gt;&apos;;
 
   // ---- UPLOAD SOH ----
@@ -1493,19 +1497,21 @@
   dr.addEventListener("drop",e=&gt;{const f=e.dataTransfer.files[0];f&amp;&amp;load(f)});
   $("tpl").onclick=tpl;const cl=$("clr");if(cl)cl.onclick=async()=&gt;{if(confirm("Hapus data SOH yang tersimpan?")){await APP.clear();toast("Data SOH dihapus")}};
   if(!s||!d)return;
+  if(R._lds!==s){R._lds=s;$("soh-body").innerHTML=`&lt;div class="card empty"&gt;&lt;b&gt;⏳ Memuat data SOH…&lt;/b&gt;Membaca ${I(s.rows.length)} baris dan menghitung MOI, mohon tunggu sebentar.&lt;/div&gt;`;setTimeout(()=&gt;{if(cur=="soh")R.soh()},60);return}
   const tv=sum(d.stores.map(x=&gt;x.val)),tq=sum(d.stores.map(x=&gt;x.qty));
   const apdK=new Set(d.stores.filter(x=&gt;x.apd).map(x=&gt;x.key)),rowsT=s.rows.filter(r=&gt;!apdK.has(r[0]||r[1])),apdHid=s.rows.length-rowsT.length;
   $("soh-body").innerHTML=`&lt;div class="bc"&gt;File aktif: &lt;b&gt;${esc(s.file)}&lt;/b&gt; · diupload ${new Date(s.at).toLocaleString("id-ID")}&lt;/div&gt;`
   +kpi(sohK(d,rowsT.length))
   +`&lt;div class="n" style="margin:-4px 0 12px"&gt;${d.stores.some(x=&gt;x.apd)?"Lokasi APD terdeteksi: "+d.stores.filter(x=&gt;x.apd).slice(0,8).map(x=&gt;esc(x.code&amp;&amp;x.name?x.code+" · "+x.name:(x.code||x.name))).join("; ")+" — "+I(apdHid)+" baris APD/1001 tidak ditampilkan di tabel Data SOH":"Belum ada lokasi APD terdeteksi — dikenali dari kode &lt;code&gt;1001&lt;/code&gt; atau kata &lt;code&gt;APD&lt;/code&gt; pada Store Code / Store Name. Semua SOH dihitung sebagai Store."}&lt;/div&gt;`
-  +`&lt;div class="card"&gt;&lt;h2&gt;Data SOH&lt;/h2&gt;&lt;div id="soh-tb"&gt;&lt;/div&gt;&lt;div class="n" id="soh-moi-n"&gt;&lt;/div&gt;&lt;/div&gt;`;
+  +`&lt;div class="card"&gt;&lt;h2&gt;Data SOH&lt;/h2&gt;&lt;div id="soh-warn"&gt;&lt;/div&gt;&lt;div id="soh-tb"&gt;&lt;/div&gt;&lt;div class="n" id="soh-moi-n"&gt;&lt;/div&gt;&lt;/div&gt;`;
   const mx=itemMoiCtx();
   const pf=r=&gt;r[7]||d.cls.get(r[2])||"C",pl=[...new Set(rowsT.map(pf))].sort();
   mkTable("soh-tb",[["Store","l"],["Item Code","l"],["Item Name","l"],["Procurement Officer","l"],["SOH Qty"],["SOH Value"],["MOI (bln)"],["Pareto","c"]],rowsT,
   {sort:{6:r=&gt;moiKey(mx.get(r))},cells:r=&gt;[esc(r[1]?r[0]+" · "+r[1]:r[0]),esc(r[2]),esc(r[3]),esc(r[6]||"-"),F(r[4],2),I(r[5]),moiCell(mx.get(r)),badge(pf(r))],
   s:r=&gt;r[0]+" "+r[1]+" "+r[2]+" "+r[3]+" "+(r[6]||""),f:r=&gt;pf(r),filter:[["","Semua Pareto"]].concat(pl.map(x=&gt;[x,"Pareto "+x]))});
   if(mx.why&amp;&amp;retry++&lt;10)setTimeout(()=&gt;{if(cur=="soh")R.soh()},1500);else if(!mx.why)retry=0;
-  $("soh-moi-n").innerHTML=mx.why?"Kolom MOI belum bisa dihitung: "+esc(mx.why)+".":"&lt;b&gt;MOI (bln)&lt;/b&gt; = SOH Value item di store tersebut ÷ ("+(mx.bs=="hpp"?"COGS":"Net Sales")+" item di store itu per bulan, periode sales disetarakan ke sebulan). Basis mengikuti pilihan di menu MOI. &lt;b&gt;–&lt;/b&gt; = MOI tidak bisa dihitung karena store tidak ditemukan di data Sales; &lt;b&gt;No Sales&lt;/b&gt; = store ada di data Sales tapi item itu tidak terjual di periode tersebut. Baris APD/1001 tidak ditampilkan. Klik judul kolom MOI untuk mengurutkan."};
+  $("soh-moi-n").innerHTML=mx.why?"Kolom MOI belum bisa dihitung: "+esc(mx.why)+".":"&lt;b&gt;MOI (bln)&lt;/b&gt; = SOH Value item di store tersebut ÷ ("+(mx.bs=="hpp"?"COGS":"Net Sales")+" item di store itu per bulan, periode sales disetarakan ke sebulan). Basis mengikuti pilihan di menu MOI. &lt;b&gt;–&lt;/b&gt; = MOI tidak bisa dihitung karena store tidak ditemukan di data Sales; &lt;b&gt;No Sales&lt;/b&gt; = store ada di data Sales tapi item itu tidak terjual di periode tersebut. Baris APD/1001 tidak ditampilkan. Klik judul kolom MOI untuk mengurutkan.";
+  $("soh-warn").innerHTML=mx.why?`&lt;div class="n" style="color:#b45309;font-weight:600;margin:0 0 8px"&gt;⚠ Kolom MOI belum terisi: ${esc(mx.why)}.&lt;/div&gt;`:""};
 
   // ---- STOCK ----
   // Split SOH: store (tanpa APD) vs APD (warehouse), agregat per item. Di-cache di objek derived.
