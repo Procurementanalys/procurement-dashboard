@@ -1470,9 +1470,9 @@
   // ---- [BARU] MOI per item di store (kolom MOI di tabel SOH (Stock On Hand)) ----
   function itemMoiCtx(){const bs=APP.basis;let m=null,SI=null;try{m=APP.moi(bs)}catch(e){m=null}
   const none=why=&gt;({why,bs,get:()=&gt;null});
-  if(!m)return none("data Sales toko belum tersedia");
+  if(!m){const r0=none("data Sales toko belum tersedia");r0.loading=true;return r0}
   try{const fw=window.parent.document.getElementById("f1").contentWindow;SI=fw.getSalesItems?fw.getSalesItems():null}catch(e){SI=null}
-  if(!SI||!SI.map)return none("data sales per item belum tersedia (upload ulang Excel Sales di menu Sales)");
+  if(!SI||!SI.map){let w="";try{w=window.parent.document.getElementById("f1").contentWindow.__itemsWhy||""}catch(e){}const r0=none("data sales per item belum tersedia"+(w?" — "+w:""));r0.loading=!w;return r0}
   const pm=m.meta||{};if(pm.period_start&amp;&amp;SI.ps&amp;&amp;(String(pm.period_start).slice(0,10)!==SI.ps||String(pm.period_end).slice(0,10)!==SI.pe))return none("periode data item ("+SI.ps+" s/d "+SI.pe+") berbeda dengan data Sales toko");
   const zc=x=&gt;String(x==null?"":x).trim().replace(/^0+/,""),idx=new Map(m.rows.map(r=&gt;[r.s.key,r])),cache=new Map(),kk=m.k||1;
   const get=r=&gt;{let v=cache.get(r);if(v!==undefined)return v;const st=idx.get(r[0]||r[1]);
@@ -1507,11 +1507,11 @@
   const mx=itemMoiCtx();
   const pf=r=&gt;r[7]||d.cls.get(r[2])||"C",pl=[...new Set(rowsT.map(pf))].sort();
   mkTable("soh-tb",[["Store","l"],["Item Code","l"],["Item Name","l"],["Procurement Officer","l"],["SOH Qty"],["SOH Value"],["MOI (bln)"],["Pareto","c"]],rowsT,
-  {sort:{6:r=&gt;moiKey(mx.get(r))},cells:r=&gt;[esc(r[1]?r[0]+" · "+r[1]:r[0]),esc(r[2]),esc(r[3]),esc(r[6]||"-"),F(r[4],2),I(r[5]),moiCell(mx.get(r)),badge(pf(r))],
+  {sort:{6:r=&gt;moiKey(mx.get(r))},cells:r=&gt;[esc(r[1]?r[0]+" · "+r[1]:r[0]),esc(r[2]),esc(r[3]),esc(r[6]||"-"),F(r[4],2),I(r[5]),(mx.loading?"⏳":moiCell(mx.get(r))),badge(pf(r))],
   s:r=&gt;r[0]+" "+r[1]+" "+r[2]+" "+r[3]+" "+(r[6]||""),f:r=&gt;pf(r),filter:[["","Semua Pareto"]].concat(pl.map(x=&gt;[x,"Pareto "+x]))});
-  if(mx.why&amp;&amp;retry++&lt;10)setTimeout(()=&gt;{if(cur=="soh")R.soh()},1500);else if(!mx.why)retry=0;
-  $("soh-moi-n").innerHTML=mx.why?"Kolom MOI belum bisa dihitung: "+esc(mx.why)+".":"&lt;b&gt;MOI (bln)&lt;/b&gt; = SOH Value item di store tersebut ÷ ("+(mx.bs=="hpp"?"COGS":"Net Sales")+" item di store itu per bulan, periode sales disetarakan ke sebulan). Basis mengikuti pilihan di menu MOI. &lt;b&gt;–&lt;/b&gt; = MOI tidak bisa dihitung karena store tidak ditemukan di data Sales; &lt;b&gt;No Sales&lt;/b&gt; = store ada di data Sales tapi item itu tidak terjual di periode tersebut. Baris APD/1001 tidak ditampilkan. Klik judul kolom MOI untuk mengurutkan.";
-  $("soh-warn").innerHTML=mx.why?`&lt;div class="n" style="color:#b45309;font-weight:600;margin:0 0 8px"&gt;⚠ Kolom MOI belum terisi: ${esc(mx.why)}.&lt;/div&gt;`:""};
+  if(mx.loading&amp;&amp;retry++&lt;30)setTimeout(()=&gt;{if(cur=="soh")R.soh()},3000);else if(!mx.why)retry=0;
+  $("soh-moi-n").innerHTML=mx.loading?"":mx.why?"Kolom MOI belum bisa dihitung: "+esc(mx.why)+".":"&lt;b&gt;MOI (bln)&lt;/b&gt; = SOH Value item di store tersebut ÷ ("+(mx.bs=="hpp"?"COGS":"Net Sales")+" item di store itu per bulan, periode sales disetarakan ke sebulan). Basis mengikuti pilihan di menu MOI. &lt;b&gt;–&lt;/b&gt; = MOI tidak bisa dihitung karena store tidak ditemukan di data Sales; &lt;b&gt;No Sales&lt;/b&gt; = store ada di data Sales tapi item itu tidak terjual di periode tersebut. Baris APD/1001 tidak ditampilkan. Klik judul kolom MOI untuk mengurutkan.";
+  $("soh-warn").innerHTML=mx.loading?`&lt;div class="n" style="font-weight:600;margin:0 0 8px"&gt;⏳ SOH sedang di-load… data sales sedang diambil, kolom MOI akan terisi otomatis.&lt;/div&gt;`:mx.why?`&lt;div class="n" style="color:#b45309;font-weight:600;margin:0 0 8px"&gt;⚠ Kolom MOI belum terisi: ${esc(mx.why)}.&lt;/div&gt;`:""};
 
   // ---- STOCK ----
   // Split SOH: store (tanpa APD) vs APD (warehouse), agregat per item. Di-cache di objek derived.
@@ -2671,13 +2671,14 @@ th{background:var(--u-navy)!important}
       const rows=[]; let off=0, meta=null;
       for(;;){
         const res=await fetch(GAS_URL+&apos;?action=salesItems&amp;offset=&apos;+off+&apos;&amp;limit=20000&apos;);
-        const j=await res.json(); if(!j.success||!j.complete) return;
+        const j=await res.json(); if(!j.success||!j.complete){ window.__itemsWhy=!j.success?(&apos;Apps Script menolak: &apos;+(j.error||&apos;action salesItems tidak dikenali&apos;)):&apos;data sales item di Sheets belum lengkap (upload belum selesai)&apos;; return; }
         meta=j; if(!j.rows.length) break;
         j.rows.forEach(r=&gt;rows.push(r)); off+=j.rows.length;
         if(off&gt;=j.total) break;
       }
-      if(rows.length&amp;&amp;meta&amp;&amp;!ITEMS){ ITEMS=buildItems(meta.period_start,meta.period_end,rows); notifyParent(); }
-    }catch(err){ console.warn(&apos;Load item gagal:&apos;,err); }
+      if(rows.length&amp;&amp;meta&amp;&amp;!ITEMS){ ITEMS=buildItems(meta.period_start,meta.period_end,rows); window.__itemsWhy=&apos;&apos;; notifyParent(); }
+      else if(!rows.length) window.__itemsWhy=&apos;sheet SalesItem di Google Sheets kosong&apos;;
+    }catch(err){ window.__itemsWhy=&apos;gagal mengambil dari Apps Script (&apos;+err.message+&apos;)&apos;; console.warn(&apos;Load item gagal:&apos;,err); }
   }
 
   async function fetchAppScriptData(){
