@@ -849,6 +849,14 @@
         #sb a.on::before{content:"";position:absolute;left:-10px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--orange)}
         #sb a.on::after{display:none}
         body.cx #sb a.on::before{left:-8px}
+        /* Submenu Greenlist (1 item yang bisa dibuka di grup ANALISIS) */
+        #gpar{justify-content:space-between}
+        #gpar .gch{font-size:16px;line-height:1;opacity:1;color:#fb923c;transition:transform .2s ease}
+        #gpar.op .gch{transform:rotate(180deg)}
+        #gsub{display:none}
+        #gsub.open{display:block!important}
+        #gpar{cursor:pointer;user-select:none}
+        #sb #gsub a{padding:8px 12px 8px 34px;font-size:13px;margin:1px 10px}
 
         /* ---------- Header ---------- */
         #hd{background:rgba(255,255,255,.86);padding:10px 24px;border-bottom:1px solid var(--bd);box-shadow:none;
@@ -1060,17 +1068,6 @@
         #usr table{border:1px solid var(--bd);box-shadow:var(--shadow-1);border-radius:14px}
         table td{border-bottom-color:#eef1f6}
     </style>
-    <style>
-      /* Submenu Greenlist (grup bisa dilipat) */
-      #sb .sgh{display:flex;align-items:center;justify-content:space-between;gap:10px;width:calc(100% - 20px);margin:2px 10px;padding:9px 12px;border:0;border-radius:10px;background:transparent;color:#a9b5ca;font:inherit;font-size:13.5px;font-weight:500;text-align:left;cursor:pointer}
-      #sb .sgh:hover{background:rgba(255,255,255,.07);color:#fff}
-      #sb .sgh.act{color:#fff;font-weight:600}
-      #sb .sgh .sgc{transition:transform .2s ease;flex:none}
-      #sb .sgh.open .sgc{transform:rotate(180deg)}
-      #sb .sgb{margin:0 0 4px 0}
-      #sb .sgb[hidden]{display:none}
-      #sb a.sgi{margin:1px 10px 1px 28px;padding:7px 12px;font-size:13px}
-    </style>
   </head>
   <body class="lock">
     <!-- PETA FILE: tekan Ctrl+F lalu cari "TAB:" , "SCRIPT:" atau "STYLE:" untuk lompat antar bagian.
@@ -1211,19 +1208,18 @@
       ><a data-f="f3" data-s="" data-t="OOS (Out of Stock)">⚠ OOS (Out of Stock)</a
       ><a data-f="f4" data-s="" data-t="SLA Supplier">◎ SLA Supplier</a
       ><a data-f="f5" data-s="" data-t="Outstanding &amp; OTB">◫ Outstanding &amp; OTB</a>
-      <div class="mh">ANALISIS</div>
+      <div class="mh" id="mhAn">ANALISIS</div>
       <a data-f="f6" data-s="" data-t="Officer Scorecard">◈ Officer Scorecard</a
-      ><a data-f="f7" data-s="" data-t="Store Health">▣ Store Health</a
-      >
-      <button type="button" class="sgh" id="glh" aria-expanded="false" aria-controls="glb"><span>✓ Greenlist</span><svg class="sgc" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
-      <div class="sgb" id="glb" hidden>
-        <a class="sgi" data-f="f8" data-s="ringkasan" data-t="Greenlist · Ringkasan">Ringkasan</a>
-        <a class="sgi" data-f="f8" data-s="tren" data-t="Greenlist · Tren">Tren</a>
-        <a class="sgi" data-f="f8" data-s="conv" data-t="Greenlist · Konversi">Konversi</a>
-        <a class="sgi" data-f="f8" data-s="store" data-t="Greenlist · Per Toko">Per Toko</a>
-        <a class="sgi" data-f="f8" data-s="gmroi" data-t="Greenlist · GMROI">GMROI</a>
-        <a class="sgi" data-f="f8" data-s="moi" data-t="Greenlist · MOI Toko &amp; Item">MOI Toko &amp; Item</a>
-        <a class="sgi" data-f="f8" data-s="data" data-t="Greenlist · Data sumber">Data sumber</a>
+      ><a data-f="f7" data-s="" data-t="Store Health">▣ Store Health</a>
+      <a id="gpar" data-perm="greenlist" style="display: none">✓ Greenlist<span class="gch">▾</span></a>
+      <div id="gsub" class="gsub">
+        <a data-f="f8" data-s="ringkasan" data-t="Greenlist · Ringkasan" data-perm="greenlist" style="display: none">Ringkasan</a>
+        <a data-f="f8" data-s="tren" data-t="Greenlist · Tren" data-perm="greenlist" style="display: none">Tren</a>
+        <a data-f="f8" data-s="conv" data-t="Greenlist · Konversi" data-perm="greenlist" style="display: none">Konversi</a>
+        <a data-f="f8" data-s="store" data-t="Greenlist · Per Toko" data-perm="greenlist" style="display: none">Per Toko</a>
+        <a data-f="f8" data-s="gmroi" data-t="Greenlist · GMROI" data-perm="greenlist" style="display: none">GMROI</a>
+        <a data-f="f8" data-s="moi" data-t="Greenlist · MOI Toko &amp; Item" data-perm="greenlist" style="display: none">MOI Toko &amp; Item</a>
+        <a data-f="f8" data-s="data" data-t="Greenlist · Data sumber" data-perm="greenlist" style="display: none">Data sumber</a>
       </div>
       <div class="mh">PENYIMPANAN</div>
       <a data-f="stg" data-s="" data-t="Spreadsheet" data-k="sheet">▦ Spreadsheet</a
@@ -1476,9 +1472,8 @@
   const off=c.officer!=null&amp;&amp;r[c.officer]!=null?String(r[c.officer]).trim():"",par=c.pareto!=null&amp;&amp;r[c.pareto]!=null?String(r[c.pareto]).trim().toUpperCase():"";out.push([store,sn,code,nm||code,num(r[c.qty]),num(r[c.val]),off,par])}
   if(!out.length){if(us)us.textContent="";toast("❌ Tidak ada baris data yang terbaca.",5000);return}
   const saved=await APP.setSoh({file:file.name,at:Date.now(),rows:out},(i,n)=&gt;{const e=$("ust");if(e)e.textContent="⏳ Mengirim ke database… "+i+"/"+n+" ("+Math.round(i/n*100)+"%)"});
-  try{const _n=new Date(),_p=x=&gt;String(x).padStart(2,"0"),_dk=_n.getFullYear()+"-"+_p(_n.getMonth()+1)+"-"+_p(_n.getDate());
-  const _g=[["Store Code","Item Code","SOH Qty","SOH Value","Procurement Officer"]].concat(out.map(r=&gt;[r[0],r[2],r[4],r[5],r[6]]));
-  if(window.parent.glFeed)window.parent.glFeed("soh",_g,toast,_dk)}catch(e){console.error(e)}
+  /* Satu kali upload: teruskan file SOH yang sama ke Greenlist */
+  try{if(APP.toGreenlistSoh)APP.toGreenlistSoh(rows,file.name)}catch(_e){}
   toast("✅ "+I(out.length)+" baris dimuat"+(skip?" ("+I(skip)+" baris dilewati)":"")+(saved==="db"?" · tersimpan di database":saved?" · tersimpan di browser":" · hanya untuk sesi ini (browser tidak mengizinkan penyimpanan)"),5500)
   }catch(e){console.error(e);if(us)us.textContent="";toast("❌ Gagal membaca Excel: "+e.message,6000)}}
   function tpl(){try{const H=["Store Code","Store Name","Item Code","Item Name","SOH Qty","SOH Value","Procurement Officer","Pareto"];
@@ -1788,14 +1783,14 @@ th{background:var(--u-navy)!important}
           id="f1"
           class="fr"
           data-doc='&lt;!DOCTYPE html&gt;
-  &lt;html lang="id"&gt;
+  &lt;html lang=&quot;id&quot;&gt;
   &lt;head&gt;
-  &lt;meta charset="UTF-8"&gt;
-  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
   &lt;title&gt;Dashboard Sales - Kaizen Spirit&lt;/title&gt;
-  &lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;
-  &lt;link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"&gt;
-  &lt;script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"&gt;&lt;/script&gt;
+  &lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+  &lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js&quot;&gt;&lt;/script&gt;
   &lt;style&gt;
     :root{
       /* PREMIUM CORPORATE PALETTE — Alpro Royal Edition */
@@ -1839,7 +1834,7 @@ th{background:var(--u-navy)!important}
 
     /* ANIMATED BACKGROUND - cosmic kaizen */
     body{
-      margin:0; font-family:&apos;Inter&apos;,sans-serif; color:var(--ink);
+      margin:0; font-family:&#x27;Inter&#x27;,sans-serif; color:var(--ink);
       background:
         radial-gradient(ellipse 90% 70% at 15% -5%, rgba(58,112,237,.28), transparent 55%),
         radial-gradient(ellipse 80% 60% at 90% 10%, rgba(236,138,72,.20), transparent 55%),
@@ -1854,7 +1849,7 @@ th{background:var(--u-navy)!important}
     }
     /* Premium grid overlay */
     body::after{
-      content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+      content:&quot;&quot;; position:fixed; inset:0; pointer-events:none; z-index:0;
       background-image:
         linear-gradient(rgba(58,112,237,.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(58,112,237,.04) 1px, transparent 1px);
@@ -1864,7 +1859,7 @@ th{background:var(--u-navy)!important}
     }
     /* Floating orbs background */
     body::before{
-      content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+      content:&quot;&quot;; position:fixed; inset:0; pointer-events:none; z-index:0;
       background-image:
         radial-gradient(circle at 15% 25%, rgba(255,182,39,.06) 0, transparent 2%),
         radial-gradient(circle at 85% 75%, rgba(224,111,36,.07) 0, transparent 2%),
@@ -1892,7 +1887,7 @@ th{background:var(--u-navy)!important}
     /* Pastikan html &amp; body full tinggi viewport */
     html, body{ width:100%; }
     body{ min-height:100vh; }
-    h1,h2,h3,.display{font-family:&apos;Outfit&apos;,sans-serif;}
+    h1,h2,h3,.display{font-family:&#x27;Outfit&#x27;,sans-serif;}
 
     /* SCROLL REVEAL */
     @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
@@ -1919,7 +1914,7 @@ th{background:var(--u-navy)!important}
     }
     /* Aurora wave effect */
     .header::before{
-      content:""; position:absolute; top:-50%; left:-50%; width:200%; height:200%;
+      content:&quot;&quot;; position:absolute; top:-50%; left:-50%; width:200%; height:200%;
       background:
         conic-gradient(from 0deg at 50% 50%,
           transparent 0deg, rgba(58,112,237,.22) 50deg,
@@ -1931,7 +1926,7 @@ th{background:var(--u-navy)!important}
     }
     /* Diagonal pattern overlay */
     .header::after{
-      content:""; position:absolute; inset:0;
+      content:&quot;&quot;; position:absolute; inset:0;
       background:repeating-linear-gradient(45deg,rgba(255,255,255,.025) 0 2px,transparent 2px 14px);
       pointer-events:none;
     }
@@ -1943,7 +1938,7 @@ th{background:var(--u-navy)!important}
       animation:float 6s ease-in-out infinite;
     }
     .brand-logo-wrap::before{
-      content:""; position:absolute; inset:-12px;
+      content:&quot;&quot;; position:absolute; inset:-12px;
       background:radial-gradient(circle, rgba(58,112,237,.45), rgba(236,138,72,.25) 40%, transparent 70%);
       filter:blur(20px); z-index:0; opacity:.9;
       animation:pulse 3.5s ease-in-out infinite;
@@ -1991,14 +1986,14 @@ th{background:var(--u-navy)!important}
     .header-meta span:hover{background:rgba(255,255,255,.12);transform:translateY(-1px);border-color:rgba(255,255,255,.3);}
     .btn-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
     .btn{
-      border:none;cursor:pointer;font-family:&apos;Outfit&apos;,sans-serif;font-weight:700;font-size:14.5px;
+      border:none;cursor:pointer;font-family:&#x27;Outfit&#x27;,sans-serif;font-weight:700;font-size:14.5px;
       padding:13px 28px;border-radius:30px;
       transition:all .25s cubic-bezier(.4,0,.2,1);
       display:inline-flex;align-items:center;gap:8px;
       position:relative;overflow:hidden;letter-spacing:.01em;
     }
     .btn::before{
-      content:""; position:absolute; top:0; left:-100%; width:100%; height:100%;
+      content:&quot;&quot;; position:absolute; top:0; left:-100%; width:100%; height:100%;
       background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);
       transition:left .6s ease;
     }
@@ -2025,14 +2020,14 @@ th{background:var(--u-navy)!important}
       animation:fadeUp .7s ease both;
     }
     .banner::before{
-      content:""; position:absolute; inset:0;
+      content:&quot;&quot;; position:absolute; inset:0;
       background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.18) 50%,transparent 70%);
       background-size:200% 100%;
       animation:shimmer 4s linear infinite;
       pointer-events:none;
     }
     .banner::after{
-      content:""; position:absolute; top:-2px; left:-2px; right:-2px; bottom:-2px;
+      content:&quot;&quot;; position:absolute; top:-2px; left:-2px; right:-2px; bottom:-2px;
       border-radius:22px; z-index:-1; opacity:.5; filter:blur(20px);
       background:inherit;
     }
@@ -2055,14 +2050,14 @@ th{background:var(--u-navy)!important}
       animation:fadeUp .6s ease both;
     }
     .card::before{
-      content:""; position:absolute; top:0; left:0; right:0; height:3px;
+      content:&quot;&quot;; position:absolute; top:0; left:0; right:0; height:3px;
       background:linear-gradient(90deg,var(--cyan-accent),var(--kaizen1),var(--fire1),var(--gold));
       background-size:200% 100%;
       opacity:0; transition:opacity .35s ease;
       animation:shimmer 4s linear infinite;
     }
     .card::after{
-      content:""; position:absolute; top:-50%; right:-50%; width:200%; height:200%;
+      content:&quot;&quot;; position:absolute; top:-50%; right:-50%; width:200%; height:200%;
       background:radial-gradient(circle at center, rgba(58,112,237,.06), transparent 40%);
       opacity:0; transition:opacity .4s ease; pointer-events:none;
     }
@@ -2081,7 +2076,7 @@ th{background:var(--u-navy)!important}
       -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
     }
     .kpi-foot{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.5;}
-    .kpi-edit{width:100%;border:1.5px dashed var(--line);border-radius:10px;padding:8px 10px;font-family:&apos;Outfit&apos;,sans-serif;font-weight:700;font-size:18px;color:var(--ink);margin-top:2px;background:var(--paper);}
+    .kpi-edit{width:100%;border:1.5px dashed var(--line);border-radius:10px;padding:8px 10px;font-family:&#x27;Outfit&#x27;,sans-serif;font-weight:700;font-size:18px;color:var(--ink);margin-top:2px;background:var(--paper);}
     .kpi-edit:focus{outline:2px solid var(--fire2);border-style:solid;}
     .badge{
       display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;
@@ -2102,7 +2097,7 @@ th{background:var(--u-navy)!important}
       animation:slideInLeft .5s ease both;
     }
     .section-title::before{
-      content:""; position:absolute; left:0; top:50%; transform:translateY(-50%);
+      content:&quot;&quot;; position:absolute; left:0; top:50%; transform:translateY(-50%);
       width:4px; height:24px; border-radius:4px;
       background:linear-gradient(180deg,var(--fire1),var(--kaizen1));
       box-shadow:0 0 12px rgba(255,93,108,.5);
@@ -2222,7 +2217,7 @@ th{background:var(--u-navy)!important}
       transform:translateX(4px);
     }
     .row-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
-    .rank{font-weight:800;font-size:14px;color:var(--muted);width:28px;flex-shrink:0;font-family:&apos;Outfit&apos;,sans-serif;}
+    .rank{font-weight:800;font-size:14px;color:var(--muted);width:28px;flex-shrink:0;font-family:&#x27;Outfit&#x27;,sans-serif;}
     .rank.r1{color:var(--gold);text-shadow:0 0 12px rgba(255,182,39,.4);}
     .rank.r2{color:var(--silver);text-shadow:0 0 8px rgba(154,165,182,.4);}
     .rank.r3{color:var(--bronze);text-shadow:0 0 8px rgba(205,127,50,.4);}
@@ -2242,7 +2237,7 @@ th{background:var(--u-navy)!important}
       position:relative;
     }
     .bar-fill::after{
-      content:""; position:absolute; inset:0;
+      content:&quot;&quot;; position:absolute; inset:0;
       background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);
       background-size:200% 100%;
       animation:shimmer 2.5s linear infinite;
@@ -2252,7 +2247,7 @@ th{background:var(--u-navy)!important}
     .table-toggle{
       width:100%;text-align:center;background:none;
       border:1.5px dashed var(--navy-card-border);color:#cdd8f5;
-      padding:14px;border-radius:14px;font-family:&apos;Outfit&apos;,sans-serif;font-weight:700;cursor:pointer;
+      padding:14px;border-radius:14px;font-family:&#x27;Outfit&#x27;,sans-serif;font-weight:700;cursor:pointer;
       margin-top:14px;transition:all .25s ease;letter-spacing:.02em;
     }
     .table-toggle:hover{
@@ -2264,7 +2259,7 @@ th{background:var(--u-navy)!important}
     .search-box{
       width:100%;padding:12px 16px;border-radius:12px;
       border:1.5px solid var(--line);margin-bottom:12px;
-      font-family:&apos;Inter&apos;,sans-serif;font-size:13.5px;
+      font-family:&#x27;Inter&#x27;,sans-serif;font-size:13.5px;
       transition:all .25s ease;background:var(--paper);
     }
     .search-box:focus{outline:none;border-color:var(--kaizen1);background:#fff;box-shadow:0 0 0 4px rgba(49,106,238,.12);}
@@ -2306,7 +2301,7 @@ th{background:var(--u-navy)!important}
       padding:0;
     }
     footer::before{
-      content:""; position:absolute; top:0; left:0; right:0; height:3px;
+      content:&quot;&quot;; position:absolute; top:0; left:0; right:0; height:3px;
       background:linear-gradient(90deg, transparent, #3a70ed, #ec8a48, #fbbf24, #3a70ed, transparent);
       background-size:200% 100%;
       animation:shimmer 4s linear infinite;
@@ -2334,17 +2329,17 @@ th{background:var(--u-navy)!important}
       object-fit:contain;
     }
     .footer-brand-text h4{
-      margin:0 0 4px;color:#fff;font-family:&apos;Outfit&apos;,sans-serif;
+      margin:0 0 4px;color:#fff;font-family:&#x27;Outfit&#x27;,sans-serif;
       font-weight:800;font-size:16px;letter-spacing:.01em;
     }
     .footer-brand-text p{margin:0;color:#94a3b8;font-size:12px;line-height:1.55;}
     .footer-col h5{
       margin:0 0 12px;color:#fff;font-size:11.5px;text-transform:uppercase;
-      letter-spacing:.18em;font-weight:800;font-family:&apos;Outfit&apos;,sans-serif;
+      letter-spacing:.18em;font-weight:800;font-family:&#x27;Outfit&#x27;,sans-serif;
       display:flex;align-items:center;gap:8px;
     }
     .footer-col h5::before{
-      content:""; width:4px;height:14px;border-radius:4px;
+      content:&quot;&quot;; width:4px;height:14px;border-radius:4px;
       background:linear-gradient(180deg,#3a70ed,#ec8a48);
     }
     .footer-stats{display:flex;flex-direction:column;gap:8px;}
@@ -2405,15 +2400,15 @@ th{background:var(--u-navy)!important}
     #fileInput{display:none;}
 
     /* Special second-row KPI cards override gradient accents */
-    .kpi-grid .card[style*="f0fdf4"]::before{background:linear-gradient(90deg,#22c55e,#10b981);}
-    .kpi-grid .card[style*="fdf4ff"]::before{background:linear-gradient(90deg,#5a88f2,#e06f24);}
+    .kpi-grid .card[style*=&quot;f0fdf4&quot;]::before{background:linear-gradient(90deg,#22c55e,#10b981);}
+    .kpi-grid .card[style*=&quot;fdf4ff&quot;]::before{background:linear-gradient(90deg,#5a88f2,#e06f24);}
 
     /* Subtle entrance for sections */
     .card.progress-card{animation:fadeUp .7s ease both;animation-delay:.15s;}
   &lt;/style&gt;
-  &lt;style id="uni-theme"&gt;@media screen{
+  &lt;style id=&quot;uni-theme&quot;&gt;@media screen{
   html,body{background:#eef1f6!important}
-  body{font-family:&apos;Inter&apos;,&apos;Segoe UI&apos;,system-ui,-apple-system,Roboto,sans-serif!important}
+  body{font-family:&#x27;Inter&#x27;,&#x27;Segoe UI&#x27;,system-ui,-apple-system,Roboto,sans-serif!important}
 
   .header .brand-logo-wrap,.header .eyebrow,.header h1,.header .sub{display:none!important}
   .header{padding:16px 20px!important}
@@ -2422,187 +2417,187 @@ th{background:var(--u-navy)!important}
   }&lt;/style&gt;&lt;/head&gt;
   &lt;body&gt;
 
-  &lt;div class="wrap"&gt;
+  &lt;div class=&quot;wrap&quot;&gt;
 
-    &lt;div class="header"&gt;
-      &lt;div class="brand-logo-wrap"&gt;
-        &lt;img src="logo-alpro.png" alt="Alpro Pharmacy" class="brand-logo" onerror="this.style.display=&apos;none&apos;"&gt;
+    &lt;div class=&quot;header&quot;&gt;
+      &lt;div class=&quot;brand-logo-wrap&quot;&gt;
+        &lt;img src=&quot;logo-alpro.png&quot; alt=&quot;Alpro Pharmacy&quot; class=&quot;brand-logo&quot; onerror=&quot;this.style.display=&#x27;none&#x27;&quot;&gt;
       &lt;/div&gt;
-      &lt;div class="eyebrow"&gt;PT ALPRO INDONESIA GROUP&lt;/div&gt;
+      &lt;div class=&quot;eyebrow&quot;&gt;PT ALPRO INDONESIA GROUP&lt;/div&gt;
       &lt;h1&gt;🔥 Dashboard Sales — Kaizen Spirit 🔥&lt;/h1&gt;
-      &lt;p class="sub"&gt;Continuous Improvement • 改善 • Never Stop Growing&lt;/p&gt;
-      &lt;div class="header-meta" id="headerMeta"&gt;&lt;/div&gt;
-      &lt;div class="btn-row"&gt;
-        &lt;button class="btn btn-primary" id="uploadBtn"&gt;⬆ Upload Excel Baru&lt;/button&gt;
-        &lt;button class="btn btn-ghost" id="refreshBtn"&gt;🔄 Refresh dari Sheets&lt;/button&gt;
-        &lt;button class="btn btn-ghost" id="resetBtn"&gt;↺ Reset Data&lt;/button&gt;
+      &lt;p class=&quot;sub&quot;&gt;Continuous Improvement • 改善 • Never Stop Growing&lt;/p&gt;
+      &lt;div class=&quot;header-meta&quot; id=&quot;headerMeta&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;btn-row&quot;&gt;
+        &lt;button class=&quot;btn btn-primary&quot; id=&quot;uploadBtn&quot;&gt;⬆ Upload Excel Baru&lt;/button&gt;
+        &lt;button class=&quot;btn btn-ghost&quot; id=&quot;refreshBtn&quot;&gt;🔄 Refresh dari Sheets&lt;/button&gt;
+        &lt;button class=&quot;btn btn-ghost&quot; id=&quot;resetBtn&quot;&gt;↺ Reset Data&lt;/button&gt;
       &lt;/div&gt;
-      &lt;input type="file" id="fileInput" accept=".xlsx,.xls"&gt;
+      &lt;input type=&quot;file&quot; id=&quot;fileInput&quot; accept=&quot;.xlsx,.xls&quot;&gt;
     &lt;/div&gt;
 
-    &lt;div class="banner banner-momentum" id="momentumBanner"&gt;&lt;/div&gt;
-    &lt;div class="banner banner-quote"&gt;
+    &lt;div class=&quot;banner banner-momentum&quot; id=&quot;momentumBanner&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;banner banner-quote&quot;&gt;
       &lt;p&gt;🌟 「改善 KAIZEN: Perbaikan kecil setiap hari menciptakan hasil luar biasa!」🌟&lt;/p&gt;
     &lt;/div&gt;
 
     &lt;!-- KPI ROW 1 --&gt;
-    &lt;div class="section-title"&gt;📊 Ringkasan Bulan Ini &lt;span class="tag" id="periodTag"&gt;&lt;/span&gt;&lt;/div&gt;
-    &lt;div class="kpi-grid"&gt;
-      &lt;div class="card"&gt;
-        &lt;div class="kpi-label"&gt;🎯 Target Sales Bulan Ini&lt;/div&gt;
-        &lt;div class="kpi-value purple" id="targetSalesVal"&gt;—&lt;/div&gt;
-        &lt;div class="kpi-foot" id="targetSalesNote"&gt;📡 Dari database (Config Sheet)&lt;/div&gt;
+    &lt;div class=&quot;section-title&quot;&gt;📊 Ringkasan Bulan Ini &lt;span class=&quot;tag&quot; id=&quot;periodTag&quot;&gt;&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;kpi-grid&quot;&gt;
+      &lt;div class=&quot;card&quot;&gt;
+        &lt;div class=&quot;kpi-label&quot;&gt;🎯 Target Sales Bulan Ini&lt;/div&gt;
+        &lt;div class=&quot;kpi-value purple&quot; id=&quot;targetSalesVal&quot;&gt;—&lt;/div&gt;
+        &lt;div class=&quot;kpi-foot&quot; id=&quot;targetSalesNote&quot;&gt;📡 Dari database (Config Sheet)&lt;/div&gt;
       &lt;/div&gt;
-      &lt;div class="card"&gt;
-        &lt;div class="kpi-label"&gt;💰 Total Net Sales&lt;/div&gt;
-        &lt;div class="kpi-value purple" id="totalSalesVal"&gt;-&lt;/div&gt;
-        &lt;div class="badge badge-purple" id="achievedBadge"&gt;-&lt;/div&gt;
+      &lt;div class=&quot;card&quot;&gt;
+        &lt;div class=&quot;kpi-label&quot;&gt;💰 Total Net Sales&lt;/div&gt;
+        &lt;div class=&quot;kpi-value purple&quot; id=&quot;totalSalesVal&quot;&gt;-&lt;/div&gt;
+        &lt;div class=&quot;badge badge-purple&quot; id=&quot;achievedBadge&quot;&gt;-&lt;/div&gt;
       &lt;/div&gt;
-      &lt;div class="card"&gt;
-        &lt;div class="kpi-label"&gt;⚡ Rata-rata Sales / Hari&lt;/div&gt;
-        &lt;div class="kpi-value" id="avgDayVal"&gt;-&lt;/div&gt;
-        &lt;div class="kpi-foot" id="avgDayFoot"&gt;-&lt;/div&gt;
+      &lt;div class=&quot;card&quot;&gt;
+        &lt;div class=&quot;kpi-label&quot;&gt;⚡ Rata-rata Sales / Hari&lt;/div&gt;
+        &lt;div class=&quot;kpi-value&quot; id=&quot;avgDayVal&quot;&gt;-&lt;/div&gt;
+        &lt;div class=&quot;kpi-foot&quot; id=&quot;avgDayFoot&quot;&gt;-&lt;/div&gt;
       &lt;/div&gt;
-      &lt;div class="card"&gt;
-        &lt;div class="kpi-label"&gt;📈 GP Margin Aktual&lt;/div&gt;
-        &lt;div class="kpi-value" id="gpPctVal"&gt;-&lt;/div&gt;
-        &lt;div class="kpi-foot" id="gpFoot"&gt;-&lt;/div&gt;
+      &lt;div class=&quot;card&quot;&gt;
+        &lt;div class=&quot;kpi-label&quot;&gt;📈 GP Margin Aktual&lt;/div&gt;
+        &lt;div class=&quot;kpi-value&quot; id=&quot;gpPctVal&quot;&gt;-&lt;/div&gt;
+        &lt;div class=&quot;kpi-foot&quot; id=&quot;gpFoot&quot;&gt;-&lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
 
     &lt;!-- KPI ROW 2: days elapsed (read-only) + daily sales --&gt;
-    &lt;div class="kpi-grid" style="grid-template-columns:1fr 1fr;margin-top:-6px;"&gt;
-      &lt;div class="card" style="background:#f0fdf4;border-color:#86efac;"&gt;
-        &lt;div class="kpi-label" style="color:#166534;"&gt;⏰ Hari Berjalan&lt;/div&gt;
-        &lt;div class="kpi-value" style="color:#166534;" id="daysDisplay"&gt;—&lt;/div&gt;
-        &lt;div class="kpi-foot"&gt;Hari berjalan bulan ini (auto dari periode Excel)&lt;/div&gt;
+    &lt;div class=&quot;kpi-grid&quot; style=&quot;grid-template-columns:1fr 1fr;margin-top:-6px;&quot;&gt;
+      &lt;div class=&quot;card&quot; style=&quot;background:#f0fdf4;border-color:#86efac;&quot;&gt;
+        &lt;div class=&quot;kpi-label&quot; style=&quot;color:#166534;&quot;&gt;⏰ Hari Berjalan&lt;/div&gt;
+        &lt;div class=&quot;kpi-value&quot; style=&quot;color:#166534;&quot; id=&quot;daysDisplay&quot;&gt;—&lt;/div&gt;
+        &lt;div class=&quot;kpi-foot&quot;&gt;Hari berjalan bulan ini (auto dari periode Excel)&lt;/div&gt;
       &lt;/div&gt;
-      &lt;div class="card" style="background:#fdf4ff;border-color:#d8b4fe;"&gt;
-        &lt;div class="kpi-label" style="color:#7e22ce;"&gt;🔮 Proyeksi Akhir Bulan&lt;/div&gt;
-        &lt;div class="kpi-value" style="color:#7e22ce;" id="proyeksiVal"&gt;—&lt;/div&gt;
-        &lt;div class="kpi-foot" id="proyeksiFoot"&gt;Estimasi berdasarkan rata-rata harian&lt;/div&gt;
+      &lt;div class=&quot;card&quot; style=&quot;background:#fdf4ff;border-color:#d8b4fe;&quot;&gt;
+        &lt;div class=&quot;kpi-label&quot; style=&quot;color:#7e22ce;&quot;&gt;🔮 Proyeksi Akhir Bulan&lt;/div&gt;
+        &lt;div class=&quot;kpi-value&quot; style=&quot;color:#7e22ce;&quot; id=&quot;proyeksiVal&quot;&gt;—&lt;/div&gt;
+        &lt;div class=&quot;kpi-foot&quot; id=&quot;proyeksiFoot&quot;&gt;Estimasi berdasarkan rata-rata harian&lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
 
     &lt;!-- PROGRESS --&gt;
-    &lt;div class="section-title"&gt;🏁 Progress ke Target&lt;/div&gt;
-    &lt;div class="card progress-card"&gt;
-      &lt;div class="progress-top"&gt;
+    &lt;div class=&quot;section-title&quot;&gt;🏁 Progress ke Target&lt;/div&gt;
+    &lt;div class=&quot;card progress-card&quot;&gt;
+      &lt;div class=&quot;progress-top&quot;&gt;
         &lt;div&gt;
-          &lt;div class="progress-pct" id="progressPctText"&gt;0%&lt;/div&gt;
-          &lt;div class="progress-remain" id="progressRemainText"&gt;-&lt;/div&gt;
+          &lt;div class=&quot;progress-pct&quot; id=&quot;progressPctText&quot;&gt;0%&lt;/div&gt;
+          &lt;div class=&quot;progress-remain&quot; id=&quot;progressRemainText&quot;&gt;-&lt;/div&gt;
         &lt;/div&gt;
-        &lt;button class="btn btn-ghost" id="tierBadge" style="background:var(--paper);color:var(--ink);border:1px solid var(--line);"&gt;-&lt;/button&gt;
+        &lt;button class=&quot;btn btn-ghost&quot; id=&quot;tierBadge&quot; style=&quot;background:var(--paper);color:var(--ink);border:1px solid var(--line);&quot;&gt;-&lt;/button&gt;
       &lt;/div&gt;
-      &lt;div class="progress-track"&gt;&lt;div class="progress-fill" id="progressFill" style="width:0%"&gt;&lt;/div&gt;&lt;/div&gt;
-      &lt;div class="tier-grid" id="tierGrid"&gt;&lt;/div&gt;
+      &lt;div class=&quot;progress-track&quot;&gt;&lt;div class=&quot;progress-fill&quot; id=&quot;progressFill&quot; style=&quot;width:0%&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+      &lt;div class=&quot;tier-grid&quot; id=&quot;tierGrid&quot;&gt;&lt;/div&gt;
     &lt;/div&gt;
 
     &lt;!-- OFFICER PERFORMANCE --&gt;
-    &lt;div class="section-title"&gt;👤 Performance by Officer &lt;span class="tag"&gt;Live dari Sheets&lt;/span&gt;&lt;/div&gt;
-    &lt;div class="card"&gt;
-      &lt;div class="panel-head"&gt;🏆 Ranking Officer — Net Sales &amp; GP&lt;/div&gt;
-      &lt;div style="overflow-x:auto;"&gt;
-        &lt;table class="officer-table" id="officerTable"&gt;
+    &lt;div class=&quot;section-title&quot;&gt;👤 Performance by Officer &lt;span class=&quot;tag&quot;&gt;Live dari Sheets&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;card&quot;&gt;
+      &lt;div class=&quot;panel-head&quot;&gt;🏆 Ranking Officer — Net Sales &amp; GP&lt;/div&gt;
+      &lt;div style=&quot;overflow-x:auto;&quot;&gt;
+        &lt;table class=&quot;officer-table&quot; id=&quot;officerTable&quot;&gt;
           &lt;thead&gt;
             &lt;tr&gt;
-              &lt;th style="width:36px;"&gt;#&lt;/th&gt;
+              &lt;th style=&quot;width:36px;&quot;&gt;#&lt;/th&gt;
               &lt;th&gt;Officer&lt;/th&gt;
-              &lt;th class="r"&gt;Qty&lt;/th&gt;
-              &lt;th class="r"&gt;Net Sales&lt;/th&gt;
-              &lt;th class="r"&gt;Target&lt;/th&gt;
-              &lt;th class="r"&gt;Achievement&lt;/th&gt;
-              &lt;th class="r"&gt;GP&lt;/th&gt;
-              &lt;th class="r"&gt;GP%&lt;/th&gt;
-              &lt;th class="r"&gt;% of Total&lt;/th&gt;
+              &lt;th class=&quot;r&quot;&gt;Qty&lt;/th&gt;
+              &lt;th class=&quot;r&quot;&gt;Net Sales&lt;/th&gt;
+              &lt;th class=&quot;r&quot;&gt;Target&lt;/th&gt;
+              &lt;th class=&quot;r&quot;&gt;Achievement&lt;/th&gt;
+              &lt;th class=&quot;r&quot;&gt;GP&lt;/th&gt;
+              &lt;th class=&quot;r&quot;&gt;GP%&lt;/th&gt;
+              &lt;th class=&quot;r&quot;&gt;% of Total&lt;/th&gt;
             &lt;/tr&gt;
           &lt;/thead&gt;
-          &lt;tbody id="officerTbody"&gt;
-            &lt;tr&gt;&lt;td colspan="7" style="text-align:center;color:var(--muted);padding:24px;"&gt;Upload Excel untuk lihat data officer&lt;/td&gt;&lt;/tr&gt;
+          &lt;tbody id=&quot;officerTbody&quot;&gt;
+            &lt;tr&gt;&lt;td colspan=&quot;7&quot; style=&quot;text-align:center;color:var(--muted);padding:24px;&quot;&gt;Upload Excel untuk lihat data officer&lt;/td&gt;&lt;/tr&gt;
           &lt;/tbody&gt;
         &lt;/table&gt;
       &lt;/div&gt;
     &lt;/div&gt;
 
     &lt;!-- TOP STORES --&gt;
-    &lt;div class="section-title"&gt;🏪 Top Stores&lt;/div&gt;
-    &lt;div class="card"&gt;
-      &lt;div class="panel-head"&gt;🏪 Top &lt;span id="storeCount"&gt;10&lt;/span&gt; Store — Net Sales&lt;/div&gt;
-      &lt;div id="storeList"&gt;&lt;/div&gt;
-      &lt;button class="table-toggle" id="toggleAllStores"&gt;Lihat Semua Toko ▾&lt;/button&gt;
-      &lt;div class="full-table-wrap" id="fullStoreWrap"&gt;
-        &lt;input class="search-box" id="storeSearch" placeholder="Cari nama toko..."&gt;
-        &lt;div class="scroll-table"&gt;
-          &lt;table class="full-table"&gt;
-            &lt;thead&gt;&lt;tr&gt;&lt;th&gt;#&lt;/th&gt;&lt;th&gt;Toko&lt;/th&gt;&lt;th style="text-align:right;"&gt;Net Sales&lt;/th&gt;&lt;th style="text-align:right;"&gt;Qty&lt;/th&gt;&lt;th style="text-align:right;"&gt;GP&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
-            &lt;tbody id="fullStoreBody"&gt;&lt;/tbody&gt;
+    &lt;div class=&quot;section-title&quot;&gt;🏪 Top Stores&lt;/div&gt;
+    &lt;div class=&quot;card&quot;&gt;
+      &lt;div class=&quot;panel-head&quot;&gt;🏪 Top &lt;span id=&quot;storeCount&quot;&gt;10&lt;/span&gt; Store — Net Sales&lt;/div&gt;
+      &lt;div id=&quot;storeList&quot;&gt;&lt;/div&gt;
+      &lt;button class=&quot;table-toggle&quot; id=&quot;toggleAllStores&quot;&gt;Lihat Semua Toko ▾&lt;/button&gt;
+      &lt;div class=&quot;full-table-wrap&quot; id=&quot;fullStoreWrap&quot;&gt;
+        &lt;input class=&quot;search-box&quot; id=&quot;storeSearch&quot; placeholder=&quot;Cari nama toko...&quot;&gt;
+        &lt;div class=&quot;scroll-table&quot;&gt;
+          &lt;table class=&quot;full-table&quot;&gt;
+            &lt;thead&gt;&lt;tr&gt;&lt;th&gt;#&lt;/th&gt;&lt;th&gt;Toko&lt;/th&gt;&lt;th style=&quot;text-align:right;&quot;&gt;Net Sales&lt;/th&gt;&lt;th style=&quot;text-align:right;&quot;&gt;Qty&lt;/th&gt;&lt;th style=&quot;text-align:right;&quot;&gt;GP&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+            &lt;tbody id=&quot;fullStoreBody&quot;&gt;&lt;/tbody&gt;
           &lt;/table&gt;
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
 
     &lt;footer&gt;
-      &lt;div class="footer-inner"&gt;
-        &lt;div class="footer-top"&gt;
-          &lt;div class="footer-brand"&gt;
-            &lt;img src="logo-alpro.png" alt="Alpro" class="footer-brand-logo" onerror="this.style.display=&apos;none&apos;"&gt;
-            &lt;div class="footer-brand-text"&gt;
+      &lt;div class=&quot;footer-inner&quot;&gt;
+        &lt;div class=&quot;footer-top&quot;&gt;
+          &lt;div class=&quot;footer-brand&quot;&gt;
+            &lt;img src=&quot;logo-alpro.png&quot; alt=&quot;Alpro&quot; class=&quot;footer-brand-logo&quot; onerror=&quot;this.style.display=&#x27;none&#x27;&quot;&gt;
+            &lt;div class=&quot;footer-brand-text&quot;&gt;
               &lt;h4&gt;PT Alpro Indonesia Group&lt;/h4&gt;
               &lt;p&gt;Sales Performance Intelligence Dashboard&lt;br&gt;Powered by Kaizen Spirit — 改善&lt;/p&gt;
             &lt;/div&gt;
           &lt;/div&gt;
-          &lt;div class="footer-col"&gt;
+          &lt;div class=&quot;footer-col&quot;&gt;
             &lt;h5&gt;Status Sistem&lt;/h5&gt;
-            &lt;div class="footer-stats" id="footerStats"&gt;
-              &lt;div class="footer-stat"&gt;&lt;span class="lbl"&gt;Holding&lt;/span&gt;&lt;span class="val" id="fHolding"&gt;-&lt;/span&gt;&lt;/div&gt;
-              &lt;div class="footer-stat"&gt;&lt;span class="lbl"&gt;Toko Aktif&lt;/span&gt;&lt;span class="val" id="fStores"&gt;-&lt;/span&gt;&lt;/div&gt;
-              &lt;div class="footer-stat"&gt;&lt;span class="lbl"&gt;Officer Aktif&lt;/span&gt;&lt;span class="val" id="fOfficers"&gt;-&lt;/span&gt;&lt;/div&gt;
+            &lt;div class=&quot;footer-stats&quot; id=&quot;footerStats&quot;&gt;
+              &lt;div class=&quot;footer-stat&quot;&gt;&lt;span class=&quot;lbl&quot;&gt;Holding&lt;/span&gt;&lt;span class=&quot;val&quot; id=&quot;fHolding&quot;&gt;-&lt;/span&gt;&lt;/div&gt;
+              &lt;div class=&quot;footer-stat&quot;&gt;&lt;span class=&quot;lbl&quot;&gt;Toko Aktif&lt;/span&gt;&lt;span class=&quot;val&quot; id=&quot;fStores&quot;&gt;-&lt;/span&gt;&lt;/div&gt;
+              &lt;div class=&quot;footer-stat&quot;&gt;&lt;span class=&quot;lbl&quot;&gt;Officer Aktif&lt;/span&gt;&lt;span class=&quot;val&quot; id=&quot;fOfficers&quot;&gt;-&lt;/span&gt;&lt;/div&gt;
             &lt;/div&gt;
           &lt;/div&gt;
-          &lt;div class="footer-col"&gt;
+          &lt;div class=&quot;footer-col&quot;&gt;
             &lt;h5&gt;Data &amp;amp; Keamanan&lt;/h5&gt;
-            &lt;div class="footer-tech"&gt;
+            &lt;div class=&quot;footer-tech&quot;&gt;
               &lt;span&gt;🔒 Local Processing&lt;/span&gt;
               &lt;span&gt;📊 Excel Engine&lt;/span&gt;
               &lt;span&gt;☁ Google Sheets Sync&lt;/span&gt;
               &lt;span&gt;🛡 Confidential&lt;/span&gt;
             &lt;/div&gt;
-            &lt;div style="margin-top:10px;font-size:11px;color:#94a3b8;line-height:1.6;"&gt;
+            &lt;div style=&quot;margin-top:10px;font-size:11px;color:#94a3b8;line-height:1.6;&quot;&gt;
               Seluruh data diproses secara lokal di browser Anda. Tidak ada data yang dikirim ke server eksternal.
             &lt;/div&gt;
           &lt;/div&gt;
         &lt;/div&gt;
-        &lt;div class="footer-bottom"&gt;
-          &lt;div class="copyright"&gt;
-            © &lt;span id="fYear"&gt;&lt;/span&gt; &lt;b&gt;PT Alpro Indonesia Group&lt;/b&gt; • All Rights Reserved
+        &lt;div class=&quot;footer-bottom&quot;&gt;
+          &lt;div class=&quot;copyright&quot;&gt;
+            © &lt;span id=&quot;fYear&quot;&gt;&lt;/span&gt; &lt;b&gt;PT Alpro Indonesia Group&lt;/b&gt; • All Rights Reserved
           &lt;/div&gt;
-          &lt;div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;"&gt;
-            &lt;span class="footer-badge"&gt;&lt;span class="dot"&gt;&lt;/span&gt; Sistem Aktif&lt;/span&gt;
-            &lt;span style="color:#64748b;font-size:11px;"&gt;v2.0 • Internal Use Only&lt;/span&gt;
+          &lt;div style=&quot;display:flex;gap:10px;align-items:center;flex-wrap:wrap;&quot;&gt;
+            &lt;span class=&quot;footer-badge&quot;&gt;&lt;span class=&quot;dot&quot;&gt;&lt;/span&gt; Sistem Aktif&lt;/span&gt;
+            &lt;span style=&quot;color:#64748b;font-size:11px;&quot;&gt;v2.0 • Internal Use Only&lt;/span&gt;
           &lt;/div&gt;
         &lt;/div&gt;
         &lt;!-- Hidden legacy footer node retained for backward compatibility --&gt;
-        &lt;div id="footerNote" style="display:none;"&gt;&lt;/div&gt;
+        &lt;div id=&quot;footerNote&quot; style=&quot;display:none;&quot;&gt;&lt;/div&gt;
       &lt;/div&gt;
     &lt;/footer&gt;
 
   &lt;/div&gt;
 
-  &lt;div class="toast" id="toast"&gt;&lt;/div&gt;
+  &lt;div class=&quot;toast&quot; id=&quot;toast&quot;&gt;&lt;/div&gt;
 
   &lt;script&gt;
   // ============================================================
   // KONFIGURASI
   // ============================================================
   // [API-SALES] URL Apps Script SALES (tab Sales / Kaizen Spirit), milik Sales. Ganti hanya baris GAS_URL di bawah ini.
-  const GAS_URL = &apos;https://script.google.com/macros/s/AKfycbxHjLlhGwjXW_DZWelfDWuG5gSvpxZgErfdbkf-nbEXKyGZ-6BelEclZUVl_Ij6c9LpEQ/exec&apos;;
+  const GAS_URL = &#x27;https://script.google.com/macros/s/AKfycbxHjLlhGwjXW_DZWelfDWuG5gSvpxZgErfdbkf-nbEXKyGZ-6BelEclZUVl_Ij6c9LpEQ/exec&#x27;;
 
   // window.storage hanya ada di artifact Claude. Di browser biasa dibuat versi localStorage
   // supaya cache data Sales/GAS benar-benar tersimpan (cadangan kalau AppScript tidak terjangkau).
   if(!window.storage){
     window.storage = {
-      async get(k){ const v = localStorage.getItem(&apos;alpro_sales_&apos;+k); if(v===null) throw new Error(&apos;not found&apos;); return {key:k, value:v}; },
-      async set(k,v){ localStorage.setItem(&apos;alpro_sales_&apos;+k, v); return {key:k, value:v}; }
+      async get(k){ const v = localStorage.getItem(&#x27;alpro_sales_&#x27;+k); if(v===null) throw new Error(&#x27;not found&#x27;); return {key:k, value:v}; },
+      async set(k,v){ localStorage.setItem(&#x27;alpro_sales_&#x27;+k, v); return {key:k, value:v}; }
     };
   }
   // Beri tahu halaman utama (Home / MOI) bahwa data Sales sudah siap / berubah
@@ -2610,121 +2605,121 @@ th{background:var(--u-navy)!important}
     try{ const a = window.parent &amp;&amp; window.parent!==window ? window.parent.APP : null; if(a &amp;&amp; a.emit) a.emit(); }catch(e){}
   }
 
-  const EXCLUDED_OFFICERS = [&apos;ZHAFRAN VIRZALDI YULMAN&apos;, &apos;RUPA LESTY&apos;];
-  const EXCLUDED_GROUPS   = [&apos;NON MERCHANDISE&apos;];
+  const EXCLUDED_OFFICERS = [&#x27;ZHAFRAN VIRZALDI YULMAN&#x27;, &#x27;RUPA LESTY&#x27;];
+  const EXCLUDED_GROUPS   = [&#x27;NON MERCHANDISE&#x27;];
 
   // ============================================================
   // DEFAULT DATA
   // ============================================================
-  const DEFAULT_DATA = {"meta":{"period_start":"2026-06-01","period_end":"2026-06-16","days_elapsed":16,"days_in_month":30,"printed_date":"2026-06-17","holding":"ALP-ALPRO INDONESIA GROUP","total_stores":214},"totals":{"net_sales":42414273381.5,"gross_sales":42800543207.94,"gp":10920773656.78,"gp_pct":25.7479,"qty":704600.0},"stores":[{"code":"0020","name":"APOTEK ALPRO GEDUNG HIJAU","sales":446918206.65,"qty":4556.9,"gp":97436889.42},{"code":"0021","name":"APOTEK ALPRO OLYMPIC CIKARANG","sales":308087583.46,"qty":3019.0,"gp":71311877.49},{"code":"0083","name":"APOTEK ALPRO TEBET MAS INDAH","sales":236344191.14,"qty":2748.2,"gp":54829227.82},{"code":"0070","name":"APOTEK ALPRO SABANG","sales":231535160.78,"qty":3181.3,"gp":56237387.78},{"code":"0005","name":"APOTEK ALPRO GOLDEN VIENNA","sales":226227229.47,"qty":3215.3,"gp":57055193.42},{"code":"0001","name":"APOTEK ALPRO TEBET TIMUR","sales":224970754.28,"qty":2632.7,"gp":53472444.58},{"code":"0077","name":"APOTEK ALPRO CITRAGRAND CIBUBUR","sales":207851380.64,"qty":2512.9,"gp":47711113.08},{"code":"0062","name":"APOTEK ALPRO KEMANG PRATAMA","sales":204218950.39,"qty":2430.2,"gp":49543852.79},{"code":"0007","name":"APOTEK ALPRO SUNTER KEMAYORAN","sales":193729364.79,"qty":2164.7,"gp":43101660.86},{"code":"0002","name":"APOTEK ALPRO VETERAN RAYA","sales":193068484.05,"qty":2646.2,"gp":48392604.89}],"officers":[{"name":"ARISYANTI PRIMA NUGRAHESTI","sales":8205568899.59,"qty":67328.3,"gp":1820636381.77,"gp_pct":22.19},{"name":"PUTRI JEANE","sales":5601429519.76,"qty":39455.5,"gp":1457638789.45,"gp_pct":26.02},{"name":"HARFIANA ASHARI","sales":4245172668.63,"qty":91854.8,"gp":955929948.66,"gp_pct":22.52},{"name":"INDRA RESSY OCTAVIANI","sales":2184382884.92,"qty":50751.3,"gp":1066726860.13,"gp_pct":48.83},{"name":"OKTAVIA FAJAR INAYAH","sales":1071092880.23,"qty":28104.9,"gp":259974144.93,"gp_pct":24.27}],"appscript":{"targetSales":0,"totalSales":0,"averageSales":0,"progressPercent":0,"remainingToTarget":0,"lastUpdate":"-"}};
+  const DEFAULT_DATA = {&quot;meta&quot;:{&quot;period_start&quot;:&quot;2026-06-01&quot;,&quot;period_end&quot;:&quot;2026-06-16&quot;,&quot;days_elapsed&quot;:16,&quot;days_in_month&quot;:30,&quot;printed_date&quot;:&quot;2026-06-17&quot;,&quot;holding&quot;:&quot;ALP-ALPRO INDONESIA GROUP&quot;,&quot;total_stores&quot;:214},&quot;totals&quot;:{&quot;net_sales&quot;:42414273381.5,&quot;gross_sales&quot;:42800543207.94,&quot;gp&quot;:10920773656.78,&quot;gp_pct&quot;:25.7479,&quot;qty&quot;:704600.0},&quot;stores&quot;:[{&quot;code&quot;:&quot;0020&quot;,&quot;name&quot;:&quot;APOTEK ALPRO GEDUNG HIJAU&quot;,&quot;sales&quot;:446918206.65,&quot;qty&quot;:4556.9,&quot;gp&quot;:97436889.42},{&quot;code&quot;:&quot;0021&quot;,&quot;name&quot;:&quot;APOTEK ALPRO OLYMPIC CIKARANG&quot;,&quot;sales&quot;:308087583.46,&quot;qty&quot;:3019.0,&quot;gp&quot;:71311877.49},{&quot;code&quot;:&quot;0083&quot;,&quot;name&quot;:&quot;APOTEK ALPRO TEBET MAS INDAH&quot;,&quot;sales&quot;:236344191.14,&quot;qty&quot;:2748.2,&quot;gp&quot;:54829227.82},{&quot;code&quot;:&quot;0070&quot;,&quot;name&quot;:&quot;APOTEK ALPRO SABANG&quot;,&quot;sales&quot;:231535160.78,&quot;qty&quot;:3181.3,&quot;gp&quot;:56237387.78},{&quot;code&quot;:&quot;0005&quot;,&quot;name&quot;:&quot;APOTEK ALPRO GOLDEN VIENNA&quot;,&quot;sales&quot;:226227229.47,&quot;qty&quot;:3215.3,&quot;gp&quot;:57055193.42},{&quot;code&quot;:&quot;0001&quot;,&quot;name&quot;:&quot;APOTEK ALPRO TEBET TIMUR&quot;,&quot;sales&quot;:224970754.28,&quot;qty&quot;:2632.7,&quot;gp&quot;:53472444.58},{&quot;code&quot;:&quot;0077&quot;,&quot;name&quot;:&quot;APOTEK ALPRO CITRAGRAND CIBUBUR&quot;,&quot;sales&quot;:207851380.64,&quot;qty&quot;:2512.9,&quot;gp&quot;:47711113.08},{&quot;code&quot;:&quot;0062&quot;,&quot;name&quot;:&quot;APOTEK ALPRO KEMANG PRATAMA&quot;,&quot;sales&quot;:204218950.39,&quot;qty&quot;:2430.2,&quot;gp&quot;:49543852.79},{&quot;code&quot;:&quot;0007&quot;,&quot;name&quot;:&quot;APOTEK ALPRO SUNTER KEMAYORAN&quot;,&quot;sales&quot;:193729364.79,&quot;qty&quot;:2164.7,&quot;gp&quot;:43101660.86},{&quot;code&quot;:&quot;0002&quot;,&quot;name&quot;:&quot;APOTEK ALPRO VETERAN RAYA&quot;,&quot;sales&quot;:193068484.05,&quot;qty&quot;:2646.2,&quot;gp&quot;:48392604.89}],&quot;officers&quot;:[{&quot;name&quot;:&quot;ARISYANTI PRIMA NUGRAHESTI&quot;,&quot;sales&quot;:8205568899.59,&quot;qty&quot;:67328.3,&quot;gp&quot;:1820636381.77,&quot;gp_pct&quot;:22.19},{&quot;name&quot;:&quot;PUTRI JEANE&quot;,&quot;sales&quot;:5601429519.76,&quot;qty&quot;:39455.5,&quot;gp&quot;:1457638789.45,&quot;gp_pct&quot;:26.02},{&quot;name&quot;:&quot;HARFIANA ASHARI&quot;,&quot;sales&quot;:4245172668.63,&quot;qty&quot;:91854.8,&quot;gp&quot;:955929948.66,&quot;gp_pct&quot;:22.52},{&quot;name&quot;:&quot;INDRA RESSY OCTAVIANI&quot;,&quot;sales&quot;:2184382884.92,&quot;qty&quot;:50751.3,&quot;gp&quot;:1066726860.13,&quot;gp_pct&quot;:48.83},{&quot;name&quot;:&quot;OKTAVIA FAJAR INAYAH&quot;,&quot;sales&quot;:1071092880.23,&quot;qty&quot;:28104.9,&quot;gp&quot;:259974144.93,&quot;gp_pct&quot;:24.27}],&quot;appscript&quot;:{&quot;targetSales&quot;:0,&quot;totalSales&quot;:0,&quot;averageSales&quot;:0,&quot;progressPercent&quot;:0,&quot;remainingToTarget&quot;:0,&quot;lastUpdate&quot;:&quot;-&quot;}};
 
   const DEFAULT_SETTINGS = { fixedCost: 0, days: DEFAULT_DATA.meta.days_elapsed };
 
   let DATA     = JSON.parse(JSON.stringify(DEFAULT_DATA));
   let SETTINGS = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
   let GAS_DATA = null;
-  let ITEMS = null; // [BARU] sales per item {ps,pe,map:{&apos;store|item&apos;:[qty,net,gp,cost,name]}} untuk export MOI per SKU
+  let ITEMS = null; // [BARU] sales per item {ps,pe,map:{&#x27;store|item&#x27;:[qty,net,gp,cost,name]}} untuk export MOI per SKU
 
   // ============================================================
   // HELPERS
   // ============================================================
   function fmtRp(n){
-    if(n===null||n===undefined||isNaN(n)) return &apos;Rp 0&apos;;
+    if(n===null||n===undefined||isNaN(n)) return &#x27;Rp 0&#x27;;
     const neg=n&lt;0; n=Math.abs(n);
-    let s=&apos;Rp &apos;+Math.round(n).toLocaleString(&apos;id-ID&apos;);
-    return neg?&apos;-&apos;+s:s;
+    let s=&#x27;Rp &#x27;+Math.round(n).toLocaleString(&#x27;id-ID&#x27;);
+    return neg?&#x27;-&#x27;+s:s;
   }
-  function fmtNum(n){ return Math.round(n).toLocaleString(&apos;id-ID&apos;); }
-  function fmtPct(n){ return n.toFixed(1)+&apos;%&apos;; }
+  function fmtNum(n){ return Math.round(n).toLocaleString(&#x27;id-ID&#x27;); }
+  function fmtPct(n){ return n.toFixed(1)+&#x27;%&#x27;; }
   function showToast(msg,dur=2600){
-    const t=document.getElementById(&apos;toast&apos;);
-    t.textContent=msg; t.classList.add(&apos;show&apos;);
-    setTimeout(()=&gt;t.classList.remove(&apos;show&apos;),dur);
+    const t=document.getElementById(&#x27;toast&#x27;);
+    t.textContent=msg; t.classList.add(&#x27;show&#x27;);
+    setTimeout(()=&gt;t.classList.remove(&#x27;show&#x27;),dur);
   }
   function isExcludedOfficer(name){
-    return EXCLUDED_OFFICERS.some(e=&gt;String(name||&apos;&apos;).toUpperCase().trim()===e.toUpperCase());
+    return EXCLUDED_OFFICERS.some(e=&gt;String(name||&#x27;&#x27;).toUpperCase().trim()===e.toUpperCase());
   }
   function isExcludedGroup(name){
-    return EXCLUDED_GROUPS.some(e=&gt;String(name||&apos;&apos;).toUpperCase().trim().startsWith(e.toUpperCase()));
+    return EXCLUDED_GROUPS.some(e=&gt;String(name||&#x27;&#x27;).toUpperCase().trim().startsWith(e.toUpperCase()));
   }
 
   // ============================================================
   // PERSIST
   // ============================================================
   async function loadPersisted(){
-    try{ const s=await window.storage.get(&apos;settings_v3&apos;); if(s&amp;&amp;s.value) SETTINGS=Object.assign({},DEFAULT_SETTINGS,JSON.parse(s.value)); }catch(e){}
-    try{ const d=await window.storage.get(&apos;dataset_v3&apos;); if(d&amp;&amp;d.value) DATA=JSON.parse(d.value); }catch(e){}
+    try{ const s=await window.storage.get(&#x27;settings_v3&#x27;); if(s&amp;&amp;s.value) SETTINGS=Object.assign({},DEFAULT_SETTINGS,JSON.parse(s.value)); }catch(e){}
+    try{ const d=await window.storage.get(&#x27;dataset_v3&#x27;); if(d&amp;&amp;d.value) DATA=JSON.parse(d.value); }catch(e){}
     await fetchAppScriptData();
     loadItems();
   }
-  async function saveSettings(){ try{ await window.storage.set(&apos;settings_v3&apos;,JSON.stringify(SETTINGS)); }catch(e){} }
-  async function saveDataset(){  try{ await window.storage.set(&apos;dataset_v3&apos;, JSON.stringify(DATA));     }catch(e){} }
+  async function saveSettings(){ try{ await window.storage.set(&#x27;settings_v3&#x27;,JSON.stringify(SETTINGS)); }catch(e){} }
+  async function saveDataset(){  try{ await window.storage.set(&#x27;dataset_v3&#x27;, JSON.stringify(DATA));     }catch(e){} }
 
   // ============================================================
   // FETCH DARI APPSCRIPT
   // ============================================================
   // ===== [BARU] SALES PER ITEM =====
-  const _zc=s=&gt;String(s==null?&apos;&apos;:s).trim().replace(/^0+/,&apos;&apos;);
+  const _zc=s=&gt;String(s==null?&#x27;&#x27;:s).trim().replace(/^0+/,&#x27;&#x27;);
   function buildItems(ps,pe,rows){
     const map={}, ex={};
     rows.forEach(r=&gt;{
-      if(r[2]===&apos;__EXCL__&apos;){ ex[_zc(r[1])]=1; return; }
-      const k=_zc(r[0])+&apos;|&apos;+_zc(r[1]), a=map[k];
+      if(r[2]===&#x27;__EXCL__&#x27;){ ex[_zc(r[1])]=1; return; }
+      const k=_zc(r[0])+&#x27;|&#x27;+_zc(r[1]), a=map[k];
       if(a){ a[0]+=+r[3]||0; a[1]+=+r[4]||0; a[2]+=+r[5]||0; a[3]+=+r[6]||0; if(!a[4]&amp;&amp;r[2]) a[4]=r[2]; }
-      else map[k]=[+r[3]||0,+r[4]||0,+r[5]||0,+r[6]||0,r[2]||&apos;&apos;];
+      else map[k]=[+r[3]||0,+r[4]||0,+r[5]||0,+r[6]||0,r[2]||&#x27;&#x27;];
     });
     return {ps:ps,pe:pe,n:rows.length,map:map,ex:ex};
   }
   async function pushItems(ps,pe,rows){
-    if(!GAS_URL||GAS_URL.includes(&apos;ISI_URL&apos;)||!rows.length) return;
+    if(!GAS_URL||GAS_URL.includes(&#x27;ISI_URL&#x27;)||!rows.length) return;
     const CHK=5000,total=rows.length;
     try{
       for(let i=0;i&lt;total;i+=CHK){
-        showToast(&apos;⏳ Menyimpan data item ke Sheets... &apos;+Math.min(i+CHK,total).toLocaleString(&apos;id-ID&apos;)+&apos; / &apos;+total.toLocaleString(&apos;id-ID&apos;),30000);
-        const res=await fetch(GAS_URL,{method:&apos;POST&apos;,headers:{&apos;Content-Type&apos;:&apos;text/plain&apos;},
-          body:JSON.stringify({action:&apos;salesItemChunk&apos;,period_start:ps,period_end:pe,reset:i===0,total:total,rows:rows.slice(i,i+CHK)})});
-        const j=await res.json(); if(!j.success) throw new Error(j.error||&apos;AppScript error&apos;);
+        showToast(&#x27;⏳ Menyimpan data item ke Sheets... &#x27;+Math.min(i+CHK,total).toLocaleString(&#x27;id-ID&#x27;)+&#x27; / &#x27;+total.toLocaleString(&#x27;id-ID&#x27;),30000);
+        const res=await fetch(GAS_URL,{method:&#x27;POST&#x27;,headers:{&#x27;Content-Type&#x27;:&#x27;text/plain&#x27;},
+          body:JSON.stringify({action:&#x27;salesItemChunk&#x27;,period_start:ps,period_end:pe,reset:i===0,total:total,rows:rows.slice(i,i+CHK)})});
+        const j=await res.json(); if(!j.success) throw new Error(j.error||&#x27;AppScript error&#x27;);
       }
-      showToast(&apos;✅ Data item tersimpan (&apos;+total.toLocaleString(&apos;id-ID&apos;)+&apos; baris), MOI per SKU siap di-export.&apos;,6000);
+      showToast(&#x27;✅ Data item tersimpan (&#x27;+total.toLocaleString(&#x27;id-ID&#x27;)+&#x27; baris), MOI per SKU siap di-export.&#x27;,6000);
     }catch(err){
       console.error(err);
-      showToast(&apos;⚠️ Data item gagal tersimpan ke Sheets: &apos;+err.message+&apos; (MOI per SKU tetap bisa dipakai selama halaman tidak di-refresh)&apos;,9000);
+      showToast(&#x27;⚠️ Data item gagal tersimpan ke Sheets: &#x27;+err.message+&#x27; (MOI per SKU tetap bisa dipakai selama halaman tidak di-refresh)&#x27;,9000);
     }
   }
   async function loadItems(){
-    if(ITEMS||!GAS_URL||GAS_URL.includes(&apos;ISI_URL&apos;)) return;
+    if(ITEMS||!GAS_URL||GAS_URL.includes(&#x27;ISI_URL&#x27;)) return;
     try{
       const rows=[]; let off=0, meta=null;
       for(;;){
-        const res=await fetch(GAS_URL+&apos;?action=salesItems&amp;offset=&apos;+off+&apos;&amp;limit=20000&apos;);
-        const j=await res.json(); if(!j.success||!j.complete){ window.__itemsWhy=!j.success?(&apos;Apps Script menolak: &apos;+(j.error||&apos;action salesItems tidak dikenali&apos;)):&apos;data sales item di Sheets belum lengkap (upload belum selesai)&apos;; return; }
+        const res=await fetch(GAS_URL+&#x27;?action=salesItems&amp;offset=&#x27;+off+&#x27;&amp;limit=20000&#x27;);
+        const j=await res.json(); if(!j.success||!j.complete){ window.__itemsWhy=!j.success?(&#x27;Apps Script menolak: &#x27;+(j.error||&#x27;action salesItems tidak dikenali&#x27;)):&#x27;data sales item di Sheets belum lengkap (upload belum selesai)&#x27;; return; }
         meta=j; if(!j.rows.length) break;
         j.rows.forEach(r=&gt;rows.push(r)); off+=j.rows.length;
         if(off&gt;=j.total) break;
       }
-      if(rows.length&amp;&amp;meta&amp;&amp;!ITEMS){ ITEMS=buildItems(meta.period_start,meta.period_end,rows); window.__itemsWhy=&apos;&apos;; notifyParent(); }
-      else if(!rows.length) window.__itemsWhy=&apos;sheet SalesItem di Google Sheets kosong&apos;;
-    }catch(err){ window.__itemsWhy=&apos;gagal mengambil dari Apps Script (&apos;+err.message+&apos;)&apos;; console.warn(&apos;Load item gagal:&apos;,err); }
+      if(rows.length&amp;&amp;meta&amp;&amp;!ITEMS){ ITEMS=buildItems(meta.period_start,meta.period_end,rows); window.__itemsWhy=&#x27;&#x27;; notifyParent(); }
+      else if(!rows.length) window.__itemsWhy=&#x27;sheet SalesItem di Google Sheets kosong&#x27;;
+    }catch(err){ window.__itemsWhy=&#x27;gagal mengambil dari Apps Script (&#x27;+err.message+&#x27;)&#x27;; console.warn(&#x27;Load item gagal:&#x27;,err); }
   }
 
   async function fetchAppScriptData(){
-    if(!GAS_URL||GAS_URL.includes(&apos;ISI_URL&apos;)){ render(); return; }
-    showToast(&apos;🔄 Mengambil data dari Google Sheets...&apos;, 5000);
+    if(!GAS_URL||GAS_URL.includes(&#x27;ISI_URL&#x27;)){ render(); return; }
+    showToast(&#x27;🔄 Mengambil data dari Google Sheets...&#x27;, 5000);
     try{
       const res  = await fetch(GAS_URL);
       const json = await res.json();
       if(json.success){
         GAS_DATA = json;
-        try{ await window.storage.set(&apos;gas_cache&apos;,JSON.stringify(json)); }catch(e){}
+        try{ await window.storage.set(&#x27;gas_cache&#x27;,JSON.stringify(json)); }catch(e){}
         applyGasData(json);
-        showToast(&apos;✅ Data live dari Google Sheets dimuat&apos;);
-      } else throw new Error(json.error||&apos;AppScript error&apos;);
+        showToast(&#x27;✅ Data live dari Google Sheets dimuat&#x27;);
+      } else throw new Error(json.error||&#x27;AppScript error&#x27;);
     }catch(err){
-      console.warn(&apos;GAS fetch gagal:&apos;, err);
+      console.warn(&#x27;GAS fetch gagal:&#x27;, err);
       try{
-        const cached=await window.storage.get(&apos;gas_cache&apos;);
-        if(cached&amp;&amp;cached.value){ GAS_DATA=JSON.parse(cached.value); applyGasData(GAS_DATA); showToast(&apos;⚠️ Pakai cache (AppScript tidak terjangkau)&apos;); }
-        else { showToast(&apos;⚠️ AppScript tidak terjangkau&apos;); }
+        const cached=await window.storage.get(&#x27;gas_cache&#x27;);
+        if(cached&amp;&amp;cached.value){ GAS_DATA=JSON.parse(cached.value); applyGasData(GAS_DATA); showToast(&#x27;⚠️ Pakai cache (AppScript tidak terjangkau)&#x27;); }
+        else { showToast(&#x27;⚠️ AppScript tidak terjangkau&#x27;); }
       }catch(e){}
     }
     render();
@@ -2740,14 +2735,14 @@ th{background:var(--u-navy)!important}
       dailySales:        gas.dailySales        || 0,
       progressPercent:   gas.progressPercent   || 0,
       remainingToTarget: gas.remainingToTarget || 0,
-      lastUpdate:        gas.lastUpdate        || &apos;-&apos;
+      lastUpdate:        gas.lastUpdate        || &#x27;-&#x27;
     };
 
     // Data per store dari sheet SalesStore — supaya tidak kembali ke 10 store bawaan setelah refresh
     if(Array.isArray(gas.stores) &amp;&amp; gas.stores.length &gt; 0){
       const gs = gas.stores.map(s =&gt; ({
-        code:  String(s.code == null ? &apos;&apos; : s.code).trim(),
-        name:  String(s.name || &apos;&apos;).trim(),
+        code:  String(s.code == null ? &#x27;&#x27; : s.code).trim(),
+        name:  String(s.name || &#x27;&#x27;).trim(),
         sales: Number(s.sales) || 0,
         qty:   Number(s.qty)   || 0,
         gp:    Number(s.gp)    || 0,
@@ -2755,8 +2750,8 @@ th{background:var(--u-navy)!important}
         cost:  Number(s.sales_cost != null ? s.sales_cost : s.cost) || 0
       })).filter(s =&gt; s.name || s.code).sort((a,b) =&gt; b.sales - a.sales);
       // Sales Cost: kalau AppScript belum menyimpan kolom cost, pertahankan cost dari data lokal (hanya bila sales store sama = upload yang sama)
-      const prevCost=new Map(); (DATA.stores||[]).forEach(s=&gt;{ if(s.cost&gt;0){ prevCost.set(&apos;c:&apos;+s.code,s); prevCost.set(&apos;n:&apos;+s.name,s); } });
-      gs.forEach(s=&gt;{ if(!(s.cost&gt;0)){ const p=prevCost.get(&apos;c:&apos;+s.code)||prevCost.get(&apos;n:&apos;+s.name); if(p &amp;&amp; Math.round(p.sales)===Math.round(s.sales)) s.cost=p.cost; } });
+      const prevCost=new Map(); (DATA.stores||[]).forEach(s=&gt;{ if(s.cost&gt;0){ prevCost.set(&#x27;c:&#x27;+s.code,s); prevCost.set(&#x27;n:&#x27;+s.name,s); } });
+      gs.forEach(s=&gt;{ if(!(s.cost&gt;0)){ const p=prevCost.get(&#x27;c:&#x27;+s.code)||prevCost.get(&#x27;n:&#x27;+s.name); if(p &amp;&amp; Math.round(p.sales)===Math.round(s.sales)) s.cost=p.cost; } });
       const tn  = gs.reduce((x,s) =&gt; x + s.sales, 0);
       const tg  = gs.reduce((x,s) =&gt; x + s.gp, 0);
       const tq  = gs.reduce((x,s) =&gt; x + s.qty, 0);
@@ -2809,36 +2804,36 @@ th{background:var(--u-navy)!important}
     const achieved= target &gt; 0 ? (total / target * 100) : 0;
 
     // Header
-    document.getElementById(&apos;periodTag&apos;).textContent =
-      DATA.meta.period_start + &apos; s/d &apos; + DATA.meta.period_end + &apos; • &apos; + DATA.meta.total_stores + &apos; toko&apos;;
-    document.getElementById(&apos;headerMeta&apos;).innerHTML =
+    document.getElementById(&#x27;periodTag&#x27;).textContent =
+      DATA.meta.period_start + &#x27; s/d &#x27; + DATA.meta.period_end + &#x27; • &#x27; + DATA.meta.total_stores + &#x27; toko&#x27;;
+    document.getElementById(&#x27;headerMeta&#x27;).innerHTML =
       `&lt;span&gt;📅 Periode: ${DATA.meta.period_start} – ${DATA.meta.period_end}&lt;/span&gt;
       &lt;span&gt;🏪 ${DATA.meta.total_stores} Toko Aktif&lt;/span&gt;
       &lt;span&gt;🕐 Diperbarui: ${gas.lastUpdate ? gas.lastUpdate.slice(0,10) : DATA.meta.printed_date}&lt;/span&gt;`;
 
     // KPI
-    document.getElementById(&apos;targetSalesVal&apos;).textContent  = target &gt; 0 ? fmtRp(target) : &apos;—&apos;;
-    document.getElementById(&apos;targetSalesNote&apos;).textContent = hasGas
-      ? &apos;📡 Dari database (Config Sheet)&apos;
-      : &apos;⚠ Deploy ulang AppScript &amp; Refresh&apos;;
-    document.getElementById(&apos;totalSalesVal&apos;).textContent   = fmtRp(total);
-    document.getElementById(&apos;achievedBadge&apos;).textContent   = target &gt; 0
-      ? (fmtPct(achieved) + &apos; ACHIEVED&apos;)
-      : (GAS_DATA ? &apos;⚠ Set target di Config!B1&apos; : &apos;⚠ Refresh dari Sheets&apos;);
-    document.getElementById(&apos;achievedBadge&apos;).className     = &apos;badge &apos; + (achieved &gt;= 100 ? &apos;badge-green&apos; : achieved &gt;= 75 ? &apos;badge-purple&apos; : &apos;badge-red&apos;);
+    document.getElementById(&#x27;targetSalesVal&#x27;).textContent  = target &gt; 0 ? fmtRp(target) : &#x27;—&#x27;;
+    document.getElementById(&#x27;targetSalesNote&#x27;).textContent = hasGas
+      ? &#x27;📡 Dari database (Config Sheet)&#x27;
+      : &#x27;⚠ Deploy ulang AppScript &amp; Refresh&#x27;;
+    document.getElementById(&#x27;totalSalesVal&#x27;).textContent   = fmtRp(total);
+    document.getElementById(&#x27;achievedBadge&#x27;).textContent   = target &gt; 0
+      ? (fmtPct(achieved) + &#x27; ACHIEVED&#x27;)
+      : (GAS_DATA ? &#x27;⚠ Set target di Config!B1&#x27; : &#x27;⚠ Refresh dari Sheets&#x27;);
+    document.getElementById(&#x27;achievedBadge&#x27;).className     = &#x27;badge &#x27; + (achieved &gt;= 100 ? &#x27;badge-green&#x27; : achieved &gt;= 75 ? &#x27;badge-purple&#x27; : &#x27;badge-red&#x27;);
 
-    document.getElementById(&apos;avgDayVal&apos;).textContent  = fmtRp(avgDay);
-    document.getElementById(&apos;avgDayFoot&apos;).textContent = `Rata-rata per hari berjalan (${days} hari)`;
+    document.getElementById(&#x27;avgDayVal&#x27;).textContent  = fmtRp(avgDay);
+    document.getElementById(&#x27;avgDayFoot&#x27;).textContent = `Rata-rata per hari berjalan (${days} hari)`;
 
-    document.getElementById(&apos;gpPctVal&apos;).textContent = fmtPct(DATA.totals.gp_pct || 0);
-    document.getElementById(&apos;gpFoot&apos;).textContent   = `GP Rp ${fmtNum(DATA.totals.gp)} dari Net Sales`;
+    document.getElementById(&#x27;gpPctVal&#x27;).textContent = fmtPct(DATA.totals.gp_pct || 0);
+    document.getElementById(&#x27;gpFoot&#x27;).textContent   = `GP Rp ${fmtNum(DATA.totals.gp)} dari Net Sales`;
 
     // Days &amp; Proyeksi Akhir Bulan
-    document.getElementById(&apos;daysDisplay&apos;).textContent = days + &apos; hari&apos;;
+    document.getElementById(&#x27;daysDisplay&#x27;).textContent = days + &#x27; hari&#x27;;
 
     // Hitung total hari dalam bulan dari period_end
     let totalDaysMonth = 30;
-    const periodEnd = DATA.meta.period_end || &apos;&apos;;
+    const periodEnd = DATA.meta.period_end || &#x27;&#x27;;
     if(periodEnd){
       const d = new Date(periodEnd.slice(0,4), parseInt(periodEnd.slice(5,7)), 0);
       if(!isNaN(d.getTime())) totalDaysMonth = d.getDate();
@@ -2846,49 +2841,49 @@ th{background:var(--u-navy)!important}
 
     // Proyeksi = rata-rata harian × total hari bulan
     const proyeksi = avgDay * totalDaysMonth;
-    document.getElementById(&apos;proyeksiVal&apos;).textContent = fmtRp(proyeksi);
+    document.getElementById(&#x27;proyeksiVal&#x27;).textContent = fmtRp(proyeksi);
     if(target &gt; 0){
       const selisih = proyeksi - target;
       if(selisih &gt;= 0){
-        document.getElementById(&apos;proyeksiFoot&apos;).innerHTML =
-          `✅ &lt;b style="color:#0f8a52;"&gt;On track!&lt;/b&gt; Proyeksi &lt;b&gt;+${fmtRp(selisih)}&lt;/b&gt; di atas target`;
+        document.getElementById(&#x27;proyeksiFoot&#x27;).innerHTML =
+          `✅ &lt;b style=&quot;color:#0f8a52;&quot;&gt;On track!&lt;/b&gt; Proyeksi &lt;b&gt;+${fmtRp(selisih)}&lt;/b&gt; di atas target`;
       } else {
-        document.getElementById(&apos;proyeksiFoot&apos;).innerHTML =
-          `⚠️ &lt;b style="color:#d6304a;"&gt;Kurang ${fmtRp(Math.abs(selisih))}&lt;/b&gt; dari target`;
+        document.getElementById(&#x27;proyeksiFoot&#x27;).innerHTML =
+          `⚠️ &lt;b style=&quot;color:#d6304a;&quot;&gt;Kurang ${fmtRp(Math.abs(selisih))}&lt;/b&gt; dari target`;
       }
     } else {
-      document.getElementById(&apos;proyeksiFoot&apos;).textContent = `Proyeksi ${totalDaysMonth} hari | avg ${fmtRp(avgDay)}/hari`;
+      document.getElementById(&#x27;proyeksiFoot&#x27;).textContent = `Proyeksi ${totalDaysMonth} hari | avg ${fmtRp(avgDay)}/hari`;
     }
 
     // === MOMENTUM BANNER ===
-    const mb = document.getElementById(&apos;momentumBanner&apos;);
+    const mb = document.getElementById(&#x27;momentumBanner&#x27;);
     let mT, mS;
-    if(target&lt;=0){      mT=&apos;🎯 SET TARGET DI CONFIG SHEET!&apos;; mS=&apos;Target belum ada di database. Set dulu di Config Sheet B1.&apos;; }
-    else if(achieved&lt;30){ mT=&apos;🚀 AYO TANCAP GAS!&apos;; mS=&apos;Ganbatte! 頑張って Momentum awal penting, terus dorong penjualan harian.&apos;; }
-    else if(achieved&lt;50){ mT=&apos;🎯 KAIZEN START! MOMENTUM BAGUS!&apos;; mS=&apos;改善開始！Great start! Terus tingkatkan dengan semangat KAIZEN!&apos;; }
-    else if(achieved&lt;75){ mT=&apos;🥈 SILVER ZONE! TERUS MELAJU!&apos;; mS=&apos;銀の勢い！Setengah jalan, push terus ke Gold tier!&apos;; }
-    else if(achieved&lt;100){mT=&apos;🥇 GOLD ZONE! DIKIT LAGI DIAMOND!&apos;; mS=&apos;金のラストスパート！Sedikit lagi mencapai target penuh!&apos;; }
-    else {                mT=&apos;💎 DIAMOND ACHIEVED! TARGET TERCAPAI!&apos;; mS=&apos;ダイヤモンド達成！Luar biasa, pertahankan momentum ini!&apos;; }
+    if(target&lt;=0){      mT=&#x27;🎯 SET TARGET DI CONFIG SHEET!&#x27;; mS=&#x27;Target belum ada di database. Set dulu di Config Sheet B1.&#x27;; }
+    else if(achieved&lt;30){ mT=&#x27;🚀 AYO TANCAP GAS!&#x27;; mS=&#x27;Ganbatte! 頑張って Momentum awal penting, terus dorong penjualan harian.&#x27;; }
+    else if(achieved&lt;50){ mT=&#x27;🎯 KAIZEN START! MOMENTUM BAGUS!&#x27;; mS=&#x27;改善開始！Great start! Terus tingkatkan dengan semangat KAIZEN!&#x27;; }
+    else if(achieved&lt;75){ mT=&#x27;🥈 SILVER ZONE! TERUS MELAJU!&#x27;; mS=&#x27;銀の勢い！Setengah jalan, push terus ke Gold tier!&#x27;; }
+    else if(achieved&lt;100){mT=&#x27;🥇 GOLD ZONE! DIKIT LAGI DIAMOND!&#x27;; mS=&#x27;金のラストスパート！Sedikit lagi mencapai target penuh!&#x27;; }
+    else {                mT=&#x27;💎 DIAMOND ACHIEVED! TARGET TERCAPAI!&#x27;; mS=&#x27;ダイヤモンド達成！Luar biasa, pertahankan momentum ini!&#x27;; }
     mb.innerHTML=`&lt;h3&gt;🎯 ${mT} 🎯&lt;/h3&gt;&lt;p&gt;${mS}&lt;/p&gt;`;
 
     // === PROGRESS + TIERS ===
-    document.getElementById(&apos;progressPctText&apos;).textContent = fmtPct(Math.max(0,achieved));
-    document.getElementById(&apos;progressRemainText&apos;).textContent = target &gt; 0
+    document.getElementById(&#x27;progressPctText&#x27;).textContent = fmtPct(Math.max(0,achieved));
+    document.getElementById(&#x27;progressRemainText&#x27;).textContent = target &gt; 0
       ? `Tersisa ${fmtRp(Math.max(0, gas.remainingToTarget || target-total))}`
-      : &apos;Target belum ada di database&apos;;
-    document.getElementById(&apos;progressFill&apos;).style.width = Math.min(100,Math.max(0,achieved))+&apos;%&apos;;
+      : &#x27;Target belum ada di database&#x27;;
+    document.getElementById(&#x27;progressFill&#x27;).style.width = Math.min(100,Math.max(0,achieved))+&#x27;%&#x27;;
 
-    const tiers=[{label:&apos;BRONZE&apos;,medal:&apos;🥉&apos;,pct:30},{label:&apos;SILVER&apos;,medal:&apos;🥈&apos;,pct:50},{label:&apos;GOLD&apos;,medal:&apos;🥇&apos;,pct:75},{label:&apos;DIAMOND&apos;,medal:&apos;💎&apos;,pct:100}];
-    let currentTier=&apos;BELUM MULAI&apos;;
-    document.getElementById(&apos;tierGrid&apos;).innerHTML=tiers.map((t,i)=&gt;{
+    const tiers=[{label:&#x27;BRONZE&#x27;,medal:&#x27;🥉&#x27;,pct:30},{label:&#x27;SILVER&#x27;,medal:&#x27;🥈&#x27;,pct:50},{label:&#x27;GOLD&#x27;,medal:&#x27;🥇&#x27;,pct:75},{label:&#x27;DIAMOND&#x27;,medal:&#x27;💎&#x27;,pct:100}];
+    let currentTier=&#x27;BELUM MULAI&#x27;;
+    document.getElementById(&#x27;tierGrid&#x27;).innerHTML=tiers.map((t,i)=&gt;{
       const ok=achieved&gt;=t.pct;
       const isEdge=ok&amp;&amp;(i===tiers.length-1||achieved&lt;tiers[i+1].pct);
       if(ok) currentTier=t.label;
-      const cls=ok?(isEdge?&apos;tier active current&apos;:&apos;tier active&apos;):&apos;tier locked&apos;;
-      const state=ok?&apos;✅ ACHIEVED!&apos;:`🔒 ${fmtPct(Math.min(100,achieved))}`;
-      return `&lt;div class="${cls}"&gt;&lt;div class="medal"&gt;${t.medal}&lt;/div&gt;&lt;div class="tname"&gt;${t.label}&lt;/div&gt;&lt;div class="ttarget"&gt;Target: ${t.pct}%&lt;/div&gt;&lt;div class="tstate"&gt;${state}&lt;/div&gt;&lt;/div&gt;`;
-    }).join(&apos;&apos;);
-    document.getElementById(&apos;tierBadge&apos;).textContent=&apos;🏅 &apos;+currentTier;
+      const cls=ok?(isEdge?&#x27;tier active current&#x27;:&#x27;tier active&#x27;):&#x27;tier locked&#x27;;
+      const state=ok?&#x27;✅ ACHIEVED!&#x27;:`🔒 ${fmtPct(Math.min(100,achieved))}`;
+      return `&lt;div class=&quot;${cls}&quot;&gt;&lt;div class=&quot;medal&quot;&gt;${t.medal}&lt;/div&gt;&lt;div class=&quot;tname&quot;&gt;${t.label}&lt;/div&gt;&lt;div class=&quot;ttarget&quot;&gt;Target: ${t.pct}%&lt;/div&gt;&lt;div class=&quot;tstate&quot;&gt;${state}&lt;/div&gt;&lt;/div&gt;`;
+    }).join(&#x27;&#x27;);
+    document.getElementById(&#x27;tierBadge&#x27;).textContent=&#x27;🏅 &#x27;+currentTier;
 
     // === OFFICER TABLE ===
     renderOfficerTable();
@@ -2896,43 +2891,43 @@ th{background:var(--u-navy)!important}
     // === TOP STORES ===
     const stores  = DATA.stores || [];
     const top10   = stores.slice(0,10);
-    document.getElementById(&apos;storeCount&apos;).textContent = Math.min(10, stores.length);
+    document.getElementById(&#x27;storeCount&#x27;).textContent = Math.min(10, stores.length);
     const maxSt   = Math.max(...top10.map(s=&gt;s.sales), 1);
-    document.getElementById(&apos;storeList&apos;).innerHTML = top10.map((s,i)=&gt;{
+    document.getElementById(&#x27;storeList&#x27;).innerHTML = top10.map((s,i)=&gt;{
       const bp = Math.min(100,(s.sales/maxSt*100));
-      const rc = i===0?&apos;r1&apos;:i===1?&apos;r2&apos;:i===2?&apos;r3&apos;:&apos;&apos;;
-      return `&lt;div class="row-item"&gt;
-        &lt;div class="row-top"&gt;
-          &lt;div class="rank ${rc}"&gt;#${i+1}&lt;/div&gt;
-          &lt;div class="name-block"&gt;&lt;div class="nm"&gt;${s.name}&lt;/div&gt;&lt;div class="meta-line"&gt;Kode ${s.code} • Qty ${fmtNum(s.qty)}&lt;/div&gt;&lt;/div&gt;
-          &lt;div class="val"&gt;${fmtRp(s.sales)}&lt;/div&gt;
+      const rc = i===0?&#x27;r1&#x27;:i===1?&#x27;r2&#x27;:i===2?&#x27;r3&#x27;:&#x27;&#x27;;
+      return `&lt;div class=&quot;row-item&quot;&gt;
+        &lt;div class=&quot;row-top&quot;&gt;
+          &lt;div class=&quot;rank ${rc}&quot;&gt;#${i+1}&lt;/div&gt;
+          &lt;div class=&quot;name-block&quot;&gt;&lt;div class=&quot;nm&quot;&gt;${s.name}&lt;/div&gt;&lt;div class=&quot;meta-line&quot;&gt;Kode ${s.code} • Qty ${fmtNum(s.qty)}&lt;/div&gt;&lt;/div&gt;
+          &lt;div class=&quot;val&quot;&gt;${fmtRp(s.sales)}&lt;/div&gt;
         &lt;/div&gt;
-        &lt;div class="bar-track"&gt;&lt;div class="bar-fill" style="width:${bp}%;background:linear-gradient(90deg,#7b2ff7,#ff5d6c);"&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;bar-track&quot;&gt;&lt;div class=&quot;bar-fill&quot; style=&quot;width:${bp}%;background:linear-gradient(90deg,#7b2ff7,#ff5d6c);&quot;&gt;&lt;/div&gt;&lt;/div&gt;
       &lt;/div&gt;`;
-    }).join(&apos;&apos;);
+    }).join(&#x27;&#x27;);
 
-    renderFullStoreTable(&apos;&apos;);
+    renderFullStoreTable(&#x27;&#x27;);
 
     // Footer
     const excl = DATA.officers ? DATA.officers.filter(o=&gt;!isExcludedOfficer(o.name)) : [];
-    document.getElementById(&apos;footerNote&apos;).innerHTML =
-      `&lt;b&gt;${DATA.meta.holding}&lt;/b&gt; • ${stores.length} toko • ${excl.length} officer aktif • Exclude: ${EXCLUDED_OFFICERS.join(&apos;, &apos;)}`;
+    document.getElementById(&#x27;footerNote&#x27;).innerHTML =
+      `&lt;b&gt;${DATA.meta.holding}&lt;/b&gt; • ${stores.length} toko • ${excl.length} officer aktif • Exclude: ${EXCLUDED_OFFICERS.join(&#x27;, &#x27;)}`;
     // Premium footer stats
-    const fH = document.getElementById(&apos;fHolding&apos;);
-    const fS = document.getElementById(&apos;fStores&apos;);
-    const fO = document.getElementById(&apos;fOfficers&apos;);
-    const fY = document.getElementById(&apos;fYear&apos;);
-    if(fH) fH.textContent = DATA.meta.holding || &apos;-&apos;;
-    if(fS) fS.textContent = stores.length + &apos; toko&apos;;
-    if(fO) fO.textContent = excl.length + &apos; officer&apos;;
+    const fH = document.getElementById(&#x27;fHolding&#x27;);
+    const fS = document.getElementById(&#x27;fStores&#x27;);
+    const fO = document.getElementById(&#x27;fOfficers&#x27;);
+    const fY = document.getElementById(&#x27;fYear&#x27;);
+    if(fH) fH.textContent = DATA.meta.holding || &#x27;-&#x27;;
+    if(fS) fS.textContent = stores.length + &#x27; toko&#x27;;
+    if(fO) fO.textContent = excl.length + &#x27; officer&#x27;;
     if(fY) fY.textContent = new Date().getFullYear();
   }
 
   function renderOfficerTable(){
     const officers = (DATA.officers || []).filter(o =&gt; !isExcludedOfficer(o.name));
-    const tbody    = document.getElementById(&apos;officerTbody&apos;);
+    const tbody    = document.getElementById(&#x27;officerTbody&#x27;);
     if(!officers.length){
-      tbody.innerHTML=&apos;&lt;tr&gt;&lt;td colspan="9" style="text-align:center;color:var(--muted);padding:24px;"&gt;Upload Excel untuk lihat data officer&lt;/td&gt;&lt;/tr&gt;&apos;;
+      tbody.innerHTML=&#x27;&lt;tr&gt;&lt;td colspan=&quot;9&quot; style=&quot;text-align:center;color:var(--muted);padding:24px;&quot;&gt;Upload Excel untuk lihat data officer&lt;/td&gt;&lt;/tr&gt;&#x27;;
       return;
     }
     const totalSales = officers.reduce((s,o)=&gt;s+(o.sales||o.net_sales||0), 0);
@@ -2945,91 +2940,88 @@ th{background:var(--u-navy)!important}
       const share = totalSales &gt; 0 ? (ns/totalSales*100) : 0;
       const tgt   = o.target || 0;
       const ach   = tgt &gt; 0 ? (ns/tgt*100) : 0;
-      const achCls= tgt&lt;=0 ? &apos;pill-amber&apos; : ach&gt;=100 ? &apos;pill-green&apos; : ach&gt;=75 ? &apos;pill-amber&apos; : &apos;pill-red&apos;;
-      const achTxt= tgt&lt;=0 ? &apos;—&apos; : fmtPct(ach);
-      const rc    = i===0?&apos;r1&apos;:i===1?&apos;r2&apos;:i===2?&apos;r3&apos;:&apos;&apos;;
-      const gpCls = gpPct&gt;=30?&apos;pill-green&apos;:gpPct&gt;=20?&apos;pill-amber&apos;:&apos;pill-red&apos;;
+      const achCls= tgt&lt;=0 ? &#x27;pill-amber&#x27; : ach&gt;=100 ? &#x27;pill-green&#x27; : ach&gt;=75 ? &#x27;pill-amber&#x27; : &#x27;pill-red&#x27;;
+      const achTxt= tgt&lt;=0 ? &#x27;—&#x27; : fmtPct(ach);
+      const rc    = i===0?&#x27;r1&#x27;:i===1?&#x27;r2&#x27;:i===2?&#x27;r3&#x27;:&#x27;&#x27;;
+      const gpCls = gpPct&gt;=30?&#x27;pill-green&#x27;:gpPct&gt;=20?&#x27;pill-amber&#x27;:&#x27;pill-red&#x27;;
       return `&lt;tr&gt;
-        &lt;td&gt;&lt;span class="rank-badge ${rc}"&gt;${i+1}&lt;/span&gt;&lt;/td&gt;
-        &lt;td style="font-weight:700;"&gt;${o.name}&lt;/td&gt;
-        &lt;td class="r"&gt;${fmtNum(qty)}&lt;/td&gt;
-        &lt;td class="r"&gt;${fmtRp(ns)}&lt;/td&gt;
-        &lt;td class="r" style="color:var(--muted);"&gt;${tgt &gt; 0 ? fmtRp(tgt) : &apos;—&apos;}&lt;/td&gt;
-        &lt;td class="r"&gt;&lt;span class="pct-pill ${achCls}"&gt;${achTxt}&lt;/span&gt;&lt;/td&gt;
-        &lt;td class="r"&gt;${fmtRp(gp)}&lt;/td&gt;
-        &lt;td class="r"&gt;&lt;span class="pct-pill ${gpCls}"&gt;${fmtPct(gpPct)}&lt;/span&gt;&lt;/td&gt;
-        &lt;td class="r"&gt;&lt;span class="pct-pill pill-amber"&gt;${fmtPct(share)}&lt;/span&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;span class=&quot;rank-badge ${rc}&quot;&gt;${i+1}&lt;/span&gt;&lt;/td&gt;
+        &lt;td style=&quot;font-weight:700;&quot;&gt;${o.name}&lt;/td&gt;
+        &lt;td class=&quot;r&quot;&gt;${fmtNum(qty)}&lt;/td&gt;
+        &lt;td class=&quot;r&quot;&gt;${fmtRp(ns)}&lt;/td&gt;
+        &lt;td class=&quot;r&quot; style=&quot;color:var(--muted);&quot;&gt;${tgt &gt; 0 ? fmtRp(tgt) : &#x27;—&#x27;}&lt;/td&gt;
+        &lt;td class=&quot;r&quot;&gt;&lt;span class=&quot;pct-pill ${achCls}&quot;&gt;${achTxt}&lt;/span&gt;&lt;/td&gt;
+        &lt;td class=&quot;r&quot;&gt;${fmtRp(gp)}&lt;/td&gt;
+        &lt;td class=&quot;r&quot;&gt;&lt;span class=&quot;pct-pill ${gpCls}&quot;&gt;${fmtPct(gpPct)}&lt;/span&gt;&lt;/td&gt;
+        &lt;td class=&quot;r&quot;&gt;&lt;span class=&quot;pct-pill pill-amber&quot;&gt;${fmtPct(share)}&lt;/span&gt;&lt;/td&gt;
       &lt;/tr&gt;`;
-    }).join(&apos;&apos;);
+    }).join(&#x27;&#x27;);
   }
 
   function renderFullStoreTable(filter){
-    const body = document.getElementById(&apos;fullStoreBody&apos;);
-    const f    = (filter||&apos;&apos;).toLowerCase();
+    const body = document.getElementById(&#x27;fullStoreBody&#x27;);
+    const f    = (filter||&#x27;&#x27;).toLowerCase();
     const rows = (DATA.stores||[]).filter(s=&gt;s.name.toLowerCase().includes(f));
     body.innerHTML = rows.map((s,i)=&gt;
-      `&lt;tr&gt;&lt;td&gt;${i+1}&lt;/td&gt;&lt;td&gt;${s.name}&lt;/td&gt;&lt;td style="text-align:right;"&gt;${fmtRp(s.sales)}&lt;/td&gt;&lt;td style="text-align:right;"&gt;${fmtNum(s.qty)}&lt;/td&gt;&lt;td style="text-align:right;"&gt;${fmtRp(s.gp||0)}&lt;/td&gt;&lt;/tr&gt;`
-    ).join(&apos;&apos;);
+      `&lt;tr&gt;&lt;td&gt;${i+1}&lt;/td&gt;&lt;td&gt;${s.name}&lt;/td&gt;&lt;td style=&quot;text-align:right;&quot;&gt;${fmtRp(s.sales)}&lt;/td&gt;&lt;td style=&quot;text-align:right;&quot;&gt;${fmtNum(s.qty)}&lt;/td&gt;&lt;td style=&quot;text-align:right;&quot;&gt;${fmtRp(s.gp||0)}&lt;/td&gt;&lt;/tr&gt;`
+    ).join(&#x27;&#x27;);
   }
 
   // ============================================================
   // EVENTS
   // ============================================================
-  document.getElementById(&apos;toggleAllStores&apos;).addEventListener(&apos;click&apos;, e=&gt;{
-    const w=document.getElementById(&apos;fullStoreWrap&apos;);
-    w.classList.toggle(&apos;open&apos;);
-    e.target.textContent=w.classList.contains(&apos;open&apos;)?&apos;Tutup Daftar ▴&apos;:&apos;Lihat Semua Toko ▾&apos;;
+  document.getElementById(&#x27;toggleAllStores&#x27;).addEventListener(&#x27;click&#x27;, e=&gt;{
+    const w=document.getElementById(&#x27;fullStoreWrap&#x27;);
+    w.classList.toggle(&#x27;open&#x27;);
+    e.target.textContent=w.classList.contains(&#x27;open&#x27;)?&#x27;Tutup Daftar ▴&#x27;:&#x27;Lihat Semua Toko ▾&#x27;;
   });
-  document.getElementById(&apos;storeSearch&apos;).addEventListener(&apos;input&apos;, e=&gt;renderFullStoreTable(e.target.value));
-  document.getElementById(&apos;refreshBtn&apos;).addEventListener(&apos;click&apos;, async ()=&gt;{ await fetchAppScriptData(); });
-  document.getElementById(&apos;resetBtn&apos;).addEventListener(&apos;click&apos;, async ()=&gt;{
+  document.getElementById(&#x27;storeSearch&#x27;).addEventListener(&#x27;input&#x27;, e=&gt;renderFullStoreTable(e.target.value));
+  document.getElementById(&#x27;refreshBtn&#x27;).addEventListener(&#x27;click&#x27;, async ()=&gt;{ await fetchAppScriptData(); });
+  document.getElementById(&#x27;resetBtn&#x27;).addEventListener(&#x27;click&#x27;, async ()=&gt;{
     DATA=JSON.parse(JSON.stringify(DEFAULT_DATA));
     SETTINGS=JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
     await saveSettings(); await saveDataset(); await fetchAppScriptData();
-    showToast(&apos;🔄 Data direset&apos;);
+    showToast(&#x27;🔄 Data direset&#x27;);
   });
 
   // ============================================================
   // UPLOAD EXCEL → Agregasi by Officer → Push ringkasan ke Sheets
   // ============================================================
-  document.getElementById(&apos;uploadBtn&apos;).addEventListener(&apos;click&apos;, ()=&gt;document.getElementById(&apos;fileInput&apos;).click());
-  document.getElementById(&apos;fileInput&apos;).addEventListener(&apos;change&apos;, async (e)=&gt;{
+  document.getElementById(&#x27;uploadBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;document.getElementById(&#x27;fileInput&#x27;).click());
+  document.getElementById(&#x27;fileInput&#x27;).addEventListener(&#x27;change&#x27;, async (e)=&gt;{
     const file = e.target.files[0];
     if(!file) return;
-    showToast(&apos;⏳ Membaca Excel...&apos;, 10000);
+    showToast(&#x27;⏳ Membaca Excel...&#x27;, 10000);
     try{
       const buf  = await file.arrayBuffer();
-      const wb   = XLSX.read(buf, {type:&apos;array&apos;});
+      const wb   = XLSX.read(buf, {type:&#x27;array&#x27;});
       const ws   = wb.Sheets[wb.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(ws, {header:1, raw:true, defval:null});
 
       // Cari baris header
       let headerIdx=-1, colMap={};
       for(let i=0;i&lt;Math.min(rows.length,30);i++){
-        const r=rows[i].map(c=&gt;(c===null||c===undefined)?&apos;&apos;:String(c).trim());
-        if(r.includes(&apos;Store Name&apos;)&amp;&amp;r.includes(&apos;Net Sales&apos;)){
+        const r=rows[i].map(c=&gt;(c===null||c===undefined)?&#x27;&#x27;:String(c).trim());
+        if(r.includes(&#x27;Store Name&#x27;)&amp;&amp;r.includes(&#x27;Net Sales&#x27;)){
           headerIdx=i; r.forEach((n,j)=&gt;{ if(n) colMap[n]=j; }); break;
         }
       }
-      if(headerIdx===-1){ showToast(&apos;❌ Format tidak dikenali — perlu kolom Store Name &amp; Net Sales&apos;); return; }
+      if(headerIdx===-1){ showToast(&#x27;❌ Format tidak dikenali — perlu kolom Store Name &amp; Net Sales&#x27;); return; }
 
       // Baca periode
-      let periodStart=&apos;-&apos;, periodEnd=&apos;-&apos;, printedDate=new Date().toISOString().slice(0,10);
+      let periodStart=&#x27;-&#x27;, periodEnd=&#x27;-&#x27;, printedDate=new Date().toISOString().slice(0,10);
       for(let i=0;i&lt;headerIdx;i++){
         const r0=rows[i][0], r1=rows[i][1];
-        if(r0&amp;&amp;String(r0).toLowerCase().includes(&apos;sales date&apos;)){
-          const parts=String(r1).split(&apos; to &apos;);
+        if(r0&amp;&amp;String(r0).toLowerCase().includes(&#x27;sales date&#x27;)){
+          const parts=String(r1).split(&#x27; to &#x27;);
           if(parts.length===2){ periodStart=parts[0].trim().slice(0,10); periodEnd=parts[1].trim().slice(0,10); }
         }
-        if(r0&amp;&amp;String(r0).toLowerCase().includes(&apos;printed date&apos;)&amp;&amp;r1) printedDate=String(r1).slice(0,10);
+        if(r0&amp;&amp;String(r0).toLowerCase().includes(&#x27;printed date&#x27;)&amp;&amp;r1) printedDate=String(r1).slice(0,10);
       }
 
-      // [BARU] kirim juga ke tab Greenlist (satu upload untuk dua tab)
-      try{ if(window.parent.glFeed) window.parent.glFeed(&apos;sales&apos;, rows, showToast); }catch(_e){ console.error(_e); }
-
       // Validasi kolom
-      const need=[&apos;Store&apos;,&apos;Store Name&apos;,&apos;Division&apos;,&apos;Officer&apos;,&apos;Quantity Sold&apos;,&apos;Net Sales&apos;,&apos;GP&apos;];
-      for(const n of need){ if(!(n in colMap)){ showToast(`❌ Kolom "${n}" tidak ditemukan`); return; } }
+      const need=[&#x27;Store&#x27;,&#x27;Store Name&#x27;,&#x27;Division&#x27;,&#x27;Officer&#x27;,&#x27;Quantity Sold&#x27;,&#x27;Net Sales&#x27;,&#x27;GP&#x27;];
+      for(const n of need){ if(!(n in colMap)){ showToast(`❌ Kolom &quot;${n}&quot; tidak ditemukan`); return; } }
 
       // Agregasi by officer + store
       const offMap={}, storeMap={};
@@ -3037,26 +3029,26 @@ th{background:var(--u-navy)!important}
 
       const costCol=Object.keys(colMap).find(k=&gt;/sales\s*cost|^cogs$|^hpp$/i.test(String(k).trim()));
       // [BARU] kolom item (untuk MOI per SKU) - hanya tambahan, agregasi lama tidak diubah
-      const _nk=h=&gt;String(h||&apos;&apos;).toLowerCase().replace(/[^a-z0-9]/g,&apos;&apos;);
+      const _nk=h=&gt;String(h||&#x27;&#x27;).toLowerCase().replace(/[^a-z0-9]/g,&#x27;&#x27;);
       const _ks=Object.keys(colMap);
-      const itemCodeCol=_ks.find(k=&gt;[&apos;itemcode&apos;,&apos;skucode&apos;,&apos;sku&apos;,&apos;skunumber&apos;,&apos;productcode&apos;,&apos;itemno&apos;,&apos;itemid&apos;,&apos;articlecode&apos;,&apos;plu&apos;,&apos;kodeitem&apos;,&apos;kodebarang&apos;].includes(_nk(k)))||_ks.find(k=&gt;/(item|sku|product|article)/i.test(k)&amp;&amp;/(code|kode|id|no)/i.test(k));
-      const itemNameCol=_ks.find(k=&gt;[&apos;itemname&apos;,&apos;itemdescription&apos;,&apos;skuname&apos;,&apos;skudescription&apos;,&apos;productname&apos;,&apos;productdescription&apos;,&apos;description&apos;,&apos;namaitem&apos;,&apos;namabarang&apos;].includes(_nk(k)))||_ks.find(k=&gt;/(item|sku|product|article)/i.test(k)&amp;&amp;/(name|nama|desc)/i.test(k));
+      const itemCodeCol=_ks.find(k=&gt;[&#x27;itemcode&#x27;,&#x27;skucode&#x27;,&#x27;sku&#x27;,&#x27;skunumber&#x27;,&#x27;productcode&#x27;,&#x27;itemno&#x27;,&#x27;itemid&#x27;,&#x27;articlecode&#x27;,&#x27;plu&#x27;,&#x27;kodeitem&#x27;,&#x27;kodebarang&#x27;].includes(_nk(k)))||_ks.find(k=&gt;/(item|sku|product|article)/i.test(k)&amp;&amp;/(code|kode|id|no)/i.test(k));
+      const itemNameCol=_ks.find(k=&gt;[&#x27;itemname&#x27;,&#x27;itemdescription&#x27;,&#x27;skuname&#x27;,&#x27;skudescription&#x27;,&#x27;productname&#x27;,&#x27;productdescription&#x27;,&#x27;description&#x27;,&#x27;namaitem&#x27;,&#x27;namabarang&#x27;].includes(_nk(k)))||_ks.find(k=&gt;/(item|sku|product|article)/i.test(k)&amp;&amp;/(name|nama|desc)/i.test(k));
       const itemAgg=new Map(), exclSet=new Set();
       for(let i=headerIdx+1;i&lt;rows.length;i++){
         const r=rows[i];
         if(!r||r.length===0) continue;
-        const storeName=r[colMap[&apos;Store Name&apos;]]; if(!storeName) continue;
-        const officer =String(r[colMap[&apos;Officer&apos;]]||&apos;&apos;).trim();
-        const division=String(r[colMap[&apos;Division&apos;]]||&apos;&apos;).trim();
+        const storeName=r[colMap[&#x27;Store Name&#x27;]]; if(!storeName) continue;
+        const officer =String(r[colMap[&#x27;Officer&#x27;]]||&#x27;&#x27;).trim();
+        const division=String(r[colMap[&#x27;Division&#x27;]]||&#x27;&#x27;).trim();
         if(isExcludedOfficer(officer)) continue;
         if(division&amp;&amp;isExcludedGroup(division)) continue;
 
-        const store=String(r[colMap[&apos;Store&apos;]]||&apos;&apos;).trim();
-        const ns   =Number(r[colMap[&apos;Net Sales&apos;]])||0;
-        const qty  =Number(r[colMap[&apos;Quantity Sold&apos;]])||0;
-        const gp   =Number(r[colMap[&apos;GP&apos;]])||0;
+        const store=String(r[colMap[&#x27;Store&#x27;]]||&#x27;&#x27;).trim();
+        const ns   =Number(r[colMap[&#x27;Net Sales&#x27;]])||0;
+        const qty  =Number(r[colMap[&#x27;Quantity Sold&#x27;]])||0;
+        const gp   =Number(r[colMap[&#x27;GP&#x27;]])||0;
         const cost =costCol!==undefined?(Number(r[colMap[costCol]])||0):0;
-        const gs   =colMap[&apos;Gross Sales&apos;]!==undefined?(Number(r[colMap[&apos;Gross Sales&apos;]])||0):ns;
+        const gs   =colMap[&#x27;Gross Sales&#x27;]!==undefined?(Number(r[colMap[&#x27;Gross Sales&#x27;]])||0):ns;
 
         totalNet+=ns; totalGross+=gs; totalGP+=gp; totalQty+=qty;
 
@@ -3071,15 +3063,15 @@ th{background:var(--u-navy)!important}
         storeMap[sKey].sales+=ns; storeMap[sKey].qty+=qty; storeMap[sKey].gp+=gp; storeMap[sKey].gross+=gs; storeMap[sKey].cost+=cost;
         // [BARU] agregasi per toko x item
         if(itemCodeCol!==undefined){
-          const ic=String(r[colMap[itemCodeCol]]==null?&apos;&apos;:r[colMap[itemCodeCol]]).trim();
+          const ic=String(r[colMap[itemCodeCol]]==null?&#x27;&#x27;:r[colMap[itemCodeCol]]).trim();
           // [BARU] khusus data per SKU: buang Non Merchandise, General Item, dan item ber-nama ALPRO
-          const _nm=itemNameCol!==undefined?String(r[colMap[itemNameCol]]==null?&apos;&apos;:r[colMap[itemNameCol]]):&apos;&apos;;
-          const _gp=(colMap[&apos;Group&apos;]!==undefined?String(r[colMap[&apos;Group&apos;]]||&apos;&apos;):&apos;&apos;)+&apos; &apos;+division;
+          const _nm=itemNameCol!==undefined?String(r[colMap[itemNameCol]]==null?&#x27;&#x27;:r[colMap[itemNameCol]]):&#x27;&#x27;;
+          const _gp=(colMap[&#x27;Group&#x27;]!==undefined?String(r[colMap[&#x27;Group&#x27;]]||&#x27;&#x27;):&#x27;&#x27;)+&#x27; &#x27;+division;
           const _ex=/non\s*merchandise/i.test(_gp)||/alpro/i.test(_nm)||/^\s*general\s+item\s*$/i.test(_nm);
           if(_ex&amp;&amp;ic) exclSet.add(ic);
           if(store&amp;&amp;ic&amp;&amp;!_ex){
-            const ik=store+&apos;|&apos;+ic; let ia=itemAgg.get(ik);
-            if(!ia){ ia=[store,ic,itemNameCol!==undefined?String(r[colMap[itemNameCol]]==null?&apos;&apos;:r[colMap[itemNameCol]]).trim():&apos;&apos;,0,0,0,0]; itemAgg.set(ik,ia); }
+            const ik=store+&#x27;|&#x27;+ic; let ia=itemAgg.get(ik);
+            if(!ia){ ia=[store,ic,itemNameCol!==undefined?String(r[colMap[itemNameCol]]==null?&#x27;&#x27;:r[colMap[itemNameCol]]).trim():&#x27;&#x27;,0,0,0,0]; itemAgg.set(ik,ia); }
             ia[3]+=qty; ia[4]+=ns; ia[5]+=gp; ia[6]+=cost;
           }
         }
@@ -3092,12 +3084,12 @@ th{background:var(--u-navy)!important}
       const stores = Object.values(storeMap).sort((a,b)=&gt;b.sales-a.sales);
 
       let daysElapsed=SETTINGS.days;
-      if(periodStart!==&apos;-&apos;&amp;&amp;periodEnd!==&apos;-&apos;){
+      if(periodStart!==&#x27;-&#x27;&amp;&amp;periodEnd!==&#x27;-&#x27;){
         const diff=Math.round((new Date(periodEnd)-new Date(periodStart))/86400000)+1;
         if(diff&gt;0&amp;&amp;diff&lt;32) daysElapsed=diff;
       }
 
-      let dimM=30; if(periodEnd!==&apos;-&apos;){ const pe=new Date(periodEnd); if(!isNaN(pe)) dimM=new Date(Date.UTC(pe.getUTCFullYear(),pe.getUTCMonth()+1,0)).getUTCDate(); }
+      let dimM=30; if(periodEnd!==&#x27;-&#x27;){ const pe=new Date(periodEnd); if(!isNaN(pe)) dimM=new Date(Date.UTC(pe.getUTCFullYear(),pe.getUTCMonth()+1,0)).getUTCDate(); }
       // Update DATA lokal
       DATA = {
         meta:{ period_start:periodStart, period_end:periodEnd, days_elapsed:daysElapsed,
@@ -3112,9 +3104,11 @@ th{background:var(--u-navy)!important}
       await saveDataset(); await saveSettings();
       render();
       notifyParent();
+      /* Sekali upload: teruskan file yang sama ke Greenlist */
+      try{ if(window.parent&amp;&amp;window.parent.APP&amp;&amp;window.parent.APP.toGreenlist) window.parent.APP.toGreenlist(rows); }catch(_e){}
 
       // ── PUSH ke Google Sheets — hanya summary by officer (~5-10 baris!) ──
-      if(GAS_URL&amp;&amp;!GAS_URL.includes(&apos;ISI_URL&apos;)&amp;&amp;officers.length&gt;0){
+      if(GAS_URL&amp;&amp;!GAS_URL.includes(&#x27;ISI_URL&#x27;)&amp;&amp;officers.length&gt;0){
         showToast(`⏳ Menyimpan ${officers.length} officer ke Sheets...`, 8000);
         try{
           const payload = {
@@ -3143,17 +3137,17 @@ th{background:var(--u-navy)!important}
             }))
           };
           const res  = await fetch(GAS_URL, {
-            method:&apos;POST&apos;,
-            headers:{&apos;Content-Type&apos;:&apos;text/plain&apos;},
+            method:&#x27;POST&#x27;,
+            headers:{&#x27;Content-Type&#x27;:&#x27;text/plain&#x27;},
             body: JSON.stringify(payload)
           });
           const json = await res.json();
-          if(!json.success) throw new Error(json.error||&apos;AppScript error&apos;);
+          if(!json.success) throw new Error(json.error||&#x27;AppScript error&#x27;);
           // Ambil summary terbaru dari AppScript (target dll)
           if(json.summary){ applyGasData(json.summary); render(); notifyParent(); }
           showToast(`✅ Selesai! ${officers.length} officer tersimpan ke Sheets &amp; dashboard diperbarui.`);
         }catch(pushErr){
-          console.error(&apos;Push gagal:&apos;,pushErr);
+          console.error(&#x27;Push gagal:&#x27;,pushErr);
           showToast(`⚠️ Dashboard OK, gagal push ke Sheets: ${pushErr.message}`);
         }
       } else {
@@ -3161,18 +3155,18 @@ th{background:var(--u-navy)!important}
       }
     // [BARU] simpan sales per item: lokal (langsung bisa dipakai export) + kirim bertahap ke sheet SalesItem
     if(itemCodeCol===undefined){
-      showToast(&apos;⚠️ Kolom kode item tidak ditemukan di Excel, MOI per SKU tidak tersedia. Kolom terbaca: &apos;+Object.keys(colMap).join(&apos;, &apos;),10000);
+      showToast(&#x27;⚠️ Kolom kode item tidak ditemukan di Excel, MOI per SKU tidak tersedia. Kolom terbaca: &#x27;+Object.keys(colMap).join(&#x27;, &#x27;),10000);
     }else{
       const itemRows=[...itemAgg.values()].filter(a=&gt;a[3]||a[4]||a[5]||a[6]); // baris tanpa sales dilewati (dianggap 0)
-      exclSet.forEach(c=&gt;itemRows.push([&apos;*&apos;,c,&apos;__EXCL__&apos;,0,0,0,0])); // penanda item yang dibuang (supaya tetap dikenal setelah refresh)
+      exclSet.forEach(c=&gt;itemRows.push([&#x27;*&#x27;,c,&#x27;__EXCL__&#x27;,0,0,0,0])); // penanda item yang dibuang (supaya tetap dikenal setelah refresh)
       ITEMS=buildItems(periodStart,periodEnd,itemRows); notifyParent();
       await pushItems(periodStart,periodEnd,itemRows);
     }
     }catch(err){
       console.error(err);
-      showToast(&apos;❌ Gagal proses Excel: &apos;+err.message);
+      showToast(&#x27;❌ Gagal proses Excel: &#x27;+err.message);
     }
-    e.target.value=&apos;&apos;;
+    e.target.value=&#x27;&#x27;;
   });
 
   // ============================================================
@@ -3180,15 +3174,15 @@ th{background:var(--u-navy)!important}
   // ============================================================
   // Set copyright year early
   (function(){
-    var fY = document.getElementById(&apos;fYear&apos;);
+    var fY = document.getElementById(&#x27;fYear&#x27;);
     if(fY) fY.textContent = new Date().getFullYear();
   })();
   loadPersisted();
   &lt;/script&gt;
-  &lt;script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon=&apos;{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}&apos; crossorigin="anonymous"&gt;&lt;/script&gt;
-  &lt;script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon=&apos;{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}&apos; crossorigin="anonymous"&gt;&lt;/script&gt;
-  &lt;script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon=&apos;{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}&apos; crossorigin="anonymous"&gt;&lt;/script&gt;
-  &lt;style id="unify"&gt;html,body{background:#eef1f6!important;color:#1b2430!important;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif!important}
+  &lt;script defer src=&quot;https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447&quot; integrity=&quot;sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==&quot; data-cf-beacon=&#x27;{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;4edd5f8ec12a48cfa682ab8261b80a79&quot;,&quot;server_timing&quot;:{&quot;name&quot;:{&quot;cfCacheStatus&quot;:true,&quot;cfEdge&quot;:true,&quot;cfExtPri&quot;:true,&quot;cfL4&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfSpeedBrain&quot;:true},&quot;location_startswith&quot;:null}}&#x27; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;
+  &lt;script defer src=&quot;https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447&quot; integrity=&quot;sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==&quot; data-cf-beacon=&#x27;{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;4edd5f8ec12a48cfa682ab8261b80a79&quot;,&quot;server_timing&quot;:{&quot;name&quot;:{&quot;cfCacheStatus&quot;:true,&quot;cfEdge&quot;:true,&quot;cfExtPri&quot;:true,&quot;cfL4&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfSpeedBrain&quot;:true},&quot;location_startswith&quot;:null}}&#x27; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;
+  &lt;script defer src=&quot;https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447&quot; integrity=&quot;sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==&quot; data-cf-beacon=&#x27;{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;4edd5f8ec12a48cfa682ab8261b80a79&quot;,&quot;server_timing&quot;:{&quot;name&quot;:{&quot;cfCacheStatus&quot;:true,&quot;cfEdge&quot;:true,&quot;cfExtPri&quot;:true,&quot;cfL4&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfSpeedBrain&quot;:true},&quot;location_startswith&quot;:null}}&#x27; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;
+  &lt;style id=&quot;unify&quot;&gt;html,body{background:#eef1f6!important;color:#1b2430!important;font-family:system-ui,-apple-system,&quot;Segoe UI&quot;,Roboto,sans-serif!important}
   body::before,body::after{display:none!important}
   *{text-shadow:none!important}
   .header{background:#fff!important;border:1px solid #e3e7ee!important;border-radius:12px!important;box-shadow:none!important;padding:16px 20px!important;text-align:left!important;min-height:0!important}
@@ -3210,8 +3204,8 @@ th{background:var(--u-navy)!important}
   .header *::before,.header *::after{display:none!important}.header *{filter:none!important;box-shadow:none!important}
   .kpi-value{font-size:22px!important}.badge,.section-title .tag{box-shadow:none!important}
   .kpi-value{font-size:18px!important;word-break:keep-all}
-  &lt;/style&gt;&lt;script&gt;window.getSales=function(){return DATA};window.getSalesItems=function(){return typeof ITEMS===&apos;undefined&apos;?null:ITEMS}&lt;/script&gt;&lt;style id="alpro-unify"&gt;
-@import url(&apos;https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap&apos;);
+  &lt;/style&gt;&lt;script&gt;window.getSales=function(){return DATA};window.getSalesItems=function(){return typeof ITEMS===&#x27;undefined&#x27;?null:ITEMS}&lt;/script&gt;&lt;style id=&quot;alpro-unify&quot;&gt;
+@import url(&#x27;https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap&#x27;);
 /* ===== ALPRO UNIFIED THEME v2 — Navy · Oranye · Putih (CSS-only) ===== */
 @media screen{
 :root{
@@ -3220,7 +3214,7 @@ th{background:var(--u-navy)!important}
   --u-sh:0 1px 2px rgba(15,28,63,.05),0 4px 14px rgba(15,28,63,.05);
 }
 html,body{background:var(--u-bg)!important;color:var(--u-text)!important;
-  font-family:&apos;Inter&apos;,system-ui,-apple-system,&apos;Segoe UI&apos;,Roboto,sans-serif!important;-webkit-font-smoothing:antialiased}
+  font-family:&#x27;Inter&#x27;,system-ui,-apple-system,&#x27;Segoe UI&#x27;,Roboto,sans-serif!important;-webkit-font-smoothing:antialiased}
 button,input,select,textarea,.btn,.action-btn{font-family:inherit!important}
 table{font-variant-numeric:tabular-nums}
 
@@ -3285,8 +3279,8 @@ footer{background:var(--u-navy)!important;border-radius:14px!important;box-shado
 .badge-green,.pill-green{background:#e8f6ee!important;color:#15803d!important;box-shadow:none!important}
 .badge-red,.pill-red{background:#fdecec!important;color:#b91c1c!important;box-shadow:none!important}
 .pill-amber{background:#fdf3dc!important;color:#92610a!important}
-[style*="fdf4ff"]{background:#fff!important;border-color:var(--u-line)!important}
-[style*="7e22ce"]{color:var(--u-navy)!important}
+[style*=&quot;fdf4ff&quot;]{background:#fff!important;border-color:var(--u-line)!important}
+[style*=&quot;7e22ce&quot;]{color:var(--u-navy)!important}
 .bar-fill{background:linear-gradient(90deg,var(--u-navy-2),var(--u-navy));box-shadow:none}
 .bar-fill::after{display:none}
 .kpi-grid .card::before{background:var(--u-navy-2)!important}
@@ -13589,7 +13583,8 @@ th { color: #5c7d6d; }
 .btn:active:not(:disabled) { transform: scale(0.95); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .page svg polyline { stroke-dasharray: none; } }
 &lt;/style&gt;
-  &lt;/head&gt;
+  &lt;style id=&quot;embed-gl&quot;&gt;.side,.ov,.edge-toggle,header #mt{display:none!important}&lt;/style&gt;
+&lt;/head&gt;
   &lt;body&gt;
     &lt;div class=&quot;app&quot;&gt;
       &lt;!-- Sidebar navigasi --&gt;
@@ -16584,7 +16579,7 @@ th { color: #5c7d6d; }
           ["agenda", "Agenda"],
           ["greenlist", "Greenlist"],
         ],
-        FPERM = { f1: "sales", f2: "budget", f3: "oos", f4: "sla" },
+        FPERM = { f1: "sales", f2: "budget", f3: "oos", f4: "sla", f8: "greenlist" },
         normPerms = (p) =>
           Array.isArray(p)
             ? p.filter(Boolean)
@@ -16597,34 +16592,7 @@ th { color: #5c7d6d; }
         f3: 'button[onclick*="openImportModal"],#importModal{display:none!important}',
         f4: '.upload-area,button[onclick*="resetToDefaultData"]{display:none!important}',
       };
-      /* Greenlist: sidebar bawaan modul disembunyikan (diganti submenu di sidebar utama).
-         Unggah master / Sales GP / SOH dan hapus data hanya untuk Admin atau user dengan izin Greenlist. */
-      function lockGreenlist(f) {
-        try {
-          const w = f.contentWindow,
-            d = w.document;
-          let css =
-            ".side,.edge-toggle,#mt,#mt2{display:none!important}.app{display:block!important}.app>.wrap{max-width:none!important}";
-          const canEdit = !!APP && (APP.role == "admin" || APP.can("greenlist"));
-          if (!canEdit) {
-            css += "#src label.btn:has(input[type=file]),#src #rst{display:none!important}";
-            const stop = (e) => {
-              const t = e.target;
-              if (t && t.closest && t.closest("#src") && (t.type == "file" || t.id == "rst")) {
-                e.stopImmediatePropagation();
-                e.preventDefault();
-              }
-            };
-            d.addEventListener("change", stop, true);
-            d.addEventListener("click", stop, true);
-          }
-          const s = d.createElement("style");
-          s.textContent = css;
-          d.head.appendChild(s);
-        } catch (e) {}
-      }
       function lockFrame(f) {
-        if (f.id == "f8") return lockGreenlist(f);
         if (!APP || APP.role == "admin" || APP.can(FPERM[f.id])) return;
         try {
           const w = f.contentWindow,
@@ -17653,46 +17621,6 @@ th { color: #5c7d6d; }
           });
         return f._p;
       }
-      /* ===== JEMBATAN UPLOAD -> GREENLIST =====
-         Upload SOH (menu SOH) dan Sales (menu Sales) otomatis ikut memperbarui tab Greenlist,
-         jadi tidak perlu upload dua kali. Upload manual di Greenlist > Data sumber tetap ada sebagai cadangan.
-         Hanya jalan untuk Admin atau user dengan izin Greenlist (sama seperti upload manual di Greenlist). */
-      window.glFeed = async function (kind, rows, say, dk) {
-        const tell = (m, ms) => { try { say && say(m, ms || 6000); } catch (e) {} };
-        try {
-          if (!(APP.role == "admin" || APP.can("greenlist"))) return;
-          const f = document.getElementById("f8");
-          await ensure(f);
-          const w = f.contentWindow;
-          if (typeof w.doSoh !== "function" || typeof w.doSales !== "function")
-            return tell("Greenlist belum siap, upload manual di Greenlist > Data sumber.");
-          // tunggu sinkron awal Google Sheets Greenlist selesai (maks 15 dtk) supaya data baru tidak tertimpa
-          for (let i = 0; i < 75; i++) {
-            let m = "";
-            try { m = w.eval("CLOUD_MSG"); } catch (e) { break; }
-            if (!/^(Mengambil|Memuat)/.test(m)) break;
-            await new Promise((r) => setTimeout(r, 200));
-          }
-          if (kind === "sales")
-            for (const r of rows) if (r) for (let j = 0; j < r.length; j++) if (r[j] === null || r[j] === undefined) r[j] = "";
-          const ori = w.toast, oc = w.confirm, msgs = [];
-          w.toast = function (m) { msgs.push(String(m)); };
-          w.confirm = function () { return false; }; // jangan menimpa bulan yang sudah lebih panjang
-          try {
-            if (kind === "soh") w.doSoh(rows, dk);
-            else w.doSales(rows);
-          } finally {
-            await new Promise((r) => setTimeout(r, 200));
-            w.toast = ori;
-            w.confirm = oc;
-          }
-          const last = msgs.filter((m) => !/^Membaca file/.test(m)).pop();
-          if (last) tell("Greenlist: " + last, 7000);
-        } catch (e) {
-          console.error(e);
-          tell("Greenlist gagal diperbarui: " + e.message + ". Upload manual di Greenlist > Data sumber.");
-        }
-      };
       function run(f, a) {
         try {
           if (a.dataset.s && f.contentWindow.go) f.contentWindow.go(a.dataset.s);
@@ -17701,14 +17629,13 @@ th { color: #5c7d6d; }
       }
       function open_(a) {
         links.forEach((x) => x.classList.toggle("on", x == a));
+        if (a.closest("#gsub")) {
+          $("#gsub").classList.add("open");
+          $("#gpar").classList.add("op");
+        }
         document.querySelectorAll(".fr").forEach((f) => f.classList.toggle("on", f.id == a.dataset.f));
         $("#pt").textContent = a.dataset.t;
         $("#sb").classList.remove("open");
-        if (glh) {
-          const g = a.classList.contains("sgi");
-          glh.classList.toggle("act", g);
-          if (g) glOpen(true);
-        }
         if (a.dataset.f == "home") {
           renderHome();
           return;
@@ -17732,16 +17659,45 @@ th { color: #5c7d6d; }
         });
       }
       links.forEach((a) => (a.onclick = () => open_(a)));
-      /* Submenu Greenlist: klik judul untuk buka/tutup */
-      const glh = $("#glh"),
-        glb = $("#glb");
-      const glOpen = (o) => {
-        if (!glh) return;
-        glb.hidden = !o;
-        glh.classList.toggle("open", o);
-        glh.setAttribute("aria-expanded", o);
-      };
-      if (glh) glh.onclick = () => glOpen(glb.hidden);
+      /* Greenlist: klik = buka/tutup submenu. Saat dibuka: sidebar digulung supaya semua submenu kelihatan,
+         dan kalau belum ada submenu aktif, langsung buka "Ringkasan" (sidebar mobile tetap terbuka). */
+      (function () {
+        const par = $("#gpar"),
+          sub = $("#gsub"),
+          sb = $("#sb");
+        function setG(o) {
+          sub.classList.toggle("open", o);
+          par.classList.toggle("op", o);
+          par.setAttribute("aria-expanded", o ? "true" : "false");
+        }
+        function toggleG(e) {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          if (sub.classList.contains("open")) return setG(false);
+          const mh = $("#mhAn");
+          if (mh) mh.classList.remove("xc");
+          setG(true);
+          const first = [...sub.querySelectorAll("a")].find((x) => x.style.display !== "none");
+          if (first && !sub.querySelector("a.on")) {
+            const mob = sb.classList.contains("open");
+            open_(first);
+            if (mob) sb.classList.add("open");
+          }
+          const last = sub.lastElementChild,
+            r = last.getBoundingClientRect(),
+            sr = sb.getBoundingClientRect();
+          if (r.bottom > sr.bottom) sb.scrollTop += r.bottom - sr.bottom + 12;
+        }
+        par.setAttribute("role", "button");
+        par.setAttribute("tabindex", "0");
+        par.setAttribute("aria-expanded", "false");
+        par.onclick = toggleG;
+        par.onkeydown = (e) => {
+          if (e.key === "Enter" || e.key === " ") toggleG(e);
+        };
+      })();
       $("#bt").onclick = () => $("#sb").classList.toggle("open");
 
       function applyRole() {
@@ -17751,6 +17707,7 @@ th { color: #5c7d6d; }
         links.forEach((a) => {
           if (a.dataset.admin) a.style.display = adm ? "" : "none";
           else if (a.dataset.s == "soh") a.style.display = APP.can("soh") ? "" : "none";
+          else if (a.dataset.perm) a.style.display = APP.can(a.dataset.perm) ? "" : "none";
         });
         const mh = $("#mhA");
         if (mh) mh.style.display = adm ? "" : "none";
@@ -17761,6 +17718,55 @@ th { color: #5c7d6d; }
           location.reload();
         };
       }
+      /* Satu kali upload: file Sales / SOH yang diunggah di menu masing-masing diteruskan ke Greenlist
+         (doSales / doSoh milik Greenlist dipakai apa adanya; hanya admin / user ber-izin Greenlist) */
+      async function glCall(fn, args) {
+        try {
+          if (!APP.can("greenlist")) return;
+          const f = document.getElementById("f8");
+          await ensure(f);
+          const w = f.contentWindow;
+          if (!w || typeof w[fn] != "function") return;
+          const old = w.toast;
+          w.toast = function (m, ms) {
+            try {
+              if (typeof toast == "function") toast("Greenlist: " + m);
+            } catch (e) {}
+            return old.call(w, m, ms);
+          };
+          try {
+            w[fn].apply(w, args);
+          } finally {
+            w.toast = old;
+          }
+        } catch (e) {
+          console.warn("Greenlist: gagal meneruskan data", e);
+        }
+      }
+      const glRows = (rows) => rows.map((r) => r.map((c) => (c == null ? "" : c)));
+      /* tanggal stok dari nama file (yyyymmdd, ddmmyyyy, ddmmyy); kalau tidak ada pola tanggal, pakai tanggal upload */
+      function sohDateFromName(name) {
+        const ok = (y, m, d) => {
+            const t = new Date(Date.UTC(y, m - 1, d));
+            return y >= 2020 && y <= 2099 && t.getUTCFullYear() == y && t.getUTCMonth() == m - 1 && t.getUTCDate() == d;
+          },
+          iso = (y, m, d) => y + "-" + String(m).padStart(2, "0") + "-" + String(d).padStart(2, "0"),
+          pats = [
+            [/(?:^|\D)(20\d{2})[-_.]?(\d{2})[-_.]?(\d{2})(?!\d)/, (x) => [+x[1], +x[2], +x[3]]],
+            [/(?:^|\D)(\d{2})[-_.]?(\d{2})[-_.]?(20\d{2})(?!\d)/, (x) => [+x[3], +x[2], +x[1]]],
+            [/(?:^|\D)(\d{2})(\d{2})(\d{2})(?!\d)/, (x) => [2000 + +x[3], +x[2], +x[1]]],
+          ];
+        for (const [re, f] of pats) {
+          const x = re.exec(String(name || ""));
+          if (!x) continue;
+          const [y, m, d] = f(x);
+          if (ok(y, m, d)) return iso(y, m, d);
+        }
+        const n = new Date();
+        return iso(n.getFullYear(), n.getMonth() + 1, n.getDate());
+      }
+      APP.toGreenlist = (rows) => glCall("doSales", [glRows(rows)]);
+      APP.toGreenlistSoh = (rows, fileName) => glCall("doSoh", [glRows(rows), sohDateFromName(fileName)]);
       function boot(u) {
         APP.user = u;
         APP.role = u.role;
@@ -17801,7 +17807,7 @@ th { color: #5c7d6d; }
             return;
           }
           const f = document.getElementById(order[i++]);
-          if (!f) return next();
+          if (!f || (f.id == "f8" && !APP.can("greenlist"))) return next();
           cap(ensure(f), 20000)
             .catch(() => {})
             .then(() => idle(next, { timeout: 600 }));
