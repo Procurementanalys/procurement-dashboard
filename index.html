@@ -998,6 +998,29 @@
         #usr button[data-k="pw"]{background:#fff;color:var(--tx-2);border:1px solid #dde2ec;box-shadow:none}
         #usr button[data-k="pw"]:hover{background:var(--surface-2);border-color:#c7cedc;box-shadow:none}
         #usr [data-ps]{font-size:11px;margin-left:8px}
+        /* Dropdown akses (Menu yang tampil / Hak upload-edit) */
+        #usr td:nth-child(4){max-width:540px;min-width:300px;line-height:1.4}
+        #usr .u-hint{padding:12px 18px;font-size:12px;color:var(--mu);border-bottom:1px solid var(--bd-2);background:#fffaf5;line-height:1.5}
+        #usr details.dd{border:1px solid #e1e5ee;border-radius:10px;background:#fff;margin:4px 0;overflow:hidden}
+        #usr details.dd.m{border-left:3px solid #2563eb}
+        #usr details.dd.e{border-left:3px solid var(--orange)}
+        #usr details.dd>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;font-size:12.5px;font-weight:700;color:var(--tx-2);user-select:none}
+        #usr details.dd>summary::-webkit-details-marker{display:none}
+        #usr details.dd>summary::after{content:"▾";color:var(--mu);transition:transform .15s}
+        #usr details.dd[open]>summary::after{transform:rotate(180deg)}
+        #usr details.dd>summary:hover{background:var(--surface-2)}
+        #usr .dd-t{flex:1}
+        #usr .dd-n{font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;background:#eff6ff;color:#2563eb;white-space:nowrap}
+        #usr details.dd.e .dd-n{background:#fff4ea;color:var(--orange-xd)}
+        #usr .dd-n.z{background:#f1f5f9!important;color:#64748b!important}
+        #usr .dd-b{padding:8px 10px 10px;border-top:1px solid #eef1f6;background:var(--surface-2)}
+        #usr .dd-a{margin-bottom:6px;font-size:11.5px}
+        #usr .dd-lnk{cursor:pointer;color:#2563eb;font-weight:700;margin-right:14px}
+        #usr .dd-lnk:hover{text-decoration:underline}
+        #usr .dd-b label{display:inline-flex;align-items:center;margin:2px 4px 2px 0!important;padding:4px 10px;border-radius:8px;background:#fff;border:1px solid #e1e5ee;font-size:12px;font-weight:600;color:var(--mu);cursor:pointer;white-space:nowrap}
+        #usr .dd-b label:hover{border-color:#c7cedc;color:var(--tx)}
+        #usr .dd.e .dd-b label:has(input:checked){background:#fff4ea;border-color:#fdba74;color:var(--orange-xd)}
+        #usr .dd.m .dd-b label:has(input:checked){background:#eff6ff;border-color:#93c5fd;color:#1d4ed8}
         #usr #ub > div:first-of-type{margin:0!important;padding:16px 18px;gap:10px!important;background:var(--surface-2);border-top:1px solid var(--bd);border-radius:0 0 16px 16px;align-items:center}
         #usr #ub > div:first-of-type > b{font-size:13px!important;color:var(--tx);margin-right:4px}
         #usr #npm{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap;color:var(--mu)}
@@ -16586,6 +16609,41 @@ th { color: #5c7d6d; }
             : typeof p == "string"
               ? p.split(/[,;\s]+/).filter(Boolean)
               : [];
+      /* ===== HAK AKSES LIHAT MENU (diatur admin di Kelola User) =====
+         Disimpan di kolom perms dengan awalan "v_" (contoh: v_sales, v_moi).
+         Akun TANPA satu pun "v_" = perilaku lama (semua menu tampil).
+         Akun dengan minimal satu "v_" = HANYA menu yang dicentang yang tampil. Admin selalu melihat semua. */
+      const VMENUS = [
+        ["v_home", "Home"],
+        ["v_agd", "Agenda"],
+        ["v_soh", "SOH (Upload)"],
+        ["v_stock", "Stock Inventory"],
+        ["v_moi", "MOI"],
+        ["v_par", "Pareto Item"],
+        ["v_sug", "Suggested Order"],
+        ["v_sales", "Sales"],
+        ["v_budget", "Budget"],
+        ["v_oos", "OOS"],
+        ["v_sla", "SLA Supplier"],
+        ["v_otb", "Outstanding & OTB"],
+        ["v_score", "Officer Scorecard"],
+        ["v_health", "Store Health"],
+        ["v_greenlist", "Greenlist"],
+        ["v_sheet", "Spreadsheet"],
+        ["v_drive", "Google Drive"],
+      ];
+      const hasVMenus = () => (APP.perms || []).some((p) => String(p).indexOf("v_") === 0);
+      const menuKey = (a) => {
+        if (a.id == "gpar" || a.closest("#gsub")) return "v_greenlist";
+        const f = a.dataset.f;
+        if (f == "f0") return "v_" + a.dataset.s;
+        if (f == "stg") return "v_" + a.dataset.k;
+        return (
+          { home: "v_home", agd: "v_agd", sug: "v_sug", f1: "v_sales", f2: "v_budget", f3: "v_oos", f4: "v_sla", f5: "v_otb", f6: "v_score", f7: "v_health" }[f] || ""
+        );
+      };
+      const canGreenlist = () =>
+        APP.role == "admin" || (hasVMenus() ? APP.perms.includes("v_greenlist") : APP.can("greenlist"));
       const LOCK_CSS = {
         f1: "#uploadBtn,#resetBtn,#fileInput{display:none!important}",
         f2: "#impOpen,#impOv{display:none!important}",
@@ -16672,7 +16730,7 @@ th { color: #5c7d6d; }
       // [API-AKUN-SOH] URL Apps Script database akun login dan SOH (halaman utama).
       /* ===== API Apps Script (database akun & SOH). Isi URL Web App di bawah setelah deploy. Kosong = mode lokal (tanpa database). ===== */
       const API_URL =
-        "https://script.google.com/macros/s/AKfycbyF2lZ4tvGsEcl_CBm86I88S9AWJKUT3LwrTBE-M9-iRJvnuovEbwfFMGiMWOSqqv-GrA/exec";
+        "https://script.google.com/macros/s/AKfycbxgozMzQ0FZKVIWJODbvd7ChjnxFvtr3GINbQagdaZIV1Jna1nePvFdcor4sbsFqxfjAA/exec";
       let TOKEN = null;
       async function api(action, data) {
         const r = await fetch(API_URL, {
@@ -17138,10 +17196,54 @@ th { color: #5c7d6d; }
         }
         el.innerHTML =
           '<div class="hm"><div class="rc-h">Kelola User</div><div class="rc-box" id="ub">Memuat…</div></div>';
+        const __dd = (window.__dd = window.__dd || new Set()),
+          ddItems = (list, cur, u) =>
+            list
+              .map(
+                ([k, l]) =>
+                  `<label><input type="checkbox"${u ? ` data-u="${esc(u)}" data-k="perm"` : ""} value="${k}"${cur.includes(k) ? " checked" : ""}> ${l}</label>`,
+              )
+              .join(""),
+          ddCount = (n, kind) => (n ? n + " dipilih" : kind == "menu" ? "Semua tampil" : "Tidak ada"),
+          ddSel = '<div class="dd-a"><span class="dd-lnk" data-sel="all">Pilih semua</span><span class="dd-lnk" data-sel="none">Kosongkan</span></div>',
+          ddBox = (u, kind, title, cls, list, cur, sel) => {
+            const n = list.filter(([k]) => cur.includes(k)).length,
+              key = u + "|" + kind;
+            return `<details class="dd ${cls}" data-kind="${kind}" data-dd="${esc(key)}"${__dd.has(key) ? " open" : ""}><summary><span class="dd-t">${title}</span><span class="dd-n${n ? "" : " z"}">${ddCount(n, kind)}</span></summary><div class="dd-b">${sel ? ddSel : ""}${ddItems(list, cur, u)}</div></details>`;
+          },
+          ddForm = (kind, title, cls, list, sel) =>
+            `<details class="dd ${cls}" data-kind="${kind}"><summary><span class="dd-t">${title}</span><span class="dd-n z">${ddCount(0, kind)}</span></summary><div class="dd-b">${sel ? ddSel : ""}${ddItems(list, [], "")}</div></details>`;
+        if (!window.__ddWired) {
+          window.__ddWired = 1;
+          el.addEventListener(
+            "toggle",
+            (e) => {
+              const d = e.target;
+              if (d && d.dataset && d.dataset.dd) d.open ? __dd.add(d.dataset.dd) : __dd.delete(d.dataset.dd);
+            },
+            true,
+          );
+          el.addEventListener("change", (e) => {
+            const d = e.target.closest && e.target.closest("details.dd");
+            if (!d) return;
+            const n = d.querySelectorAll("input[type=checkbox]:checked").length,
+              s = d.querySelector(".dd-n");
+            s.textContent = ddCount(n, d.dataset.kind);
+            s.classList.toggle("z", !n);
+          });
+          el.addEventListener("click", (e) => {
+            const t = e.target.closest && e.target.closest("[data-sel]");
+            if (!t) return;
+            const d = t.closest("details.dd"),
+              bx = [...d.querySelectorAll("input[type=checkbox]")];
+            bx.forEach((i) => (i.checked = t.dataset.sel == "all"));
+            if (bx[0]) bx[0].dispatchEvent(new Event("change", { bubbles: true }));
+          });
+        }
         const draw = (us) => {
           $("#ub").innerHTML =
-            `<table><tr><th>Username</th><th>Nama</th><th>Role</th><th>Akses</th><th>Status</th><th></th></tr>${us.map((x) => `<tr><td>${esc(x.u)}</td><td>${esc(x.n)}</td><td><select data-u="${esc(x.u)}" data-k="role"><option value="admin"${x.role == "admin" ? " selected" : ""}>Admin</option><option value="user"${x.role == "user" ? " selected" : ""}>User (view)</option></select></td><td>${x.role == "admin" ? '<i style="color:#64748b">Semua</i>' : PERMS.map(([k, l]) => `<label style="margin-right:8px;white-space:nowrap"><input type="checkbox" data-u="${esc(x.u)}" data-k="perm" value="${k}"${normPerms(x.perms).includes(k) ? " checked" : ""}> ${l}</label>`).join("")}<span data-ps="${esc(x.u)}" style="font-size:11px;margin-left:6px;font-weight:600"></span></td><td><button data-u="${esc(x.u)}" data-k="act" data-v="${x.active ? 0 : 1}">${x.active ? "Aktif · nonaktifkan" : "Nonaktif · aktifkan"}</button></td><td><button data-u="${esc(x.u)}" data-k="pw">Reset password</button></td></tr>`).join("")}</table>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center"><b style="font-size:13px">Tambah user:</b><input id="nu" placeholder="username" autocomplete="off" spellcheck="false"><input id="nn" placeholder="nama lengkap" autocomplete="off"><select id="nr"><option value="user">User (view)</option><option value="admin">Admin</option></select><span id="npm" style="font-size:12px">Akses: ${PERMS.map(([k, l]) => `<label style="margin-right:6px"><input type="checkbox" value="${k}"> ${l}</label>`).join("")}</span><input id="np" type="password" placeholder="password (min 6)" autocomplete="new-password"><button id="na">Tambah</button></div><div id="um" style="margin-top:8px;font-size:12px;color:#64748b"></div>`;
+            `<div class="u-hint"><b>Menu yang tampil</b> = menu apa saja yang boleh dilihat akun ini (kosong = semua tampil). &nbsp;·&nbsp; <b>Hak upload / edit</b> = boleh upload / ubah data. Klik panel untuk membuka, lalu centang.</div><table><tr><th>Username</th><th>Nama</th><th>Role</th><th>Akses</th><th>Status</th><th></th></tr>${us.map((x) => `<tr><td>${esc(x.u)}</td><td>${esc(x.n)}</td><td><select data-u="${esc(x.u)}" data-k="role"><option value="admin"${x.role == "admin" ? " selected" : ""}>Admin</option><option value="user"${x.role == "user" ? " selected" : ""}>User (view)</option></select></td><td>${x.role == "admin" ? '<i style="color:#64748b">Semua</i>' : ddBox(x.u, "menu", "Menu yang tampil", "m", VMENUS, normPerms(x.perms), true) + ddBox(x.u, "edit", "Hak upload / edit", "e", PERMS, normPerms(x.perms), false)}<span data-ps="${esc(x.u)}" style="font-size:11px;margin-left:6px;font-weight:600"></span></td><td><button data-u="${esc(x.u)}" data-k="act" data-v="${x.active ? 0 : 1}">${x.active ? "Aktif · nonaktifkan" : "Nonaktif · aktifkan"}</button></td><td><button data-u="${esc(x.u)}" data-k="pw">Reset password</button></td></tr>`).join("")}</table>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center"><b style="font-size:13px">Tambah user:</b><input id="nu" placeholder="username" autocomplete="off" spellcheck="false"><input id="nn" placeholder="nama lengkap" autocomplete="off"><select id="nr"><option value="user">User (view)</option><option value="admin">Admin</option></select><span id="npm" style="display:flex;flex-direction:column;gap:4px;flex:1 1 100%;font-size:12px">${ddForm("menu", "Menu yang tampil", "m", VMENUS, true)}${ddForm("edit", "Hak upload / edit", "e", PERMS, false)}</span><input id="np" type="password" placeholder="password (min 6)" autocomplete="new-password"><button id="na">Tambah</button></div><div id="um" style="margin-top:8px;font-size:12px;color:#64748b"></div>`;
           if (us.length && us.every((x) => x.perms === undefined))
             $("#um").textContent =
               "⚠ Apps Script belum menyimpan akses per akun (kolom perms). Update Code.gs dulu, kalau tidak pilihan checkbox tidak tersimpan.";
@@ -17159,14 +17261,18 @@ th { color: #5c7d6d; }
                 e.textContent = t;
               }
             },
-            go = async (fn, ok, u) => {
+            go = async (fn, ok, u, exp) => {
               try {
                 await fn();
                 const r = await api("users");
                 draw(r.users);
                 const bad = r.users.length && r.users.every((x) => x.perms === undefined);
+                const me = exp && r.users.find((x) => x.u == u),
+                  miss = me && exp.some((k) => !normPerms(me.perms).includes(k));
                 if (bad && u) {
                   ps(u, "⚠ Tidak tersimpan (Code.gs belum di-update)", "#dc2626");
+                } else if (miss) {
+                  ps(u, "⚠ Sebagian akses ditolak server (cek Code.gs)", "#dc2626");
                 } else {
                   ps(u, "✓ Tersimpan");
                   if (ok) {
@@ -17196,17 +17302,14 @@ th { color: #5c7d6d; }
               if (k == "perm")
                 c.onchange = () => {
                   ps(u, "Menyimpan…", "#64748b");
-                  go(
-                    () =>
-                      api("userSet", {
-                        u,
-                        perms: [...$("#ub").querySelectorAll('input[data-k="perm"]')]
-                          .filter((i) => i.dataset.u == u && i.checked)
-                          .map((i) => i.value),
-                      }),
-                    "✓ Akses upload " + u + " tersimpan.",
-                    u,
-                  );
+                  window.__pt = window.__pt || {};
+                  clearTimeout(window.__pt[u]);
+                  window.__pt[u] = setTimeout(() => {
+                    const pm = [...$("#ub").querySelectorAll('input[data-k="perm"]')]
+                      .filter((i) => i.dataset.u == u && i.checked)
+                      .map((i) => i.value);
+                    go(() => api("userSet", { u, perms: pm }), "✓ Akses " + u + " tersimpan.", u, pm);
+                  }, 900);
                 };
               if (k == "act")
                 c.onclick = () =>
@@ -17628,6 +17731,7 @@ th { color: #5c7d6d; }
         } catch (e) {}
       }
       function open_(a) {
+        if (a.style.display === "none") return;
         links.forEach((x) => x.classList.toggle("on", x == a));
         if (a.closest("#gsub")) {
           $("#gsub").classList.add("open");
@@ -17702,12 +17806,26 @@ th { color: #5c7d6d; }
 
       function applyRole() {
         const adm = APP.role == "admin",
-          up = !adm && APP.perms.length > 0,
-          pl = APP.perms.map((k) => (PERMS.find((x) => x[0] == k) || [0, k])[1]).join(", ");
+          vm = !adm && hasVMenus(),
+          up2 = APP.perms.filter((k) => String(k).indexOf("v_") !== 0),
+          up = !adm && up2.length > 0,
+          pl = up2.map((k) => (PERMS.find((x) => x[0] == k) || [0, k])[1]).join(", ");
         links.forEach((a) => {
           if (a.dataset.admin) a.style.display = adm ? "" : "none";
+          else if (vm) a.style.display = APP.perms.includes(menuKey(a)) ? "" : "none";
           else if (a.dataset.s == "soh") a.style.display = APP.can("soh") ? "" : "none";
           else if (a.dataset.perm) a.style.display = APP.can(a.dataset.perm) ? "" : "none";
+        });
+        document.querySelectorAll("#sb .mh").forEach((h) => {
+          if (h.id == "mhA") return;
+          if (!vm) {
+            h.style.display = "";
+            return;
+          }
+          let vis = false;
+          for (let n = h.nextElementSibling; n && !n.classList.contains("mh"); n = n.nextElementSibling)
+            if (n.tagName == "A" && n.style.display != "none") vis = true;
+          h.style.display = vis ? "" : "none";
         });
         const mh = $("#mhA");
         if (mh) mh.style.display = adm ? "" : "none";
@@ -17773,7 +17891,7 @@ th { color: #5c7d6d; }
         APP.perms = normPerms(u.perms);
         document.body.classList.remove("lock");
         applyRole();
-        open_(links[0]);
+        open_(links.find((a) => a.dataset.f && a.style.display !== "none") || links[0]);
         if (API_URL) syncSoh();
         else
           idb
@@ -17807,7 +17925,7 @@ th { color: #5c7d6d; }
             return;
           }
           const f = document.getElementById(order[i++]);
-          if (!f || (f.id == "f8" && !APP.can("greenlist"))) return next();
+          if (!f || (f.id == "f8" && !canGreenlist())) return next();
           cap(ensure(f), 20000)
             .catch(() => {})
             .then(() => idle(next, { timeout: 600 }));
