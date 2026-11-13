@@ -12,7 +12,7 @@
          TAG             TAB / BAGIAN                          VARIABEL
          [API-SALES]     Sales (Kaizen Spirit)                 GAS_URL
          [API-BUDGET]    Budget                                PROCUREMENT_API_URL
-         [API-OOS]       OOS (Out of Stock)                    API_URL
+         [API-OOS]       OOS Nasional / Pilar / MK dan CK      API_URL (1 Apps Script; scope dikirim lewat parameter scope)
          [API-OTB]       Outstanding dan OTB                   API
          [API-AKUN-SOH]  Database akun login dan SOH (utama)  API_URL
          [API-GREENLIST] Greenlist (item master, sendiri)      API_URL (di dalam tab Greenlist, id="f8")
@@ -857,6 +857,12 @@
         #gsub.open{display:block!important}
         #gpar{cursor:pointer;user-select:none}
         #sb #gsub a{padding:8px 12px 8px 34px;font-size:13px;margin:1px 10px}
+        #opar{justify-content:space-between;cursor:pointer;user-select:none}
+        #opar .gch{font-size:16px;line-height:1;opacity:1;color:#fb923c;transition:transform .2s ease}
+        #opar.op .gch{transform:rotate(180deg)}
+        #osub{display:none}
+        #osub.open{display:block!important}
+        #sb #osub a{padding:8px 12px 8px 34px;font-size:13px;margin:1px 10px}
 
         /* ---------- Header ---------- */
         #hd{background:rgba(255,255,255,.86);padding:10px 24px;border-bottom:1px solid var(--bd);box-shadow:none;
@@ -1228,8 +1234,7 @@
       ><a data-f="sug" data-s="" data-t="Suggested Order">⊕ Suggested Order</a>
       <div class="mh">PERFORMANCE</div>
       <a data-f="f1" data-s="" data-t="Sales">↗ Sales</a><a data-f="f2" data-s="" data-t="Budget">$ Budget</a
-      ><a data-f="f3" data-s="" data-t="OOS (Out of Stock)">⚠ OOS (Out of Stock)</a
-      ><a data-f="f4" data-s="" data-t="SLA Supplier">◎ SLA Supplier</a
+      ><a id="opar">⚠ OOS<span class="gch">▾</span></a><div id="osub" class="gsub"><a data-f="f3" data-s="nasional" data-t="OOS · Nasional">Nasional</a><a data-f="f3" data-s="pilar" data-t="OOS · Pilar">Pilar</a><a data-f="f3" data-s="mkck" data-t="OOS · MK dan CK">MK dan CK</a></div><a data-f="f4" data-s="" data-t="SLA Supplier">◎ SLA Supplier</a
       ><a data-f="f5" data-s="" data-t="Outstanding &amp; OTB">◫ Outstanding &amp; OTB</a>
       <div class="mh" id="mhAn">ANALISIS</div>
       <a data-f="f6" data-s="" data-t="Officer Scorecard">◈ Officer Scorecard</a
@@ -7421,7 +7426,7 @@ thead th:last-child{border-top-right-radius:11px!important}
       &lt;div class=&quot;sticky-header-inner&quot;&gt;
         &lt;section class=&quot;hero&quot;&gt;
           &lt;div&gt;
-            &lt;h1&gt;OOS Dashboard&lt;/h1&gt;
+            &lt;h1 id=&quot;scopeTitle&quot;&gt;OOS Nasional&lt;/h1&gt;
           &lt;/div&gt;
           &lt;div class=&quot;hero-meta&quot;&gt;
             &lt;div class=&quot;chip&quot; id=&quot;generatedAtChip&quot;&gt;-&lt;/div&gt;
@@ -7714,7 +7719,16 @@ thead th:last-child{border-top-right-radius:11px!important}
     &lt;script src=&quot;https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js&quot;&gt;&lt;/script&gt;
     &lt;script&gt;
       // [API-OOS] URL Apps Script OOS (tab OOS / Out of Stock).
-      const API_URL = 'https://script.google.com/macros/s/AKfycbzVs-UhC0kbzcf3IH_A5fMTD0EioGbUShuS94kv_Mkh-7hrY1hH6Yoq4XJobUZBTU5nlA/exec';
+      const API_URL = 'https://script.google.com/macros/s/AKfycbwOEkWouSaZnDSOQqO-QinSQ6BVvJi5vrkgkiCpZlg7IcXAn5mfZyuNx7BbB5RPN24DSw/exec';
+      // Scope OOS: 1 Apps Script, 1 spreadsheet. Pembeda = parameter scope (sheet OOS / OOS_Pilar / OOS_MKCK).
+      const OOS_SCOPES = {
+        nasional: { title: 'OOS Nasional' },
+        pilar: { title: 'OOS Pilar' },
+        mkck: { title: 'OOS MK dan CK' }
+      };
+      let oosScope = '';
+      let loadSeq = 0;
+
 
       let dashboardData = null;
 
@@ -7745,6 +7759,7 @@ thead th:last-child{border-top-right-radius:11px!important}
       function buildApiUrl(action, params = {}) {
         const url = new URL(API_URL);
         url.searchParams.set('action', action);
+        url.searchParams.set('scope', oosScope || 'nasional');
 
         Object.keys(params).forEach(key =&gt; {
           const val = params[key];
@@ -7778,7 +7793,7 @@ thead th:last-child{border-top-right-radius:11px!important}
             // Backend tetap membaca body ini sebagai JSON biasa (lihat parsePostBody_).
             'Content-Type': 'text/plain;charset=utf-8'
           },
-          body: JSON.stringify({ action, ...payload })
+          body: JSON.stringify({ action, scope: oosScope || 'nasional', ...payload })
         });
 
         const data = await res.json();
@@ -7791,15 +7806,18 @@ thead th:last-child{border-top-right-radius:11px!important}
       }
 
       async function loadDashboard() {
+        const mySeq = loadSeq;
         try {
           // Tiga request dikirim BERSAMAAN (sebelumnya berurutan: dashboard -> feedback -> histori)
           const feedbackP = loadFeedbackFromServer();
           const historyP = loadHistory();
           const data = await fetchApi('dashboard');
+          if (mySeq !== loadSeq) { return; }
 
           dashboardData = data;
           const newUpdatedAt = data.databaseUpdatedAt || data.generatedAt || null;
           await feedbackP;
+          if (mySeq !== loadSeq) { return; }
           renderSummary();
           renderTopStores();
           renderOfficerTable();
@@ -7810,6 +7828,11 @@ thead th:last-child{border-top-right-radius:11px!important}
         } catch (err) {
           console.error(err);
           alert('Gagal load dashboard: ' + err.message);
+        } finally {
+          if (mySeq === loadSeq) {
+            const c = document.querySelector('.container');
+            if (c) { c.style.opacity = ''; }
+          }
         }
       }
 
@@ -7821,7 +7844,9 @@ thead th:last-child{border-top-right-radius:11px!important}
       async function loadHistory() {
         try {
           const limit = document.getElementById('historyRangeSelect')?.value || 30;
+          const mySeq = loadSeq;
           const data = await fetchApi('history', { limit });
+          if (mySeq !== loadSeq) { return; }
           renderHistoryChart(data.history || []);
         } catch (err) {
           console.error(err);
@@ -8145,7 +8170,9 @@ thead th:last-child{border-top-right-radius:11px!important}
 
       async function loadFeedbackFromServer() {
         try {
+          const mySeq = loadSeq;
           const data = await fetchApi('getFeedback');
+          if (mySeq !== loadSeq) { return false; }
           const prevLocked = Array.from(lockedItems);
           lockedItems.clear();
           prevLocked.forEach(k =&gt; { delete feedbackMap[k]; });
@@ -8766,7 +8793,29 @@ thead th:last-child{border-top-right-radius:11px!important}
         }
       });
 
-      window.addEventListener('DOMContentLoaded', loadDashboard);
+      // Dipanggil sidebar (data-s = nasional | pilar | mkck). Template sama, hanya sumber data (API) yang beda.
+      function go(s) {
+        if (!OOS_SCOPES[s]) { s = 'nasional'; }
+        if (s === oosScope) { return; }
+        oosScope = s;
+        loadSeq++;
+        dashboardData = null;
+        Object.keys(feedbackMap).forEach(function (k) { delete feedbackMap[k]; });
+        lockedItems.clear();
+        document.querySelectorAll('tbody').forEach(function (tb) { tb.innerHTML = ''; });
+        ['kpiOosStore', 'kpiOosPct', 'kpiMaster', 'kpiDimension'].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) { el.textContent = '-'; }
+        });
+        var t = document.getElementById('scopeTitle');
+        if (t) { t.textContent = OOS_SCOPES[s].title; }
+        var c = document.querySelector('.container');
+        if (c) { c.style.opacity = '.45'; }
+        loadDashboard();
+      }
+      window.addEventListener('DOMContentLoaded', function () {
+        setTimeout(function () { if (!oosScope) { go('nasional'); } }, 400);
+      });
     &lt;/script&gt;
   &lt;style id=&quot;unify&quot;&gt;html,body{background:#eef1f6!important;color:#1b2430!important;font-family:system-ui,-apple-system,&quot;Segoe UI&quot;,Roboto,sans-serif!important}
   body::before,body::after{display:none!important}
@@ -16635,6 +16684,7 @@ th { color: #5c7d6d; }
       const hasVMenus = () => (APP.perms || []).some((p) => String(p).indexOf("v_") === 0);
       const menuKey = (a) => {
         if (a.id == "gpar" || a.closest("#gsub")) return "v_greenlist";
+        if (a.id == "opar" || a.closest("#osub")) return "v_oos";
         const f = a.dataset.f;
         if (f == "f0") return "v_" + a.dataset.s;
         if (f == "stg") return "v_" + a.dataset.k;
@@ -17737,6 +17787,10 @@ th { color: #5c7d6d; }
           $("#gsub").classList.add("open");
           $("#gpar").classList.add("op");
         }
+        if (a.closest("#osub")) {
+          $("#osub").classList.add("open");
+          $("#opar").classList.add("op");
+        }
         document.querySelectorAll(".fr").forEach((f) => f.classList.toggle("on", f.id == a.dataset.f));
         $("#pt").textContent = a.dataset.t;
         $("#sb").classList.remove("open");
@@ -17803,6 +17857,37 @@ th { color: #5c7d6d; }
         };
       })();
       $("#bt").onclick = () => $("#sb").classList.toggle("open");
+      /* OOS: klik = buka/tutup submenu (Nasional / Pilar / MK dan CK). Semua submenu memakai iframe f3. */
+      (function () {
+        const par = $("#opar"),
+          sub = $("#osub"),
+          sb = $("#sb");
+        function setO(o) {
+          sub.classList.toggle("open", o);
+          par.classList.toggle("op", o);
+          par.setAttribute("aria-expanded", o ? "true" : "false");
+        }
+        function toggleO(e) {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          if (sub.classList.contains("open")) return setO(false);
+          setO(true);
+          if (!sub.querySelector("a.on")) {
+            const mob = sb.classList.contains("open");
+            open_(sub.querySelector("a"));
+            if (mob) sb.classList.add("open");
+          }
+        }
+        par.setAttribute("role", "button");
+        par.setAttribute("tabindex", "0");
+        par.setAttribute("aria-expanded", "false");
+        par.onclick = toggleO;
+        par.onkeydown = (e) => {
+          if (e.key === "Enter" || e.key === " ") toggleO(e);
+        };
+      })();
 
       function applyRole() {
         const adm = APP.role == "admin",
